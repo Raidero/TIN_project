@@ -1,0 +1,11 @@
+# depslib dependency file v1.0
+1523471604 source:c:\users\grzegorz\desktop\programy\tin_project\main.c
+	<stdlib.h>
+	"AccountService.h"
+
+1523471742 c:\users\grzegorz\desktop\programy\tin_project\accountservice.h
+	<stdio.h>
+
+1523471728 source:c:\users\grzegorz\desktop\programy\tin_project\accountservice.c
+	"AccountService.h"
+
