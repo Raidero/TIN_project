@@ -4,12 +4,12 @@ int logInService(char* login, char* passhash, char* ip)
 {
     if(isLoggedIn(ip))
     {
-        fprintf(stderr, "Account %s already logged in\n", login);
+        fprintf(stderr, "Player %s already logged in\n", login);
         return LOGGED_IN_ERROR;
     }
     if(verifyLoginAndPassword(login, passhash) == 1)
     {
-        fprintf(stderr, "Account %s already logged in\n", login);
+        fprintf(stderr, "Player %s already logged in\n", login);
         return WRONG_LOGIN_OR_PASSWORD;
     }
     //TODO
@@ -31,7 +31,7 @@ int createAccountService(char* login, char* passhash)
 {
     if(isLoginUsed(login))
     {
-        fprintf(stderr, "Account %s already exists\n", login);
+        fprintf(stderr, "Player %s already exists\n", login);
         return CREATE_ACCOUNT_ERROR;
     }
     //TODO
@@ -42,7 +42,7 @@ int deleteAccountService(char* login, char* passhash)
 {
     if(!isLoginUsed(login))
     {
-        fprintf(stderr, "Account %s doesn't exists\n", login);
+        fprintf(stderr, "Player %s doesn't exists\n", login);
         return DELETE_ACCOUNT_ERROR;
     }
     //TODO
@@ -82,4 +82,18 @@ bool verifyLoginAndPassword(char* login, char* passhash)
 {
     //TODO
     return 0;
+}
+
+char* loginToIp(struct AccountData* loggedaccounts, int numberofaccounts, char* login) //should we do it?
+{
+    int i;
+    for(i = 0; i < numberofaccounts; ++i)
+    {
+        if(loggedaccounts[i].login == login)
+        {
+            return loggedaccounts[i].currentip;
+        }
+    }
+    fprintf(stderr, "Failed to find ip for login %s", login);
+    return NULL;
 }

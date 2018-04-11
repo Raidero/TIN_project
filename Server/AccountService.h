@@ -1,3 +1,5 @@
+#ifndef ACCOUNT_SERVICE_GUARD
+#define ACCOUNT_SERVICE_GUARD
 #include <stdio.h>
 
 #define LOGGED_IN_ERROR 1
@@ -17,7 +19,8 @@ struct AccountData
 {
     char* login;
     char* passwordhash;
-
+    char* currentip;
+    bool ishost;
 };
 
 int logInService(char* login, char* passhash, char* ip);
@@ -31,3 +34,6 @@ int updateStats(struct AccountStatistics* stats);
 bool isLoginUsed(char* login);
 bool isLoggedIn(char* ip);
 bool verifyLoginAndPassword(char* login, char* passhash);
+char* loginToIp(struct AccountData* loggedaccounts, int numberofaccounts, char* login);
+
+#endif // ACCOUNT_SERVICE_GUARD
