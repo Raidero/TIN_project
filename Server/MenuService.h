@@ -4,8 +4,10 @@
 #include "RoomService.h"
 #include "AccountService.h"
 
+#define PLAYER_NOT_FOUND 1
+
 int connectAccountToRoomService(Room* rooms, int numberofrooms, char* ip);
 int setReadyToStartService();
-void voteForHostService(Room* room, char* login);
+int voteForHostService(Room* room, char* login);
 
 #endif // MENU_SERVICE_H
