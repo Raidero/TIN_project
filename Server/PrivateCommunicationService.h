@@ -1,7 +1,6 @@
 #ifndef PRIVATE_COMMUNICATION_SERVICE_H
 #define PRIVATE_COMMUNICATION_SERVICE_H
 
-
 typedef struct
 {
     char* receiver;
