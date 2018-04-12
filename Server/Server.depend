@@ -32,3 +32,33 @@
 1523479890 source:c:\users\grzegorz\desktop\programy\tin_project\server\roomservice.c
 	"RoomService.h"
 
+1523547538 source:/home/bmielcza/Desktop/git/TIN_project/Server/MenuService.c
+	"MenuService.h"
+
+1523547310 /home/bmielcza/Desktop/git/TIN_project/Server/MenuService.h
+	"RoomService.h"
+	"AccountService.h"
+
+1523547445 /home/bmielcza/Desktop/git/TIN_project/Server/RoomService.h
+	"AccountService.h"
+
+1523547279 /home/bmielcza/Desktop/git/TIN_project/Server/AccountService.h
+	<stdio.h>
+
+1523547223 source:/home/bmielcza/Desktop/git/TIN_project/Server/RoomService.c
+	"RoomService.h"
+
+1523547296 source:/home/bmielcza/Desktop/git/TIN_project/Server/AccountService.c
+	"AccountService.h"
+
+1523543744 source:/home/bmielcza/Desktop/git/TIN_project/Server/main.c
+	<stdlib.h>
+	"MenuService.h"
+	"AccountService.h"
+	"RoomService.h"
+	"PrivateCommunicationService.h"
+
+1523547166 /home/bmielcza/Desktop/git/TIN_project/Server/PrivateCommunicationService.h
+
+1523541306 source:/home/bmielcza/Desktop/git/TIN_project/Server/PrivateCommunicationService.c
+

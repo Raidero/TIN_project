@@ -1,6 +1,7 @@
 #include "RoomService.h"
+#include <stdio.h>
 
-int findFreeRoomForAccount(struct Room* rooms, int numberofrooms, char* ip)
+int findFreeRoomForAccount(Room* rooms, int numberofrooms, char* ip)
 {
     int i;
     if(rooms == NULL)
@@ -19,12 +20,12 @@ int findFreeRoomForAccount(struct Room* rooms, int numberofrooms, char* ip)
     return FREE_ROOM_NOT_FOUND;
 }
 
-void connectAccountToRoom(struct Room* room, char* ip)
+void connectAccountToRoom(Room* room, char* ip)
 {
-    room->playersips[room->currentsize++] = ip;
+//    room->playersips[room->currentsize++] = ip;
 }
 
-void createRoomForAccount(struct Room* rooms, int numberofrooms, char* ip)
+void createRoomForAccount(Room* rooms, int numberofrooms, char* ip)
 {
 
 }

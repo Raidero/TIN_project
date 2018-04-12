@@ -60,7 +60,7 @@ int changePasswordService(char* ip, char* oldpasshash, char* newpasshash)
     return 0;
 }
 
-int updateStats(struct AccountStatistics* stats)
+int updateStats(AccountStatistics* stats)
 {
     //TODO
     return 0;
@@ -84,7 +84,7 @@ bool verifyLoginAndPassword(char* login, char* passhash)
     return 0;
 }
 
-char* loginToIp(struct AccountData* loggedaccounts, int numberofaccounts, char* login) //should we do it?
+char* loginToIp(AccountData* loggedaccounts, int numberofaccounts, char* login) //should we do it?
 {
     int i;
     for(i = 0; i < numberofaccounts; ++i)

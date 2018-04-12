@@ -1,6 +1,6 @@
 #include "MenuService.h"
 
-int connectAccountToRoomService(struct Room* rooms, int numberofrooms, char* ip)
+int connectAccountToRoomService(Room* rooms, int numberofrooms, char* ip)
 {
     if(!isLoggedIn(ip))
     {
@@ -16,7 +16,7 @@ int connectAccountToRoomService(struct Room* rooms, int numberofrooms, char* ip)
     return 0;
 }
 
-void voteForHostService(struct Room* room, struct AccountData* loggedaccounts, int numberofaccouns, char* login)
+void voteForHostService(Room* room, AccountData* loggedaccounts, int numberofaccouns, char* login)
 {
     int i;
     char* ip = loginToIp(loggedaccounts, numberofaccouns, login);
@@ -26,10 +26,10 @@ void voteForHostService(struct Room* room, struct AccountData* loggedaccounts, i
     }
     for(i = 0; i < room->currentsize; ++i)
     {
-        if(room->playersips[i] == ip)
-        {
+        //if(room->playersips[i] == ip)
+        //{
             //TODO
-        }
+        //}
     }
 }
 

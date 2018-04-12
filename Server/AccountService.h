@@ -1,5 +1,5 @@
-#ifndef ACCOUNT_SERVICE_GUARD
-#define ACCOUNT_SERVICE_GUARD
+#ifndef ACCOUNT_SERVICE_H
+#define ACCOUNT_SERVICE_H
 #include <stdio.h>
 
 #define LOGGED_IN_ERROR 1
@@ -10,18 +10,18 @@
 
 typedef char bool;
 
-struct AccountStatistics
+typedef struct
 {
 
-};
+} AccountStatistics;
 
-struct AccountData
+typedef struct
 {
     char* login;
     char* passwordhash;
     char* currentip;
     bool ishost;
-};
+} AccountData;
 
 int logInService(char* login, char* passhash, char* ip);
 int logOutService(char* ip);
@@ -30,10 +30,10 @@ int deleteAccountService(char* login, char* passhash);
 int changePasswordService(char* ip, char* oldpasshash, char* newpasshash);
 
 
-int updateStats(struct AccountStatistics* stats);
+int updateStats(AccountStatistics* stats);
 bool isLoginUsed(char* login);
 bool isLoggedIn(char* ip);
 bool verifyLoginAndPassword(char* login, char* passhash);
-char* loginToIp(struct AccountData* loggedaccounts, int numberofaccounts, char* login);
+char* loginToIp(AccountData* loggedaccounts, int numberofaccounts, char* login);
 
-#endif // ACCOUNT_SERVICE_GUARD
+#endif // ACCOUNT_SERVICE_H
