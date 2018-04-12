@@ -84,12 +84,12 @@ bool verifyLoginAndPassword(char* login, char* passhash)
     return 0;
 }
 
-char* loginToIp(AccountData* loggedaccounts, int numberofaccounts, char* login) //should we do it?
+char* loginToIp(char* login, Room* room) //should we do it?
 {
     int i;
-    for(i = 0; i < numberofaccounts; ++i)
+    for(i = 0; i < room.currentsize; ++i)
     {
-        if(loggedaccounts[i].login == login)
+        //if(room.login == login)
         {
             return loggedaccounts[i].currentip;
         }

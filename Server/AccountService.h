@@ -34,6 +34,4 @@ int updateStats(AccountStatistics* stats);
 bool isLoginUsed(char* login);
 bool isLoggedIn(char* ip);
 bool verifyLoginAndPassword(char* login, char* passhash);
-char* loginToIp(AccountData* loggedaccounts, int numberofaccounts, char* login);
-
 #endif // ACCOUNT_SERVICE_H
