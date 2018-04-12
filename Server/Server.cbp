@@ -35,6 +35,14 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="AccountService.h" />
+		<Unit filename="MenuService.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="MenuService.h" />
+		<Unit filename="RoomService.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="RoomService.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
