@@ -98,3 +98,49 @@
 	<stdio.h>
 	<string.h>
 
+1523549964 source:/home/kjaszczuk/Desktop/TIN/TIN_project/Server/PrivateCommunicationService.c
+
+1523553068 source:/home/kjaszczuk/Desktop/TIN/TIN_project/Server/AccountService.c
+	"AccountService.h"
+	<stdio.h>
+	<string.h>
+
+1523553068 /home/kjaszczuk/Desktop/TIN/TIN_project/Server/AccountService.h
+
+1523557802 source:/home/kjaszczuk/Desktop/TIN/TIN_project/Server/main.c
+	<stdlib.h>
+	<stdio.h>
+	"MenuService.h"
+	"AccountService.h"
+	"RoomService.h"
+	"PrivateCommunicationService.h"
+	"Server.h"
+
+1523553068 /home/kjaszczuk/Desktop/TIN/TIN_project/Server/MenuService.h
+	"RoomService.h"
+	"AccountService.h"
+
+1523553068 /home/kjaszczuk/Desktop/TIN/TIN_project/Server/RoomService.h
+	"AccountService.h"
+
+1523550138 /home/kjaszczuk/Desktop/TIN/TIN_project/Server/PrivateCommunicationService.h
+
+1523553068 source:/home/kjaszczuk/Desktop/TIN/TIN_project/Server/MenuService.c
+	"MenuService.h"
+	<stdio.h>
+	<string.h>
+
+1523553068 source:/home/kjaszczuk/Desktop/TIN/TIN_project/Server/RoomService.c
+	"RoomService.h"
+	<stdio.h>
+	<string.h>
+
+1523558751 source:/home/kjaszczuk/Desktop/TIN/TIN_project/Server/Server.c
+	<sys/types.h>
+	<sys/socket.h>
+	<netdb.h>
+	<netinet/in.h>
+	<stdio.h>
+
+1523558613 /home/kjaszczuk/Desktop/TIN/TIN_project/Server/Server.h
+

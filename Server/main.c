@@ -5,6 +5,8 @@
 #include "AccountService.h"
 #include "RoomService.h"
 #include "PrivateCommunicationService.h"
+#include "Server.h"
+
 int main()
 {
     printf("Hello world!\n");
