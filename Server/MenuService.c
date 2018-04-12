@@ -11,13 +11,12 @@ int connectAccountToRoomService(Room* rooms, int numberofrooms, char* ip)
     if(findFreeRoomForAccount(rooms, numberofrooms, ip))
     {
         createRoomForAccount(rooms, numberofrooms, ip);
-
     }
     //TODO
     return 0;
 }
 
-void voteForHostService(Room* room, char* login)
+int voteForHostService(Room* room, char* login)
 {
     int i;
     char* ip = loginToIp(room->players, room->currentsize, login);
@@ -33,7 +32,10 @@ void voteForHostService(Room* room, char* login)
         }
     }
     fprintf(stderr, "Failed to find player with given ip: %s", ip);
+    return PLAYER_NOT_FOUND;
 }
+
+
 
 
 
