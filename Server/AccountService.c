@@ -1,5 +1,6 @@
 #include "AccountService.h"
-
+#include <stdio.h>
+#include <string.h>
 int logInService(char* login, char* passhash, char* ip)
 {
     if(isLoggedIn(ip))
@@ -84,14 +85,14 @@ bool verifyLoginAndPassword(char* login, char* passhash)
     return 0;
 }
 
-char* loginToIp(AccountData* loggedaccounts, int numberofaccounts, char* login) //should we do it?
+char* loginToIp(AccountData* accountsinroom, int numberofaccounts, char* login) //should we do it?
 {
     int i;
     for(i = 0; i < numberofaccounts; ++i)
     {
-        if(loggedaccounts[i].login == login)
+        if(strcmp(accountsinroom[i].login, login))
         {
-            return loggedaccounts[i].currentip;
+            return accountsinroom[i].currentip;
         }
     }
     fprintf(stderr, "Failed to find ip for login %s", login);

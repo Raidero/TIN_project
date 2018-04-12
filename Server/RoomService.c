@@ -1,6 +1,6 @@
 #include "RoomService.h"
 #include <stdio.h>
-
+#include <string.h>
 int findFreeRoomForAccount(Room* rooms, int numberofrooms, char* ip)
 {
     int i;

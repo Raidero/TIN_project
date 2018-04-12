@@ -12,7 +12,7 @@
 1523481369 source:c:\users\grzegorz\desktop\programy\tin_project\server\accountservice.c
 	"AccountService.h"
 
-1523481380 c:\users\grzegorz\desktop\programy\tin_project\server\accountservice.h
+1523547833 c:\users\grzegorz\desktop\programy\tin_project\server\accountservice.h
 	<stdio.h>
 
 1523478962 source:c:\users\grzegorz\desktop\programy\tin_project\server\main.c
@@ -23,7 +23,7 @@
 	"RoomService.h"
 	"AccountService.h"
 
-1523479849 source:c:\users\grzegorz\desktop\programy\tin_project\server\menuservice.c
+1523481728 source:c:\users\grzegorz\desktop\programy\tin_project\server\menuservice.c
 	"MenuService.h"
 
 1523479890 c:\users\grzegorz\desktop\programy\tin_project\server\roomservice.h
@@ -61,4 +61,40 @@
 1523547166 /home/bmielcza/Desktop/git/TIN_project/Server/PrivateCommunicationService.h
 
 1523541306 source:/home/bmielcza/Desktop/git/TIN_project/Server/PrivateCommunicationService.c
+
+1523549928 source:c:\users\grzegorz\desktop\programy\tin\tin_project\server\privatecommunicationservice.c
+
+1523552074 source:c:\users\grzegorz\desktop\programy\tin\tin_project\server\roomservice.c
+	"RoomService.h"
+	<stdio.h>
+	<string.h>
+
+1523551896 c:\users\grzegorz\desktop\programy\tin\tin_project\server\roomservice.h
+	"AccountService.h"
+
+1523552248 c:\users\grzegorz\desktop\programy\tin\tin_project\server\accountservice.h
+
+1523552063 source:c:\users\grzegorz\desktop\programy\tin\tin_project\server\accountservice.c
+	"AccountService.h"
+	<stdio.h>
+	<string.h>
+
+1523552026 source:c:\users\grzegorz\desktop\programy\tin\tin_project\server\main.c
+	<stdlib.h>
+	<stdio.h>
+	"MenuService.h"
+	"AccountService.h"
+	"RoomService.h"
+	"PrivateCommunicationService.h"
+
+1523551916 c:\users\grzegorz\desktop\programy\tin\tin_project\server\menuservice.h
+	"RoomService.h"
+	"AccountService.h"
+
+1523549928 c:\users\grzegorz\desktop\programy\tin\tin_project\server\privatecommunicationservice.h
+
+1523552658 source:c:\users\grzegorz\desktop\programy\tin\tin_project\server\menuservice.c
+	"MenuService.h"
+	<stdio.h>
+	<string.h>
 

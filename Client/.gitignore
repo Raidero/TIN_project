@@ -1,3 +1,5 @@
 *.o
+*.layout
+*.depend
 obj/
 bin/
