@@ -1,6 +1,6 @@
 #ifndef ACCOUNT_SERVICE_H
 #define ACCOUNT_SERVICE_H
-#include <stdio.h>
+
 
 #define LOGGED_IN_ERROR 1
 #define WRONG_LOGIN_OR_PASSWORD 2
@@ -20,7 +20,7 @@ typedef struct
     char* login;
     char* passwordhash;
     char* currentip;
-    bool ishost;
+    int votercounter;
 } AccountData;
 
 int logInService(char* login, char* passhash, char* ip);
@@ -34,4 +34,6 @@ int updateStats(AccountStatistics* stats);
 bool isLoginUsed(char* login);
 bool isLoggedIn(char* ip);
 bool verifyLoginAndPassword(char* login, char* passhash);
+char* loginToIp(AccountData* accountsinroom, int numberofaccounts, char* login);
+
 #endif // ACCOUNT_SERVICE_H

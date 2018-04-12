@@ -9,7 +9,7 @@ typedef struct
 {
     short capacity;
     short currentsize;
-    AccountData* playersips;
+    AccountData* players;
 } Room;
 
 int findFreeRoomForAccount(Room* rooms, int numberofrooms, char* ip);

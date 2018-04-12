@@ -1,5 +1,6 @@
 #include "MenuService.h"
-
+#include <stdio.h>
+#include <string.h>
 int connectAccountToRoomService(Room* rooms, int numberofrooms, char* ip)
 {
     if(!isLoggedIn(ip))
@@ -16,21 +17,22 @@ int connectAccountToRoomService(Room* rooms, int numberofrooms, char* ip)
     return 0;
 }
 
-void voteForHostService(Room* room, AccountData* loggedaccounts, int numberofaccouns, char* login)
+void voteForHostService(Room* room, char* login)
 {
     int i;
-    char* ip = loginToIp(loggedaccounts, numberofaccouns, login);
+    char* ip = loginToIp(room->players, room->currentsize, login);
     if(ip == NULL)
     {
-        //TODO
+        fprintf(stderr, "Failed to find player with given ip: %s", ip);
     }
     for(i = 0; i < room->currentsize; ++i)
     {
-        //if(room->playersips[i] == ip)
-        //{
-            //TODO
-        //}
+        if(strcmp(room->players[i].currentip, ip))
+        {
+            ++room->players[i].votercounter;
+        }
     }
+    fprintf(stderr, "Failed to find player with given ip: %s", ip);
 }
 
 

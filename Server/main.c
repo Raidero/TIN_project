@@ -1,4 +1,6 @@
 #include <stdlib.h>
+#include <stdio.h>
+
 #include "MenuService.h"
 #include "AccountService.h"
 #include "RoomService.h"

@@ -6,6 +6,6 @@
 
 int connectAccountToRoomService(Room* rooms, int numberofrooms, char* ip);
 int setReadyToStartService();
-void voteForHostService(Room* room, AccountData* loggedaccounts, int numberofaccouns, char* login);
+void voteForHostService(Room* room, char* login);
 
 #endif // MENU_SERVICE_H
