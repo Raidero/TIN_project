@@ -9,8 +9,8 @@ typedef struct
 
 typedef struct
 {
-	Header header;
-    char* message;	/* overflow protection -- but only @ client? */
+    Header header;
+    char* message;
 } Message;
 
 int sendMessageToPlayerService(Message* message);
