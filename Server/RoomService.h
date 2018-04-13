@@ -1,10 +1,9 @@
 #ifndef ROOM_SERVICE_H
 #define ROOM_SERVICE_H
-
+#include <stdio.h>
+#include <string.h>
 #include "AccountService.h"
 #include "Defines.h"
-
-
 
 typedef struct
 {

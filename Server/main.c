@@ -1,14 +1,16 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "MenuService.h"
-#include "AccountService.h"
-#include "RoomService.h"
-#include "PrivateCommunicationService.h"
 #include "Server.h"
 
 int main()
 {
-    printf("Hello world!\n");
+    int serversocket;
+    int serverport;
+    struct sockaddr_in serveraddress;
+     serveraddress.sin_family = AF_INET;
+    initServer(&serversocket, &serverport, &serveraddress);
+    startServer(serversocket, serverport, serveraddress);
+
     return 0;
 }
