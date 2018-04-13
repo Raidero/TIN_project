@@ -1,0 +1,24 @@
+#ifndef DEFINES_H
+#define DEFINES_H
+
+#define FREE_ROOM_NOT_FOUND 1
+#define MAX_ROOM_COUNT 16
+#define MAX_PLAYER_COUNT 16
+#define PLAYER_NOT_FOUND 1
+#define OUT_OF_RANGE 1
+#define IP_NOT_FOUND 1
+#define ERROR_OPENING_SOCKET 1
+#define ERROR_BINDING_SOCKET 2
+#define ERROR_STARTING_SERVER 3
+#define MAX_CONNECTION_LIMIT 128
+#define LOGGED_IN_ERROR 1
+#define WRONG_LOGIN_OR_PASSWORD 2
+#define LOGGED_OUT_ERROR 1
+#define CREATE_ACCOUNT_ERROR 1
+#define DELETE_ACCOUNT_ERROR 1
+#define MAX_ACCOUNTS_COUNT 512
+#define MAX_LOGIN_LENGTH 32
+#define MAX_PASSHASH_LENGTH 256  //???have to change it later, to the value that hash function will return
+
+#endif // DEFINES_H
+

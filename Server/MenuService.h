@@ -3,11 +3,11 @@
 
 #include "RoomService.h"
 #include "AccountService.h"
+#include "Defines.h"
 
-#define PLAYER_NOT_FOUND 1
 
-int connectAccountToRoomService(Room* rooms, int numberofrooms, char* ip);
-int setReadyToStartService();
-int voteForHostService(Room* room, char* login);
+int connectAccountToRoomService(AccountData* account);
+int setReadyToStartService(uint32_t ip, unsigned short roomid);
+int voteForHostService(char* login, unsigned short roomid); //fully done, but i'm not sure about this one, votecounter in Room struct seems odd
 
 #endif // MENU_SERVICE_H

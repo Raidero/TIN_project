@@ -6,11 +6,8 @@
 #include <netdb.h>
 #include <netinet/in.h>
 #include <stdio.h>
+#include "Defines.h"
 
-#define ERROR_OPENING_SOCKET 1
-#define ERROR_BINDING_SOCKET 2
-#define ERROR_STARTING_SERVER 3
-#define MAX_CONNECTION_LIMIT 128
 
 void initServer(int* serversocketfd, int* portnumber, struct sockaddr_in* server_address)
 {
