@@ -36,6 +36,7 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="AccountService.h" />
+		<Unit filename="Defines.h" />
 		<Unit filename="MenuService.c">
 			<Option compilerVar="CC" />
 		</Unit>

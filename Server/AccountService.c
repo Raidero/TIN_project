@@ -1,58 +1,66 @@
 #include "AccountService.h"
 #include <stdio.h>
 #include <string.h>
-int logInService(char* login, char* passhash, char* ip)
+
+AccountData* loggedaccounts[MAX_ACCOUNTS_COUNT];
+
+int logInService(AccountData* account)
 {
-    if(isLoggedIn(ip))
+    if(isLoggedIn(account->currentip))
     {
-        fprintf(stderr, "Player %s already logged in\n", login);
+        fprintf(stderr, "Player %s already logged in\n", account->login);
         return LOGGED_IN_ERROR;
     }
-    if(verifyLoginAndPassword(login, passhash) == 1)
+    if(verifyLoginAndPassword(account))
     {
-        fprintf(stderr, "Player %s already logged in\n", login);
+        fprintf(stderr, "Player %s already logged in\n", account->login);
         return WRONG_LOGIN_OR_PASSWORD;
     }
-    //TODO
+    //TODO find login and hash for password in file, if there is, load it
     return 0;
 }
 
-int logOutService(char* ip)
+int logOutService(uint32_t ip)
 {
-    if(!isLoggedIn(ip))
+    int i;
+    for(i = 0; i < MAX_ACCOUNTS_COUNT; ++i)
     {
-        fprintf(stderr, "Player is not logged in\n");
-        return LOGGED_OUT_ERROR;
+        if(loggedaccounts[i] != NULL && loggedaccounts[i]->currentip == ip)
+        {
+            free(loggedaccounts[i]);    //only one person can logout own account, so it is safe not to use any mutex
+            loggedaccounts[i] = NULL;
+            return 0;
+        }
     }
-    //TODO
-    return 0;
+    fprintf(stderr, "Player is not logged in\n");
+    return LOGGED_OUT_ERROR;
 }
 
-int createAccountService(char* login, char* passhash)
+int createAccountService(AccountData* account)
 {
-    if(isLoginUsed(login))
+    if(isLoginUsed(account->login))
     {
-        fprintf(stderr, "Player %s already exists\n", login);
+        fprintf(stderr, "Player %s already exists\n", account->login);
         return CREATE_ACCOUNT_ERROR;
     }
-    //TODO
+    //TODO save in file data for account, login and password hash, make place for statistics
     return 0;
 }
 
-int deleteAccountService(char* login, char* passhash)
+int deleteAccountService(AccountData* account)
 {
-    if(!isLoginUsed(login))
+    if(!isLoginUsed(account->login))
     {
-        fprintf(stderr, "Player %s doesn't exists\n", login);
+        fprintf(stderr, "Player %s doesn't exists\n", account->login);
         return DELETE_ACCOUNT_ERROR;
     }
-    //TODO
+    //TODO delete account from file, delete stats
     return 0;
 }
 
-int changePasswordService(char* ip, char* oldpasshash, char* newpasshash)
+int changePasswordService(AccountData* account, char* newpasshash)
 {
-    if(!isLoggedIn(ip))
+    if(!isLoggedIn(account->currentip))
     {
         fprintf(stderr, "Player is not logged in\n");
         return LOGGED_OUT_ERROR;
@@ -69,32 +77,46 @@ int updateStats(AccountStatistics* stats)
 
 bool isLoginUsed(char* login)
 {
-    //TODO
+    int i;
+    for(i = 0; i < MAX_ACCOUNTS_COUNT; ++i)
+    {
+        if(loggedaccounts[i] != NULL && !strcmp(loggedaccounts[i]->login, login))
+        {
+            return 1;
+        }
+    }
     return 0;
 }
 
-bool isLoggedIn(char* ip)
-{
-    //TODO
-    return 0;
-}
-
-bool verifyLoginAndPassword(char* login, char* passhash)
-{
-    //TODO
-    return 0;
-}
-
-char* loginToIp(AccountData* accountsinroom, int numberofaccounts, char* login) //should we do it?
+bool isLoggedIn(uint32_t ip)
 {
     int i;
-    for(i = 0; i < numberofaccounts; ++i)
+    for(i = 0; i < MAX_ACCOUNTS_COUNT; ++i)
     {
-        if(strcmp(accountsinroom[i].login, login))
+        if(loggedaccounts[i] != NULL && loggedaccounts[i]->currentip == ip)
         {
-            return accountsinroom[i].currentip;
+            return 1;
+        }
+    }
+    return 0;
+}
+
+bool verifyLoginAndPassword(AccountData* account)
+{
+    //TODO check in file if the account login and hash is there, compare them, and if they are ok, return 0 on success
+    return 0;
+}
+
+uint32_t loginToIp(AccountData** accountsinroom, char* login) //we have to think if it can't be made easier
+{
+    int i;
+    for(i = 0; i < MAX_PLAYER_COUNT; ++i)
+    {
+        if(accountsinroom[i] != NULL && !strcmp(accountsinroom[i]->login, login))
+        {
+            return accountsinroom[i]->currentip;
         }
     }
     fprintf(stderr, "Failed to find ip for login %s", login);
-    return NULL;
+    return 0;
 }

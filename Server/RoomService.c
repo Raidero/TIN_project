@@ -1,35 +1,41 @@
 #include "RoomService.h"
 #include <stdio.h>
 #include <string.h>
-int findFreeRoomForAccount(Room* rooms, AccountData* playerdata)
+
+Room* rooms[MAX_ROOM_COUNT];
+
+int findFreeRoomForAccount(AccountData* playerdata)
 {
-    int i;
+    uint16_t i, j;
 
     for(i = 0; i < MAX_ROOM_COUNT; ++i)
     {
-        if(rooms[i].currentsize < rooms[i].MAX_PLAYER_COUNT)
+        for(j = 0; j < MAX_PLAYER_COUNT; ++j)
         {
-			// mutex
-            connectAccountToRoom(&rooms[i], playerdata);
-            return 0;
+            if(rooms[i]->players[j] == NULL)
+            {
+                connectAccountToRoom(rooms[i], playerdata, j);
+                return 0;
+            }
         }
     }
     return FREE_ROOM_NOT_FOUND;
 }
 
-int connectAccountToRoom(Room* room, AccountData* playerdata)
+int connectAccountToRoom(Room* room, AccountData* playerdata, uint16_t index)
 {
-    room->players[room->currentsize++] = playerdata;
-
+    //lock
+    room->players[index] = playerdata; //many players can try to take place in room at once
+    //unlock
 	return 0;
 }
 
-int createRoomForAccount(Room* rooms, char* ip)
+int createRoomForAccount(AccountData* playerdata)
 {
 	return 0;
 }
 
-int refreshRoom(Room* room, char* ip)
+int refreshRoom(uint16_t roomid) // have to check if id is not out of range of max possible id to don't check out of table range data
 {
 	return 0;
 }

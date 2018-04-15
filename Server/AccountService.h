@@ -1,12 +1,9 @@
 #ifndef ACCOUNT_SERVICE_H
 #define ACCOUNT_SERVICE_H
 
-
-#define LOGGED_IN_ERROR 1
-#define WRONG_LOGIN_OR_PASSWORD 2
-#define LOGGED_OUT_ERROR 1
-#define CREATE_ACCOUNT_ERROR 1
-#define DELETE_ACCOUNT_ERROR 1
+#include <stdint.h>
+#include <stdlib.h>
+#include "Defines.h"
 
 typedef char bool;
 
@@ -17,23 +14,26 @@ typedef struct
 
 typedef struct
 {
-    char* login;
-    char* passwordhash;
-    char* currentip;
+    uint16_t accountid;                     //place in file
+    char login[MAX_LOGIN_LENGTH];
+    char passwordhash[MAX_PASSHASH_LENGTH];
+    uint32_t currentip;                     //changed so it now reflects ip from in_addr struct
     int votercounter;
 } AccountData;
 
-int logInService(char* login, char* passhash, char* ip);
-int logOutService(char* ip);
-int createAccountService(char* login, char* passhash);
-int deleteAccountService(char* login, char* passhash);
-int changePasswordService(char* ip, char* oldpasshash, char* newpasshash);
+extern AccountData* loggedaccounts[MAX_ACCOUNTS_COUNT];
+
+int logInService(AccountData* account);    //there needs to be added max login length and max passhash length
+int logOutService(uint32_t ip); //fully done, someone please check
+int createAccountService(AccountData* account); //max..
+int deleteAccountService(AccountData* account); //maxx...
+int changePasswordService(AccountData* account, char* newpasshash); //max lenth passhashnew !!
 
 
-int updateStats(AccountStatistics* stats);
-bool isLoginUsed(char* login);
-bool isLoggedIn(char* ip);
-bool verifyLoginAndPassword(char* login, char* passhash);
-char* loginToIp(AccountData* accountsinroom, int numberofaccounts, char* login);
+int updateStats(AccountStatistics* stats); //TODO
+bool isLoginUsed(char* login); // fully done, Krzysiu or Bartek, please check
+bool isLoggedIn(uint32_t ip);  // fully done, Krzysiu or Bartek, please check
+bool verifyLoginAndPassword(AccountData* account); //TODO
+uint32_t loginToIp(AccountData** accountsinroom, char* login); //fully done, Krzysiu or Bartek, please check
 
 #endif // ACCOUNT_SERVICE_H

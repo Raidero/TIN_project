@@ -1,39 +1,63 @@
 #include "MenuService.h"
 #include <stdio.h>
 #include <string.h>
-int connectAccountToRoomService(Room* rooms, int numberofrooms, char* ip)
+
+
+int connectAccountToRoomService(AccountData* account)
 {
-    if(!isLoggedIn(ip))
+    if(!isLoggedIn(account->currentip))
     {
         fprintf(stderr, "Player is not logged in\n");
         return LOGGED_IN_ERROR;
     }
-    if(findFreeRoomForAccount(rooms, numberofrooms, ip))
+    if(findFreeRoomForAccount(account))
     {
-        createRoomForAccount(rooms, numberofrooms, ip);
+        createRoomForAccount(account);
     }
     //TODO
     return 0;
 }
 
-int voteForHostService(Room* room, char* login)
+int setReadyToStartService(uint32_t ip, unsigned short roomid)
 {
-    int i;
-    char* ip = loginToIp(room->players, room->currentsize, login);
-    if(ip == NULL)
+    if(roomid >= MAX_ROOM_COUNT)
     {
-        fprintf(stderr, "Failed to find player with given ip: %s", ip);
+        fprintf(stderr, "Specified roomid is out of range");
+        return OUT_OF_RANGE;
     }
-    for(i = 0; i < room->currentsize; ++i)
+    int i;
+    for(i = 0; i < MAX_PLAYER_COUNT; ++i)
     {
-        if(strcmp(room->players[i].currentip, ip))
+        if(rooms[roomid]->players[i] != NULL && rooms[roomid]->players[i]->currentip == ip)
         {
-            ++room->players[i].votercounter;
+            rooms[roomid]->isplayerready[i] = 1; //1 == TRUE
+            return 0;
         }
     }
-    fprintf(stderr, "Failed to find player with given ip: %s", ip);
+    return IP_NOT_FOUND;
+}
+
+int voteForHostService(char* login, unsigned short roomid)
+{
+    if(roomid >= MAX_ROOM_COUNT)
+    {
+        fprintf(stderr, "Specified roomid is out of range");
+        return OUT_OF_RANGE;
+    }
+    int i;
+    uint32_t ip = loginToIp(rooms[roomid]->players, login);
+    for(i = 0; i < MAX_PLAYER_COUNT; ++i)
+    {
+        if(rooms[roomid]->players[i] != NULL && rooms[roomid]->players[i]->currentip == ip)
+        {
+            ++rooms[roomid]->players[i]->votercounter;
+        }
+    }
+    fprintf(stderr, "Failed to find player with given ip: %d", ip);
     return PLAYER_NOT_FOUND;
 }
+
+
 
 
 
