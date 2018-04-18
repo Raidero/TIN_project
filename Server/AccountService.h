@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include "Defines.h"
+#include <stdio.h>
+#include <string.h>
 
 typedef char bool;
 

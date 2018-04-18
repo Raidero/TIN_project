@@ -1,5 +1,7 @@
 #ifndef MENU_SERVICE_H
 #define MENU_SERVICE_H
+#include <stdio.h>
+#include <string.h>
 
 #include "RoomService.h"
 #include "AccountService.h"
