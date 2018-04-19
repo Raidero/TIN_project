@@ -25,5 +25,6 @@
 int initServer(int* serversocketfd, int* portnumber, struct sockaddr_in* serveraddress);
 int startServer(int serversocketfd, int portnumber, struct sockaddr_in serveraddress);
 void* services();
+pthread_t* requestNewMemory(pthread_t* threads, int numberofthreads);
 
 #endif // SERVER_H

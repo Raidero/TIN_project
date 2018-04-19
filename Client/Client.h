@@ -21,7 +21,7 @@
 #define DEFAULT_PORT 8001
 #define DEFAULT_IP "10.0.2.15"
 
-int initClient(int* serversocketfd, short* portnumber, struct sockaddr_in* server_address);
-int startClient(int serversocketfd, struct sockaddr_in server_address);
+int initClient(int* serversocketfd, short* portnumber, struct sockaddr_in* serveraddress);
+int startClient(int serversocketfd, struct sockaddr_in serveraddress);
 
 #endif // CLIENT_H
