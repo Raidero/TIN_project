@@ -32,33 +32,48 @@
 1523479890 source:c:\users\grzegorz\desktop\programy\tin_project\server\roomservice.c
 	"RoomService.h"
 
-1523547538 source:/home/bmielcza/Desktop/git/TIN_project/Server/MenuService.c
+1524083644 source:/home/bmielcza/Desktop/git/TIN_project/Server/MenuService.c
 	"MenuService.h"
-
-1523547310 /home/bmielcza/Desktop/git/TIN_project/Server/MenuService.h
-	"RoomService.h"
-	"AccountService.h"
-
-1523547445 /home/bmielcza/Desktop/git/TIN_project/Server/RoomService.h
-	"AccountService.h"
-
-1523547279 /home/bmielcza/Desktop/git/TIN_project/Server/AccountService.h
 	<stdio.h>
+	<string.h>
 
-1523547223 source:/home/bmielcza/Desktop/git/TIN_project/Server/RoomService.c
+1524083644 /home/bmielcza/Desktop/git/TIN_project/Server/MenuService.h
+	<stdio.h>
+	<string.h>
 	"RoomService.h"
-
-1523547296 source:/home/bmielcza/Desktop/git/TIN_project/Server/AccountService.c
 	"AccountService.h"
+	"Defines.h"
 
-1523543744 source:/home/bmielcza/Desktop/git/TIN_project/Server/main.c
+1524083644 /home/bmielcza/Desktop/git/TIN_project/Server/RoomService.h
+	<stdio.h>
+	<string.h>
+	"AccountService.h"
+	"Defines.h"
+
+1524083644 /home/bmielcza/Desktop/git/TIN_project/Server/AccountService.h
+	<stdint.h>
 	<stdlib.h>
-	"MenuService.h"
-	"AccountService.h"
-	"RoomService.h"
-	"PrivateCommunicationService.h"
+	"Defines.h"
+	<stdio.h>
+	<string.h>
 
-1523547166 /home/bmielcza/Desktop/git/TIN_project/Server/PrivateCommunicationService.h
+1524083644 source:/home/bmielcza/Desktop/git/TIN_project/Server/RoomService.c
+	"RoomService.h"
+	<stdio.h>
+	<string.h>
+
+1524083644 source:/home/bmielcza/Desktop/git/TIN_project/Server/AccountService.c
+	"AccountService.h"
+	<stdio.h>
+	<string.h>
+
+1524137642 source:/home/bmielcza/Desktop/git/TIN_project/Server/main.c
+	<stdlib.h>
+	<stdio.h>
+	<arpa/inet.h>
+	"Server.h"
+
+1524083644 /home/bmielcza/Desktop/git/TIN_project/Server/PrivateCommunicationService.h
 
 1523541306 source:/home/bmielcza/Desktop/git/TIN_project/Server/PrivateCommunicationService.c
 
@@ -165,4 +180,29 @@
 	"PrivateCommunicationService.h"
 
 1524078381 /home/kjaszczuk/Desktop/TIN/TIN_project/Server/Defines.h
+
+1524083644 /home/bmielcza/Desktop/git/TIN_project/Server/Defines.h
+
+1524137642 /home/bmielcza/Desktop/git/TIN_project/Server/Server.h
+	<sys/types.h>
+	<sys/socket.h>
+	<netdb.h>
+	<netinet/in.h>
+	<stdio.h>
+	<pthread.h>
+	<strings.h>
+	<unistd.h>
+	<arpa/inet.h>
+	"MenuService.h"
+	"PrivateCommunicationService.h"
+
+1524137642 source:/home/bmielcza/Desktop/git/TIN_project/Server/Server.c
+	"Server.h"
+	<sys/types.h>
+	<sys/socket.h>
+	<netdb.h>
+	<netinet/in.h>
+	<stdio.h>
+	<pthread.h>
+	"Defines.h"
 
