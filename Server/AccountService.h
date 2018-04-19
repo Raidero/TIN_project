@@ -7,7 +7,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifndef __cplusplus
 typedef char bool;
+#endif // __cplusplus
 
 typedef struct
 {

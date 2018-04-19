@@ -19,6 +19,8 @@
 					<Add library="pthread" />
 					<Add library="libboost_system" />
 					<Add library="boost_unit_test_framework" />
+					<Add library="boost_filesystem" />
+					<Add directory="/home/bmielcza/Desktop/git/TIN_project/Server" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -76,6 +78,7 @@
 		<Unit filename="../Server.h">
 			<Option virtualFolder="Headers/src/" />
 		</Unit>
+		<Unit filename="AccountServiceTests.cpp" />
 		<Unit filename="test_main.cpp" />
 		<Extensions>
 			<code_completion />
