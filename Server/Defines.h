@@ -19,6 +19,13 @@
 #define MAX_ACCOUNTS_COUNT 512
 #define MAX_LOGIN_LENGTH 32
 #define MAX_PASSHASH_LENGTH 256  //???have to change it later, to the value that hash function will return
+#define DATA_FILE_NAME "accountdata"
+#define DATA_FILE_MODE "a+b"
+#define OPEN_FILE_ERROR 500
+#define FILE_NOT_OPEN 501
+#define FILE_WRITE_ERROR 502
+#define FILE_READ_ERROR 503
+#define MAX_ACCOUNTS_LOGGED_IN_ERROR 504
 
 #endif // DEFINES_H
 
