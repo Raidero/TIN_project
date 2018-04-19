@@ -18,7 +18,6 @@ typedef struct
 
 typedef struct
 {
-    uint16_t accountid;                     //place in file
     char login[MAX_LOGIN_LENGTH];
     char passwordhash[MAX_PASSHASH_LENGTH];
     uint32_t currentip;                     //changed so it now reflects ip from in_addr struct

@@ -4,6 +4,36 @@
 
 AccountData* loggedaccounts[MAX_ACCOUNTS_COUNT];
 FILE* datafile = NULL;
+
+
+AccountData* init(char* login, char* passwordhash, uint32_t currentip, int votercounter)
+{
+    int i = 0;
+    AccountData* acc = (AccountData*)malloc(sizeof(AccountData));
+    while(login[i] != '\0')
+    {
+        acc->login[i] = login[i];
+        ++i;
+        if(i >= MAX_LOGIN_LENGTH)
+        {
+            acc->login[MAX_LOGIN_LENGTH - 1] = '\0';
+        }
+    }
+    i = 0;
+    while(passwordhash[i] != '\0')
+    {
+        acc->passwordhash[i] = passwordhash[i];
+        ++i;
+        if(i >= MAX_PASSHASH_LENGTH)
+        {
+            acc->login[MAX_PASSHASH_LENGTH - 1] = '\0';
+        }
+    }
+    acc->currentip = currentip;
+    acc->votercounter = votercounter;
+    return acc;
+}
+
 int logInService(AccountData* account)
 {
     int i;
@@ -71,12 +101,35 @@ int createAccountService(AccountData* account)
 
 int deleteAccountService(AccountData* account)
 {
+    if(isLoggedIn(account->currentip))
+    {
+        fprintf(stderr, "Player %s logged in, cannot delete logged in account\n", account->login);
+        return LOGGED_IN_ERROR;
+    }
     if(!isLoginUsed(account->login))
     {
         fprintf(stderr, "Player %s doesn't exists\n", account->login);
         return DELETE_ACCOUNT_ERROR;
     }
-    //TODO delete account from file, delete stats
+    if(verifyLoginAndPassword(account))
+    {
+        fprintf(stderr, "Wrong login or password for login: %s\n", account->login);
+        return WRONG_LOGIN_OR_PASSWORD;
+    } //look at the comment in function below (changePAsswordService)
+    if(datafile == NULL)
+    {
+        fprintf(stderr, "File is not open\n");
+        return FILE_NOT_OPEN;
+    }
+    bzero(&account, sizeof(*account));
+    fseek(datafile, -sizeof(*account), SEEK_CUR);
+    fwrite(&account, sizeof(*account), 1, datafile);
+    if(ferror(datafile))
+    {
+        fprintf(stderr, "Cannot write to file\n");
+        return FILE_WRITE_ERROR;
+    }
+    printf("Deleted account");
     return 0;
 }
 
@@ -91,8 +144,21 @@ int changePasswordService(AccountData* account, char* newpasshash)
     {
         fprintf(stderr, "Wrong login or password for login: %s\n", account->login);
         return WRONG_LOGIN_OR_PASSWORD;
+    } //now file cursor is set right after the struct Account data for which we look for
+    //because verifyLoginAndPassword set it that way, so now we have to back -sizeof(AccountData)
+    if(datafile == NULL)
+    {
+        fprintf(stderr, "File is not open\n");
+        return FILE_NOT_OPEN;
     }
-    //TODO
+    strcpy(account->passwordhash, newpasshash);
+    fseek(datafile, -sizeof(*account), SEEK_CUR);
+    fwrite(account, sizeof(*account), 1, datafile);
+    if(ferror(datafile))
+    {
+        fprintf(stderr, "Cannot write to file\n");
+        return FILE_WRITE_ERROR;
+    }
     return 0;
 }
 
@@ -104,6 +170,11 @@ int updateStats(AccountStatistics* stats)
 
 bool isLoginUsed(char* login)
 {
+    if(datafile == NULL)
+    {
+        fprintf(stderr, "File is not open\n");
+        return 0;
+    }
     AccountData tocompare;
     fseek(datafile, 0L, SEEK_SET);
     while(!feof(datafile))
@@ -137,6 +208,11 @@ bool isLoggedIn(uint32_t ip)
 
 bool verifyLoginAndPassword(AccountData* account)
 {
+    if(datafile == NULL)
+    {
+        fprintf(stderr, "File is not open\n");
+        return 0;
+    }
     AccountData tocompare;
     fseek(datafile, 0L, SEEK_SET);
     while(!feof(datafile))
@@ -189,5 +265,21 @@ int closeDataFile()
         return FILE_NOT_OPEN;
     }
     fclose(datafile);
+    return 0;
+}
+
+int deleteDataFile()
+{
+    if(datafile == NULL)
+    {
+        datafile = fopen(DATA_FILE_NAME, "wr+b");
+        fclose(datafile);
+    }
+    else
+    {
+        fclose(datafile);
+        datafile = fopen(DATA_FILE_NAME, "wr+b");
+        fclose(datafile);
+    }
     return 0;
 }
