@@ -71,17 +71,42 @@ int createAccountService(AccountData* account)
 
 int deleteAccountService(AccountData* account)
 {
+    AccountData tocompare;
     if(!isLoginUsed(account->login))
     {
         fprintf(stderr, "Player %s doesn't exists\n", account->login);
         return DELETE_ACCOUNT_ERROR;
     }
-    //TODO delete account from file, delete stats
+    fseek(datafile, 0L, SEEK_SET);
+    while(!feof(datafile))
+    {
+        fread(&tocompare, sizeof(tocompare), 1, datafile);
+        if(ferror(datafile))
+        {
+            fprintf(stderr, "Cannot read from file\n");
+            return FILE_READ_ERROR;
+        }
+        if(!strcmp(tocompare.login, account->login)
+        && !strcmp(tocompare.passwordhash, account->passwordhash))
+        {
+            return 1;
+        }
+    }
+    fseek(datafile, -sizeof(tocompare), SEEK_CUR);
+    bzero(&tocompare, sizeof(tocompare));
+    fwrite(&tocompare, sizeof(tocompare), 1, datafile);
+    if(ferror(datafile))
+    {
+        fprintf(stderr, "Cannot write to file\n");
+        return FILE_WRITE_ERROR;
+    }
+    printf("Deleted account with login: %s", account->login);
     return 0;
 }
 
 int changePasswordService(AccountData* account, char* newpasshash)
 {
+    AccountData tocompare;
     if(!isLoggedIn(account->currentip))
     {
         fprintf(stderr, "Player is not logged in\n");
@@ -92,7 +117,29 @@ int changePasswordService(AccountData* account, char* newpasshash)
         fprintf(stderr, "Wrong login or password for login: %s\n", account->login);
         return WRONG_LOGIN_OR_PASSWORD;
     }
-    //TODO
+    strcpy(account.passwordhash, newpasshash);
+    fseek(datafile, 0L, SEEK_SET);
+    while(!feof(datafile))
+    {
+        fread(&tocompare, sizeof(tocompare), 1, datafile);
+        if(ferror(datafile))
+        {
+            fprintf(stderr, "Cannot read from file\n");
+            return FILE_READ_ERROR;
+        }
+        if(!strcmp(tocompare.login, account->login)
+        && !strcmp(tocompare.passwordhash, account->passwordhash))
+        {
+            return 1;
+        }
+    }
+    fseek(datafile, -sizeof(tocompare), SEEK_CUR);
+    fwrite(account, sizeof(*account), 1, datafile);
+    if(ferror(datafile))
+    {
+        fprintf(stderr, "Cannot write to file\n");
+        return FILE_WRITE_ERROR;
+    }
     return 0;
 }
 
@@ -190,4 +237,19 @@ int closeDataFile()
     }
     fclose(datafile);
     return 0;
+}
+
+int deleteDataFile()
+{
+    if(datafile == NULL)
+    {
+        datafile = fopen(DATA_FILE_NAME, "wr+b");
+        fclose(datafile);
+    }
+    else
+    {
+        fclose(datafile);
+        datafile = fopen(DATA_FILE_NAME, "wr+b");
+        fclose(datafile);
+    }
 }
