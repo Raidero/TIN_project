@@ -24,6 +24,7 @@ typedef struct
 } AccountData;
 
 extern AccountData* loggedaccounts[MAX_ACCOUNTS_COUNT];
+extern FILE* datafile;
 
 int logInService(AccountData* account);    //there needs to be added max login length and max passhash length
 int logOutService(uint32_t ip); //fully done, someone please check
@@ -37,5 +38,6 @@ bool isLoginUsed(char* login); // fully done, Krzysiu or Bartek, please check
 bool isLoggedIn(uint32_t ip);  // fully done, Krzysiu or Bartek, please check
 bool verifyLoginAndPassword(AccountData* account); //TODO
 uint32_t loginToIp(AccountData** accountsinroom, char* login); //fully done, Krzysiu or Bartek, please check
-
+int initDataFile();
+int closeDataFile();
 #endif // ACCOUNT_SERVICE_H

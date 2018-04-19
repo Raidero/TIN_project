@@ -181,9 +181,52 @@
 
 1524078381 /home/kjaszczuk/Desktop/TIN/TIN_project/Server/Defines.h
 
-1524083644 /home/bmielcza/Desktop/git/TIN_project/Server/Defines.h
+1523827808 source:/home/grzegorz/Desktop/TIN_project/Server/MenuService.c
+	"MenuService.h"
+	<stdio.h>
+	<string.h>
 
-1524137642 /home/bmielcza/Desktop/git/TIN_project/Server/Server.h
+1524079446 /home/grzegorz/Desktop/TIN_project/Server/MenuService.h
+	<stdio.h>
+	<string.h>
+	"RoomService.h"
+	"AccountService.h"
+	"Defines.h"
+
+1524079446 /home/grzegorz/Desktop/TIN_project/Server/RoomService.h
+	<stdio.h>
+	<string.h>
+	"AccountService.h"
+	"Defines.h"
+
+1524145033 /home/grzegorz/Desktop/TIN_project/Server/AccountService.h
+	<stdint.h>
+	<stdlib.h>
+	"Defines.h"
+	<stdio.h>
+	<string.h>
+
+1524147790 /home/grzegorz/Desktop/TIN_project/Server/Defines.h
+
+1523827808 source:/home/grzegorz/Desktop/TIN_project/Server/PrivateCommunicationService.c
+
+1523827808 source:/home/grzegorz/Desktop/TIN_project/Server/RoomService.c
+	"RoomService.h"
+	<stdio.h>
+	<string.h>
+
+1524145056 source:/home/grzegorz/Desktop/TIN_project/Server/AccountService.c
+	"AccountService.h"
+	<stdio.h>
+	<string.h>
+
+1524144275 source:/home/grzegorz/Desktop/TIN_project/Server/main.c
+	<stdlib.h>
+	<stdio.h>
+	<arpa/inet.h>
+	"Server.h"
+
+1524144236 /home/grzegorz/Desktop/TIN_project/Server/Server.h
 	<sys/types.h>
 	<sys/socket.h>
 	<netdb.h>
@@ -196,7 +239,9 @@
 	"MenuService.h"
 	"PrivateCommunicationService.h"
 
-1524137642 source:/home/bmielcza/Desktop/git/TIN_project/Server/Server.c
+1524079446 /home/grzegorz/Desktop/TIN_project/Server/PrivateCommunicationService.h
+
+1524144236 source:/home/grzegorz/Desktop/TIN_project/Server/Server.c
 	"Server.h"
 	<sys/types.h>
 	<sys/socket.h>

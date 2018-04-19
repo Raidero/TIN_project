@@ -3,9 +3,10 @@
 #include <string.h>
 
 AccountData* loggedaccounts[MAX_ACCOUNTS_COUNT];
-
+FILE* datafile = NULL;
 int logInService(AccountData* account)
 {
+    int i;
     if(isLoggedIn(account->currentip))
     {
         fprintf(stderr, "Player %s already logged in\n", account->login);
@@ -13,11 +14,20 @@ int logInService(AccountData* account)
     }
     if(verifyLoginAndPassword(account))
     {
-        fprintf(stderr, "Player %s already logged in\n", account->login);
+        fprintf(stderr, "Wrong login or password for login: %s\n", account->login);
         return WRONG_LOGIN_OR_PASSWORD;
     }
-    //TODO find login and hash for password in file, if there is, load it
-    return 0;
+    for(i = 0; i < MAX_ACCOUNTS_COUNT; ++i)
+    {
+        if(loggedaccounts[i] == NULL)
+        {
+            loggedaccounts[i] = account;
+            printf("Player %s logged in", account->login);
+            return 0;
+        }
+    }
+    fprintf(stderr, "Maximum server capacity reached\n");
+    return MAX_ACCOUNTS_LOGGED_IN_ERROR;
 }
 
 int logOutService(uint32_t ip)
@@ -29,6 +39,7 @@ int logOutService(uint32_t ip)
         {
             free(loggedaccounts[i]);    //only one person can logout own account, so it is safe not to use any mutex
             loggedaccounts[i] = NULL;
+            printf("Player logged out");
             return 0;
         }
     }
@@ -43,7 +54,18 @@ int createAccountService(AccountData* account)
         fprintf(stderr, "Player %s already exists\n", account->login);
         return CREATE_ACCOUNT_ERROR;
     }
-    //TODO save in file data for account, login and password hash, make place for statistics
+    if(datafile == NULL)
+    {
+        fprintf(stderr, "File is not open\n");
+        return FILE_NOT_OPEN;
+    }
+    fseek(datafile, 0L, SEEK_END);
+    fwrite(account, sizeof(*account), 1, datafile);
+    if(ferror(datafile))
+    {
+        fprintf(stderr, "Cannot write to file\n");
+        return FILE_WRITE_ERROR;
+    }
     return 0;
 }
 
@@ -65,6 +87,11 @@ int changePasswordService(AccountData* account, char* newpasshash)
         fprintf(stderr, "Player is not logged in\n");
         return LOGGED_OUT_ERROR;
     }
+    if(verifyLoginAndPassword(account))
+    {
+        fprintf(stderr, "Wrong login or password for login: %s\n", account->login);
+        return WRONG_LOGIN_OR_PASSWORD;
+    }
     //TODO
     return 0;
 }
@@ -77,10 +104,17 @@ int updateStats(AccountStatistics* stats)
 
 bool isLoginUsed(char* login)
 {
-    int i;
-    for(i = 0; i < MAX_ACCOUNTS_COUNT; ++i)
+    AccountData tocompare;
+    fseek(datafile, 0L, SEEK_SET);
+    while(!feof(datafile))
     {
-        if(loggedaccounts[i] != NULL && !strcmp(loggedaccounts[i]->login, login))
+        fread(&tocompare, sizeof(tocompare), 1, datafile);
+        if(ferror(datafile))
+        {
+            fprintf(stderr, "Cannot read from file\n");
+            return 0;
+        }
+        if(!strcmp(tocompare.login, login))
         {
             return 1;
         }
@@ -103,7 +137,22 @@ bool isLoggedIn(uint32_t ip)
 
 bool verifyLoginAndPassword(AccountData* account)
 {
-    //TODO check in file if the account login and hash is there, compare them, and if they are ok, return 0 on success
+    AccountData tocompare;
+    fseek(datafile, 0L, SEEK_SET);
+    while(!feof(datafile))
+    {
+        fread(&tocompare, sizeof(tocompare), 1, datafile);
+        if(ferror(datafile))
+        {
+            fprintf(stderr, "Cannot read from file\n");
+            return 0;
+        }
+        if(!strcmp(tocompare.login, account->login)
+        && !strcmp(tocompare.passwordhash, account->passwordhash))
+        {
+            return 1;
+        }
+    }
     return 0;
 }
 
@@ -118,5 +167,27 @@ uint32_t loginToIp(AccountData** accountsinroom, char* login) //we have to think
         }
     }
     fprintf(stderr, "Failed to find ip for login %s", login);
+    return 0;
+}
+
+int initDataFile()
+{
+    datafile = fopen(DATA_FILE_NAME, DATA_FILE_MODE);
+    if(datafile == NULL)
+    {
+        fprintf(stderr, "Can't open data file\n");
+        return OPEN_FILE_ERROR;
+    }
+    return 0;
+}
+
+int closeDataFile()
+{
+    if(datafile == NULL)
+    {
+        fprintf(stderr, "File is not open\n");
+        return FILE_NOT_OPEN;
+    }
+    fclose(datafile);
     return 0;
 }
