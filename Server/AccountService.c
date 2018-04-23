@@ -108,7 +108,7 @@ int deleteAccountService(AccountData* account)
     }
     if(!isLoginUsed(account->login))
     {
-        fprintf(stderr, "Player %s doesn't exists\n", account->login);
+        fprintf(stderr, "Player %s doesn't exist\n", account->login);
         return DELETE_ACCOUNT_ERROR;
     }
     if(verifyLoginAndPassword(account))
