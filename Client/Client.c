@@ -36,7 +36,7 @@ int startClient(int clientsocketfd, struct sockaddr_in serveraddress)
     /*connect client to server using connect call*/
     if (connect(clientsocketfd,(struct sockaddr *) &serveraddress, sizeof(serveraddress)) < 0)
     {
-        fprintf(stderr, "Couldn't connect client to server");
+        fprintf(stderr, "Couldn't connect client to server\n");
         return ERROR_CONNECTING_CLIENT;
     }
     printf("Please enter the message: ");
