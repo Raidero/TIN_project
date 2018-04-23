@@ -13,9 +13,13 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
+					<Add directory="include" />
 				</Compiler>
 				<Linker>
 					<Add library="pthread" />
+					<Add library="sfml-graphics" />
+					<Add library="sfml-window" />
+					<Add library="sfml-system" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -25,6 +29,7 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
+					<Add directory="include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -38,9 +43,9 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Client.h" />
-		<Unit filename="main.c">
-			<Option compilerVar="CC" />
-		</Unit>
+		<Unit filename="include/MenuViewModel.h" />
+		<Unit filename="main.cpp" />
+		<Unit filename="src/MenuViewModel.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />
