@@ -33,12 +33,12 @@ int createAccountService(AccountData* account); //max..
 int deleteAccountService(AccountData* account); //maxx...
 int changePasswordService(AccountData* account, char* newpasshash); //max lenth passhashnew !!
 
-
 int updateStats(AccountStatistics* stats); //TODO
 bool isLoginUsed(char* login); // fully done, Krzysiu or Bartek, please check
 bool isLoggedIn(uint32_t ip);  // fully done, Krzysiu or Bartek, please check
-bool verifyLoginAndPassword(AccountData* account); //TODO
+bool verifyLoginAndPassword(AccountData* account); // done
 uint32_t loginToIp(AccountData** accountsinroom, char* login); //fully done, Krzysiu or Bartek, please check
 int initDataFile();
 int closeDataFile();
+int deleteDataFile();
 #endif // ACCOUNT_SERVICE_H

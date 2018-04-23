@@ -16,16 +16,16 @@ BOOST_AUTO_TEST_SUITE(AccountServiceTests)
 //int add( int i, int j ) { return i+j; }
 
 
-BOOST_AUTO_TEST_CASE( GivenAccount_TryToCreateAccount_Successful )
+BOOST_AUTO_TEST_CASE( GivenAccountData_TryingToCreateAccount_ProcessIsSuccessful )
 {
-	datafile = fopen(DATA_FILE_NAME, "wr+b");
-	fclose(datafile);
+	/// zmienic totalnie - AccountData* init()
+	deleteDataFile();	// empty or create empty datafile
 
 	BOOST_REQUIRE(initDataFile() == 0);
+
 	AccountData account;
 	strcpy(account.login, "login1");
 	strcpy(account.passwordhash, "hashed1");
-
 
 	BOOST_REQUIRE(createAccountService(&account) == 0);
 
@@ -49,6 +49,155 @@ BOOST_AUTO_TEST_CASE( GivenAccount_TryToCreateAccount_Successful )
                          "add(..) result: " << add( 2,2 ) );
 
     BOOST_CHECK_EQUAL( add( 2,2 ), 4 );	  // #7 continues on error*/
+}
+
+
+BOOST_AUTO_TEST_CASE( GivenSameAccountDatas_WhenTryingToCreate2Accounts_ProcessIsUnsuccessful )
+{
+// TODO
+
+}
+
+
+// logIn
+BOOST_AUTO_TEST_CASE( GivenNonEmptyAccountDataFile_WhenTryingToLogIn_UserIsLoggedIn )
+{
+// TODO
+
+}
+
+BOOST_AUTO_TEST_CASE( GivenNonEmptyAccountDataFile_WhenTryingToLogIn_UserIsNotRegistered )
+{
+// TODO
+
+}
+
+BOOST_AUTO_TEST_CASE( GivenLoggedInUser_WhenTryingToLogIn_UserIsAlreadyLoggedIn )
+{
+// TODO
+
+}
+
+BOOST_AUTO_TEST_CASE( GivenFullServer_WhenTryingToLogIn_ReturnError )
+{
+// TODO
+
+}
+
+
+// logOut
+BOOST_AUTO_TEST_CASE( GivenNonEmptyServer_WhenTryingToLogOut_UserIsLoggedOut )
+{
+// TODO
+
+}
+
+BOOST_AUTO_TEST_CASE( GivenNonEmptyServer_WhenTryingToLogOut_ReturnErrorUserIsNotLoggedIn )
+{
+// TODO
+
+}
+
+BOOST_AUTO_TEST_CASE( GivenNonEmptyServer_WhenTryingToLogOut_UserIsNotRegistered )
+{
+// TODO
+
+}
+
+BOOST_AUTO_TEST_CASE( GivenEmptyServer_WhenTryingToLogOut_ReturnError )
+{
+// TODO
+
+}
+
+
+// createAccountService
+BOOST_AUTO_TEST_CASE( GivenAccountData_WhenTryingToCreateAccount_UserIsRegistered )
+{
+// TODO
+
+}
+
+BOOST_AUTO_TEST_CASE( GivenAccountDataWithRegisteredUser_WhenTryingToCreateAccount_ReturnError )
+{
+// TODO
+
+}
+
+BOOST_AUTO_TEST_CASE( GivenNonExistentDataFile_WhenTryingToCreateAccount_ReturnError )
+{
+// TODO
+
+}
+
+
+// deleteAccountService
+BOOST_AUTO_TEST_CASE( GivenNonEmptyAccountDataFile_WhenTryingToDeleteUser_UserNoLongerExists )
+{
+// TODO
+
+}
+
+BOOST_AUTO_TEST_CASE( GivenLoggedInUser_WhenTryingToDeleteItsData_ReturnError )
+{
+// TODO
+
+}
+
+BOOST_AUTO_TEST_CASE( GivenNonEmptyAccountDataFile_WhenTryingToDeleteNonExistentUser_ReturnError )
+{
+// TODO
+
+}
+
+BOOST_AUTO_TEST_CASE( GivenEmptyAccountDataFile_WhenTryingToDeleteUser_ReturnError )
+{
+// TODO
+
+}
+
+BOOST_AUTO_TEST_CASE( GivenWrongPassword_WhenTryingToDeleteUser_UserStillExists )
+{
+// TODO
+
+}
+
+BOOST_AUTO_TEST_CASE( GivenNonExistentAccountDataFile_WhenTryingToDeleteUser_ReturnError )
+{
+// TODO
+
+}
+
+
+// changePasswordService
+BOOST_AUTO_TEST_CASE( GivenAccountDataFile_WhenTryingToChangePassword_PasswordIsChanged )
+{
+// TODO
+
+}
+
+BOOST_AUTO_TEST_CASE( GivenEmptyAccountDataFile_WhenTryingToChangePassword_ReturnError )
+{
+// TODO
+
+}
+
+BOOST_AUTO_TEST_CASE( GivenNotLoggedInUser_WhenTryingToChangePassword_ReturnError )
+{
+// TODO
+
+}
+
+BOOST_AUTO_TEST_CASE( GivenAccountDataWithWrongPassword_WhenTryingToChangePassword_ReturnError )
+{
+// TODO
+
+}
+
+BOOST_AUTO_TEST_CASE( GivenNonExistentAccountDataFile_WhenTryingToChangePassword_ReturnError )
+{
+// TODO
+
 }
 
 
