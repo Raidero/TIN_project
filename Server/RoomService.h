@@ -19,11 +19,14 @@ typedef struct
 
 extern Room* rooms[MAX_ROOM_COUNT];
 
+Room* initRoom();
+void disposeRoom(int roomid);
+void checkIfRoomIsEmptyAndDispose(int roomid);
 int findFreeRoomForAccount(AccountData* playerdata);
 int connectAccountToRoom(Room* room, AccountData* playerdata, int index);
 int createRoomForAccount(AccountData* playerdata);
 char* refreshRoomService(AccountData* playerdata, int roomid);
 
-int sweepPlayer(AccountData* playerdata);	// function looks for a player and removes it from a room
+int sweepPlayer(AccountData* playerdata, int roomid);	// function looks for a player and removes it from a room
 //create function that check if all the players are still in the room
 #endif // ROOM_SERVICE_H

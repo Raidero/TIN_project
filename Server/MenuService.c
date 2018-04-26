@@ -5,27 +5,33 @@
 
 int connectAccountToRoomService(AccountData* account)
 {
+    int roomid = 0;
     if(!isLoggedIn(account->currentip))
     {
         fprintf(stderr, "Player is not logged in\n");
         return LOGGED_IN_ERROR;
     }
-    if(findFreeRoomForAccount(account))
+    roomid = findFreeRoomForAccount(account);
+    if(roomid < 0)
     {
-        createRoomForAccount(account);
+        roomid = createRoomForAccount(account);
+        if(roomid < 0)
+        {
+            fprintf(stderr, "Couldn't connect account to any room\n");
+            return roomid;
+        }
     }
-    //TODO
-    return 0;
+    return roomid;
 }
 
-int setReadyToStartService(uint32_t ip, unsigned short roomid)
+int setReadyToStartService(uint32_t ip, int roomid)
 {
-    if(roomid >= MAX_ROOM_COUNT)
+    int i;
+    if(roomid < 0 && roomid >= MAX_ROOM_COUNT)
     {
-        fprintf(stderr, "Specified roomid is out of range");
+        fprintf(stderr, "Specified roomid is out of range: %d", roomid);
         return OUT_OF_RANGE;
     }
-    int i;
     for(i = 0; i < MAX_PLAYER_COUNT; ++i)
     {
         if(rooms[roomid]->players[i] != NULL && rooms[roomid]->players[i]->currentip == ip)
@@ -37,11 +43,11 @@ int setReadyToStartService(uint32_t ip, unsigned short roomid)
     return IP_NOT_FOUND;
 }
 
-int voteForHostService(char* login, unsigned short roomid)
+int voteForHostService(char* login, int roomid)
 {
-    if(roomid >= MAX_ROOM_COUNT)
+    if(roomid < 0 && roomid >= MAX_ROOM_COUNT)
     {
-        fprintf(stderr, "Specified roomid is out of range");
+        fprintf(stderr, "Specified roomid is out of range: %d", roomid);
         return OUT_OF_RANGE;
     }
     int i;
