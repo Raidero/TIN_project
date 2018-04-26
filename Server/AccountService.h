@@ -27,6 +27,7 @@ typedef struct
 extern AccountData* loggedaccounts[MAX_ACCOUNTS_COUNT];
 extern FILE* datafile;
 
+void initAccountService();
 AccountData* initAccoundData(char* login, char* passwordhash, uint32_t currentip, int votercounter);
 void disposeAccountData(int i);
 int logInService(AccountData* account);    //there needs to be added max login length and max passhash length

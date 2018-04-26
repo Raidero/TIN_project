@@ -7,7 +7,12 @@ pthread_mutex_t queuelock;
 
 void initQueue()
 {
+    int i;
     pthread_mutex_init(&queuelock, NULL);
+    for(i = 0; i < MAX_QUEUE_LENGTH; ++i)
+    {
+        queue[i] = NULL;
+    }
 }
 
 void disposeQueue()
@@ -50,6 +55,16 @@ void popElement(Event* element)
         }
     }
     pthread_mutex_unlock(&queuelock);
+}
+
+Event* createEvent(void (*func)(void), char* args, int socket, char message)
+{
+    Event* event = (Event*)malloc(sizeof(Event));
+    event->functionpointer = func;
+    event->argumentsbuffer = args;
+    event->socket = socket;
+    event->message = message;
+    return event;
 }
 
 void* startEventHandler()

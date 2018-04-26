@@ -6,6 +6,15 @@ extern AccountData* loggedaccounts[MAX_ACCOUNTS_COUNT];
 
 Room* rooms[MAX_ROOM_COUNT];
 
+void initRoomService()
+{
+    int i;
+    for(i = 0; i < MAX_ROOM_COUNT; ++i)
+    {
+        rooms[i] = NULL;
+    }
+}
+
 Room* initRoom()
 {
     int i;

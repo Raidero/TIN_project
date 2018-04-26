@@ -19,6 +19,7 @@ typedef struct
 
 extern Room* rooms[MAX_ROOM_COUNT];
 
+void initRoomService();
 Room* initRoom();
 void disposeRoom(int roomid);
 void checkIfRoomIsEmptyAndDispose(int roomid);

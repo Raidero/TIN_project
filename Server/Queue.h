@@ -21,8 +21,9 @@ Event* queue[MAX_QUEUE_LENGTH];
 
 void initQueue();
 void disposeQueue();
-void addElement();
-void popElement();
+void addNewElement(Event* element);
+void popElement(Event* element);
+Event* createEvent(void (*func)(void), char* args, int socket, char message);
 void* startEventHandler();
 
 #endif // QUEUE_H

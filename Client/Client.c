@@ -31,7 +31,7 @@ int initClient(int* clientsocketfd, short* portnumber, struct sockaddr_in* serve
 int startClient(int clientsocketfd, struct sockaddr_in serveraddress)
 {
     int n;
-    char buffer[256];
+    char buffer[BUFFER_SIZE];
 
     /*connect client to server using connect call*/
     if (connect(clientsocketfd,(struct sockaddr *) &serveraddress, sizeof(serveraddress)) < 0)
@@ -43,16 +43,16 @@ int startClient(int clientsocketfd, struct sockaddr_in serveraddress)
     while(1)
     {
 
-        bzero(buffer, 256);
-        fgets(buffer, 255, stdin);
+        bzero(buffer, BUFFER_SIZE);
+        fgets(buffer, BUFFER_SIZE, stdin);
         n = write(clientsocketfd, buffer, strlen(buffer));
         if (n < 0)
         {
             fprintf(stderr, "Couldn't write to socket");
             return ERROR_WRITING_TO_SOCKET;
         }
-        bzero(buffer, 256);
-        n = read(clientsocketfd, buffer, 255);
+        bzero(buffer, BUFFER_SIZE);
+        n = read(clientsocketfd, buffer, BUFFER_SIZE);
         if (n < 0)
         {
             fprintf(stderr, "Couldn't read from socket");

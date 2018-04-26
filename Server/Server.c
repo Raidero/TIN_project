@@ -1,12 +1,17 @@
 #include "Server.h"
 #include "Defines.h"
 
-int* newclientsocketfd;
 pthread_t newClientThread;
 int serversocketfd;
+int *newclientsocketfd;
 
-int initServer(int* portnumber, struct sockaddr_in* serveraddress)
+int initServer(struct sockaddr_in* serveraddress)
 {
+    int i;
+    for(i = 0; i < MAX_THREADS_COUNT; ++i)
+    {
+        threads[i] = 0;
+    }
     /*first call to socket function*/
     int option = 1;
     serversocketfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -21,7 +26,6 @@ int initServer(int* portnumber, struct sockaddr_in* serveraddress)
         return ERROR_SETTING_SOCKET_OPTIONS;
     }
     bzero((char *) serveraddress, sizeof(*serveraddress));
-    *portnumber = DEFAULT_PORT;
 
     /*initialize socket structure*/
     serveraddress->sin_family = AF_INET;
@@ -38,7 +42,7 @@ int initServer(int* portnumber, struct sockaddr_in* serveraddress)
     return 0;
 }
 
-int startServer(int portnumber, struct sockaddr_in server_address)
+int startServer(struct sockaddr_in server_address)
 {
     struct sockaddr_in client_address;
     unsigned int client_length = sizeof(client_address);
@@ -50,27 +54,39 @@ int startServer(int portnumber, struct sockaddr_in server_address)
         *newclientsocketfd = accept(serversocketfd, (struct sockaddr *) &client_address, &client_length);
         if(*newclientsocketfd < 0)
         {
-            fprintf(stderr, "Couldn't start server\n");
+            fprintf(stderr, "Couldn't accept connection\n");
             return ERROR_STARTING_SERVER;
         }
-        if (pthread_create(&newClientThread, NULL, services, newclientsocketfd))
+        if(createNewThread(newclientsocketfd) < 0)
         {
             fprintf(stderr, "Couldn't create new thread");
             return ERROR_CREATING_THREAD;
         }
-
     }
     return 0;
 }
 
 void intHandler(int sig_num)
 {
-    if(newClientThread != NULL)
+    int i;
+    for(i = 0; i < MAX_THREADS_COUNT; ++i)
     {
-        pthread_kill(newClientThread, 0);
-        if(newclientsocketfd != NULL)
-            close(*newclientsocketfd);
+        if(threads[i] != 0)
+        {
+            pthread_join(threads[i], NULL);
+        }
     }
+    /*for(i = 0; i < MAX_THREADS_COUNT; ++i)
+    {
+        if(threads[i] != NULL)
+        {
+            pthread_kill(*threads[i], 0);
+            if(sockets[i] != NULL)
+            {
+                close(*sockets[i]);
+            }
+        }
+    }*/ ///in case we want to kill all the threads
     close(serversocketfd);
     exit(0);
 }
@@ -85,8 +101,8 @@ void* services(void *i)
     while(1)
     {
         bzero(buffer, BUFFER_SIZE);
-        readbytes = read(socket, buffer, 1);
-        if(readbytes < 0 && accountid >= 0)
+        readbytes = recv(socket, buffer, 1, MSG_WAITALL);
+        if(readbytes <= 0)
         {
             if(accountid >= 0)
             {
@@ -95,18 +111,36 @@ void* services(void *i)
                 disposeAccountData(accountid);
             }
             close(socket);
-            break;//bye
+            free(i);
+            pthread_exit(NULL);
+            //break;//bye
         }
         else if(readbytes >= 1) //here we come
         {
             switch(buffer[0])
             {
-                case REQUEST_LOGIN:
+                case 48:
                 {
+                    send(socket, "wait for args", 14, NULL);
+                    int i;
+                    char* args = (char*)malloc(sizeof(AccountData));
+                    readbytes = 0;
                     do{
-                        readbytes = read(socket, buffer, sizeof(AccountData));
-                    }while(1);
+                        readbytes += recv(socket, buffer, sizeof(AccountData), NULL);
+                    }while(readbytes < sizeof(AccountData));
+                    printf("XD");
+                    fflush(stdout);
+                    for(i = 0; i < sizeof(AccountData); ++i)
+                    {
+                        args[i] = buffer[i];
+                    }
+                    Event* event = createEvent((void (*)(void))logInService, args, socket, REQUEST_LOGIN);
+                    addNewElement(event);
+                    printf("XD");
+                    fflush(stdout);
+                    break;
                 }
+                ///TODO....
             }
         }
 
@@ -117,25 +151,21 @@ void* services(void *i)
     return NULL;
 }
 
-pthread_t* requestNewMemory(pthread_t* threads, int numberofthreads)
+int createNewThread(int* socket)
 {
-    pthread_t* temp;
     int i;
-    numberofthreads <<=1;
-    if(threads!=NULL)
+    for(i = 0; i < MAX_THREADS_COUNT; ++i)
     {
-        temp = (pthread_t*)malloc(numberofthreads*sizeof(pthread_t));
-        for(i = 0; threads[i]; i++)
+        if(threads[i] == 0)
         {
-            temp[i]=threads[i];
-            free(&threads[i]);
-
+            if(pthread_create(&threads[i], NULL, services, socket))
+            {
+                fprintf(stderr, "Couldn't create new thread");
+                return ERROR_CREATING_THREAD;
+            }
+            return i;
         }
     }
-    threads = (pthread_t*)malloc(numberofthreads * sizeof(pthread_t));
-    for(i = 0; temp[i]; i++)
-    {
-        threads[i]=temp[i];
-    }
-    return threads;
+    fprintf(stderr, "Couldn't find free thread\n");
+    return MAX_THREADS_LIMIT_ERROR;
 }

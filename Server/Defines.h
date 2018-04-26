@@ -9,6 +9,7 @@
 #define ERROR_BINDING_SOCKET -102
 #define ERROR_STARTING_SERVER -103
 #define ERROR_CREATING_THREAD -104
+#define ERROR_SETTING_SOCKET_OPTIONS -105
 
 #define OPEN_FILE_ERROR -201
 #define FILE_NOT_OPEN -202
@@ -25,6 +26,7 @@
 
 #define MAX_ROOM_LIMIT_ERROR -501
 #define MAX_ACCOUNTS_LOGGED_IN_ERROR -502
+#define MAX_THREADS_LIMIT_ERROR -503
 
 #define MAX_LOGIN_LENGTH 32
 #define MAX_PASSHASH_LENGTH 256  //???have to change it later, to the value that hash function will return
@@ -34,6 +36,7 @@
 #define MAX_CONNECTION_LIMIT 128 //how many clients can wait in queue on accept connection
 #define MAX_ACCOUNTS_COUNT 512
 #define MAX_THREADS_COUNT 512
+#define MAX_SOCKETS_COUNT 512
 #define MAX_QUEUE_LENGTH 1024
 #define BUFFER_SIZE 1024
 
