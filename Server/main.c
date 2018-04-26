@@ -4,15 +4,12 @@
 
 #include "Server.h"
 
-
 int main()
 {
-
-    int serversocket;
     int serverport;
     struct sockaddr_in serveraddress;
-    initServer(&serversocket, &serverport, &serveraddress);
-    startServer(serversocket, serverport, serveraddress);
+    initServer(&serverport, &serveraddress);
+    startServer(serverport, serveraddress);
 
     return 0;
 }

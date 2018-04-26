@@ -60,5 +60,7 @@ int startClient(int clientsocketfd, struct sockaddr_in serveraddress)
         }
         printf("%s\n", buffer);
     }
+    close(clientsocketfd); // added
+    exit(0); // added
     return 0;
 }
