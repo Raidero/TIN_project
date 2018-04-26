@@ -3,6 +3,7 @@
 MenuViewModel::MenuViewModel()
 {
     isloggedin = false;
+    isvisible = true;
     font.loadFromFile("font");
     title.setString("Maze Shooter");
     title.setCharacterSize(FONT_BIG);
@@ -47,6 +48,27 @@ void MenuViewModel::disableButton(sf::Text& name)
 void MenuViewModel::buttonChangedName(sf::Text& name, std::string newtext)
 {
     name.setString(newtext);
+}
+
+int MenuViewModel::checkButtonsPressed(float x, float y)
+{
+    for(int i = 0; i < NUMBER_OF_BUTTONS; ++i)
+    {
+
+        if(buttons[i].getPosition().x < x &&
+            buttons[i].getPosition().y < y &&
+            buttons[i].getSize().x + buttons[i].getPosition().x > x &&
+            buttons[i].getSize().y + buttons[i].getPosition().y > y)
+        {
+            buttonPressed(i);
+        }
+
+    }
+    return NO_BUTTON_IS_PRESSED;
+}
+
+void MenuViewModel::buttonPressed(int i)
+{
 }
 
 

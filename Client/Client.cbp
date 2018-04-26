@@ -12,6 +12,7 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
+					<Add option="-Wall" />
 					<Add option="-g" />
 					<Add directory="include" />
 				</Compiler>
@@ -43,8 +44,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Client.h" />
+		<Unit filename="include/LoginViewModel.h" />
 		<Unit filename="include/MenuViewModel.h" />
 		<Unit filename="main.cpp" />
+		<Unit filename="src/LoginViewModel.cpp" />
 		<Unit filename="src/MenuViewModel.cpp" />
 		<Extensions>
 			<code_completion />

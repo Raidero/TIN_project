@@ -20,7 +20,7 @@ int main()
     if(startClient(clientsocket, serveraddress))
     {
         std::cout << "Couldn't connect to server. Try again later\n";
-        return 1;
+        //return 1;
     }
 
     while (window.isOpen())
