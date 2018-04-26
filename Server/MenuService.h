@@ -9,7 +9,7 @@
 
 
 int connectAccountToRoomService(AccountData* account);
-int setReadyToStartService(uint32_t ip, unsigned short roomid);
-int voteForHostService(char* login, unsigned short roomid); //fully done, but i'm not sure about this one, votecounter in Room struct seems odd
+int setReadyToStartService(uint32_t ip, int roomid);
+int voteForHostService(char* login, int roomid); //fully done, but i'm not sure about this one, votecounter in Room struct seems odd
 
 #endif // MENU_SERVICE_H

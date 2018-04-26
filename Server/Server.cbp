@@ -48,6 +48,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="PrivateCommunicationService.h" />
+		<Unit filename="Queue.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Queue.h" />
 		<Unit filename="RoomService.c">
 			<Option compilerVar="CC" />
 		</Unit>

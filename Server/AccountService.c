@@ -6,7 +6,7 @@ AccountData* loggedaccounts[MAX_ACCOUNTS_COUNT];
 FILE* datafile = NULL;
 
 
-AccountData* init(char* login, char* passwordhash, uint32_t currentip, int votercounter)
+AccountData* initAccoundData(char* login, char* passwordhash, uint32_t currentip, int votercounter)
 {
     int i = 0;
     AccountData* acc = (AccountData*)malloc(sizeof(AccountData));
@@ -32,6 +32,16 @@ AccountData* init(char* login, char* passwordhash, uint32_t currentip, int voter
     acc->currentip = currentip;
     acc->votercounter = votercounter;
     return acc;
+}
+
+void disposeAccountData(int i)
+{
+    if(i >= 0 && i < MAX_ACCOUNTS_COUNT && loggedaccounts[i] != NULL)
+    {
+        free(loggedaccounts[i]);
+        loggedaccounts[i] = NULL;
+    }
+
 }
 
 int logInService(AccountData* account)
@@ -135,6 +145,7 @@ int deleteAccountService(AccountData* account)
 
 int changePasswordService(AccountData* account, char* newpasshash)
 {
+    int i = 0;
     if(!isLoggedIn(account->currentip))
     {
         fprintf(stderr, "Player is not logged in\n");
@@ -151,7 +162,15 @@ int changePasswordService(AccountData* account, char* newpasshash)
         fprintf(stderr, "File is not open\n");
         return FILE_NOT_OPEN;
     }
-    strcpy(account->passwordhash, newpasshash);
+    while(newpasshash[i] != '\0')
+    {
+        account->passwordhash[i] = newpasshash[i];
+        ++i;
+        if(i >= MAX_PASSHASH_LENGTH)
+        {
+            account->login[MAX_PASSHASH_LENGTH - 1] = '\0';
+        }
+    }
     fseek(datafile, -sizeof(*account), SEEK_CUR);
     fwrite(account, sizeof(*account), 1, datafile);
     if(ferror(datafile))

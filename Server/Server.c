@@ -77,18 +77,44 @@ void intHandler(int sig_num)
 
 void* services(void *i)
 {
+    int accountid = -1, roomid = -1;
     int socket = *((int *)i);
-    printf("Services function\n");
-    char b[256];
+    printf("New client connected: %d\n", socket);
+    char buffer[BUFFER_SIZE];
+    int readbytes;
     while(1)
     {
-        bzero(b, 256);
-        read(socket, b, 256);
-        printf("%s", b);
-        bzero(b, 256);
-        if (write(socket, "got your message", 17)==-1)
-            break;
+        bzero(buffer, BUFFER_SIZE);
+        readbytes = read(socket, buffer, 1);
+        if(readbytes < 0 && accountid >= 0)
+        {
+            if(accountid >= 0)
+            {
+                sweepPlayer(loggedaccounts[accountid], roomid);
+                checkIfRoomIsEmptyAndDispose(roomid);
+                disposeAccountData(accountid);
+            }
+            close(socket);
+            break;//bye
+        }
+        else if(readbytes >= 1) //here we come
+        {
+            switch(buffer[0])
+            {
+                case REQUEST_LOGIN:
+                {
+                    do{
+                        readbytes = read(socket, buffer, sizeof(AccountData));
+                    }while(1);
+                }
+            }
+        }
+
+        printf("%s", buffer);
+        bzero(buffer, BUFFER_SIZE);
+        write(socket, "got your message", 17);
     }
+    return NULL;
 }
 
 pthread_t* requestNewMemory(pthread_t* threads, int numberofthreads)
