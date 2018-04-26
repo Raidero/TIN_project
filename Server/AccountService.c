@@ -3,8 +3,20 @@
 #include <string.h>
 
 AccountData* loggedaccounts[MAX_ACCOUNTS_COUNT];
-FILE* datafile = NULL;
+FILE* datafile;
 
+void initAccountService()
+{
+    int i;
+    for(i = 0; i < MAX_ACCOUNTS_COUNT; ++i)
+    {
+        loggedaccounts[i] = NULL;
+    }
+    if(initDataFile() < 0)
+    {
+        fprintf(stderr, "Account Service initialization failed\n");
+    }
+}
 
 AccountData* initAccoundData(char* login, char* passwordhash, uint32_t currentip, int votercounter)
 {

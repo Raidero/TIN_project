@@ -6,10 +6,12 @@
 
 int main()
 {
-    int serverport;
     struct sockaddr_in serveraddress;
-    initServer(&serverport, &serveraddress);
-    startServer(serverport, serveraddress);
+    initAccountService();
+    initRoomService();
+
+    initServer(&serveraddress);
+    startServer(serveraddress);
 
     return 0;
 }
