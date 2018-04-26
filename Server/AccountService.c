@@ -53,7 +53,7 @@ int logInService(AccountData* account)
         {
             loggedaccounts[i] = account;
             printf("Player %s logged in", account->login);
-            return 0;
+            return i;
         }
     }
     fprintf(stderr, "Maximum server capacity reached\n");
