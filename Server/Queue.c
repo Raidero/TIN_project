@@ -80,9 +80,10 @@ void* startEventHandler()
                 case REQUEST_LOGIN:
                 {
                     int result;
-                    int (*func)(AccountData*) = (int (*)(AccountData*))event->functionpointer;
+                    int (*func)(AccountData*, int) = (int (*)(AccountData*, int))event->functionpointer;
                     AccountData* accdata = (AccountData*)event->argumentsbuffer;
-                    result = func(accdata);
+                    int* playerid = (int*)&event->argumentsbuffer[sizeof(AccountData)];
+                    result = func(accdata, *playerid);
                     send(event->socket, &result, sizeof(int), 0);
                     break;
                 }

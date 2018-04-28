@@ -30,7 +30,7 @@ extern FILE* datafile;
 void initAccountService();
 AccountData* initAccoundData(char* login, char* passwordhash, uint32_t currentip, int votercounter);
 void disposeAccountData(int i);
-int logInService(AccountData* account);    //there needs to be added max login length and max passhash length
+int logInService(AccountData* account, int playerid);    //there needs to be added max login length and max passhash length
 int logOutService(uint32_t ip); //fully done, someone please check
 int createAccountService(AccountData* account); //max..
 int deleteAccountService(AccountData* account); //maxx...
@@ -41,6 +41,7 @@ bool isLoginUsed(char* login); // fully done, Krzysiu or Bartek, please check
 bool isLoggedIn(uint32_t ip);  // fully done, Krzysiu or Bartek, please check
 bool verifyLoginAndPassword(AccountData* account); // done
 uint32_t loginToIp(AccountData** accountsinroom, char* login); //fully done, Krzysiu or Bartek, please check
+int loginToPlayerId(char* login);
 int initDataFile();
 int closeDataFile();
 int deleteDataFile();
