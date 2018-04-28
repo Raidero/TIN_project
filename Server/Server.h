@@ -19,11 +19,14 @@
 #define DEFAULT_IP "10.0.2.15"
 
 pthread_t threads[MAX_THREADS_COUNT];
+int sockets[MAX_SOCKETS_COUNT];
 
 int initServer(struct sockaddr_in* serveraddress);
 int startServer(struct sockaddr_in serveraddress);
 void intHandler(int sig);
 void* services(void *i);
 int createNewThread(int* socket);
+int createNewSocket(); //return index of first free socket, it will be playerid
+int socketToPlayerId(int socket);
 
 #endif // SERVER_H

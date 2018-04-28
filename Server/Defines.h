@@ -4,6 +4,7 @@
 #define FREE_ROOM_NOT_FOUND -1
 #define PLAYER_NOT_FOUND -2
 #define IP_NOT_FOUND -3
+#define PLAYER_ID_NOT_FOUND -4
 
 #define ERROR_OPENING_SOCKET -101
 #define ERROR_BINDING_SOCKET -102
@@ -21,12 +22,14 @@
 #define WRONG_LOGIN_OR_PASSWORD -304
 #define LOGGED_IN_ERROR -305
 #define LOGGED_OUT_ERROR -306
+#define ACCOUNT_PLACE_TAKEN_ERROR -307
 
 #define OUT_OF_RANGE -401
 
 #define MAX_ROOM_LIMIT_ERROR -501
 #define MAX_ACCOUNTS_LOGGED_IN_ERROR -502
 #define MAX_THREADS_LIMIT_ERROR -503
+#define MAX_SOCKETS_LIMIT_ERROR -504
 
 #define MAX_LOGIN_LENGTH 32
 #define MAX_PASSHASH_LENGTH 256  //???have to change it later, to the value that hash function will return
