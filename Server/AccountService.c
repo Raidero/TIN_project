@@ -56,9 +56,8 @@ void disposeAccountData(int i)
 
 }
 
-int logInService(AccountData* account)
+int logInService(AccountData* account, int playerid)
 {
-    int i;
     if(isLoggedIn(account->currentip))
     {
         fprintf(stderr, "Player %s already logged in\n", account->login);
@@ -69,17 +68,14 @@ int logInService(AccountData* account)
         fprintf(stderr, "Wrong login or password for login: %s\n", account->login);
         return WRONG_LOGIN_OR_PASSWORD;
     }
-    for(i = 0; i < MAX_ACCOUNTS_COUNT; ++i)
+    if(loggedaccounts[playerid] == NULL)
     {
-        if(loggedaccounts[i] == NULL)
-        {
-            loggedaccounts[i] = account;
-            printf("Player %s logged in", account->login);
-            return i;
-        }
+        loggedaccounts[playerid] = account;
+        printf("Player %s logged in", account->login);
+        return playerid;
     }
-    fprintf(stderr, "Maximum server capacity reached\n");
-    return MAX_ACCOUNTS_LOGGED_IN_ERROR;
+    fprintf(stderr, "Place is already taken\n");
+    return ACCOUNT_PLACE_TAKEN_ERROR;
 }
 
 int logOutService(uint32_t ip)
@@ -274,7 +270,21 @@ uint32_t loginToIp(AccountData** accountsinroom, char* login) //we have to think
         }
     }
     fprintf(stderr, "Failed to find ip for login %s", login);
-    return 0;
+    return IP_NOT_FOUND;
+}
+
+int loginToPlayerId(char* login)
+{
+    int i;
+    for(i = 0; i < MAX_ACCOUNTS_COUNT; ++i)
+    {
+        if(loggedaccounts[i] != NULL && !strcmp(loggedaccounts[i]->login, login))
+        {
+            return i;
+        }
+    }
+    fprintf(stderr, "Failed to find ip for login %s", login);
+    return PLAYER_ID_NOT_FOUND;
 }
 
 int initDataFile()

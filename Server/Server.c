@@ -2,15 +2,18 @@
 #include "Defines.h"
 
 pthread_t newClientThread;
-int serversocketfd;
-int *newclientsocketfd;
+int serversocketfd = -1;
 
 int initServer(struct sockaddr_in* serveraddress)
 {
     int i;
     for(i = 0; i < MAX_THREADS_COUNT; ++i)
     {
-        threads[i] = 0;
+        threads[i] = -1;
+    }
+    for(i = 0; i < MAX_SOCKETS_COUNT; ++i)
+    {
+        sockets[i] = -1;
     }
     /*first call to socket function*/
     int option = 1;
@@ -46,18 +49,25 @@ int startServer(struct sockaddr_in server_address)
 {
     struct sockaddr_in client_address;
     unsigned int client_length = sizeof(client_address);
+    int socketindex;
     signal(SIGINT, intHandler);
 
     while(1)
     {
-        newclientsocketfd = (int*)malloc(sizeof(int));
-        *newclientsocketfd = accept(serversocketfd, (struct sockaddr *) &client_address, &client_length);
-        if(*newclientsocketfd < 0)
+        socketindex = createNewSocket();
+        if(socketindex < 0)
+        {
+            fprintf(stderr, "Couldn't find free socket for new client\n");
+            sleep(10);
+            continue;
+        }
+        sockets[socketindex] = accept(serversocketfd, (struct sockaddr *) &client_address, &client_length);
+        if(sockets[socketindex] < 0)
         {
             fprintf(stderr, "Couldn't accept connection\n");
             return ERROR_STARTING_SERVER;
         }
-        if(createNewThread(newclientsocketfd) < 0)
+        if(createNewThread(&sockets[socketindex]) < 0)
         {
             fprintf(stderr, "Couldn't create new thread");
             return ERROR_CREATING_THREAD;
@@ -69,25 +79,45 @@ int startServer(struct sockaddr_in server_address)
 void intHandler(int sig_num)
 {
     int i;
-    for(i = 0; i < MAX_THREADS_COUNT; ++i)
+    /*for(i = 0; i < MAX_THREADS_COUNT; ++i)
     {
         if(threads[i] != 0)
         {
             pthread_join(threads[i], NULL);
         }
-    }
-    /*for(i = 0; i < MAX_THREADS_COUNT; ++i)
+    }*/
+    for(i = 0; i < MAX_THREADS_COUNT; ++i)
     {
-        if(threads[i] != NULL)
+        if(threads[i] != -1)
         {
-            pthread_kill(*threads[i], 0);
-            if(sockets[i] != NULL)
-            {
-                close(*sockets[i]);
-            }
+            pthread_kill(threads[i], 0);
         }
-    }*/ ///in case we want to kill all the threads
-    close(serversocketfd);
+    } ///in case we want to kill all the threads
+    for(i = 0; i < MAX_THREADS_COUNT; ++i)
+    {
+        if(sockets[i] != -1)
+        {
+            close(sockets[i]);
+        }
+    }
+    for(i = 0; i < MAX_ACCOUNTS_COUNT; ++i)
+    {
+        if(loggedaccounts[i] != NULL)
+        {
+            free(loggedaccounts[i]);
+        }
+    }
+    for(i = 0; i < MAX_ROOM_COUNT; ++i)
+    {
+        if(rooms[i] != NULL)
+        {
+            free(rooms[i]);
+        }
+    }
+    if(serversocketfd != -1)
+    {
+        close(serversocketfd);
+    }
     exit(0);
 }
 
@@ -95,6 +125,14 @@ void* services(void *i)
 {
     int accountid = -1, roomid = -1;
     int socket = *((int *)i);
+    accountid = socketToPlayerId(socket);
+    if(accountid < 0)
+    {
+        fprintf(stderr, "Player id not found\n");
+        close(socket);
+        free(i);
+        pthread_exit(NULL);
+    }
     printf("New client connected: %d\n", socket);
     char buffer[BUFFER_SIZE];
     int readbytes;
@@ -126,11 +164,11 @@ void* services(void *i)
                     char* args = (char*)malloc(sizeof(AccountData));
                     readbytes = 0;
                     do{
-                        readbytes += recv(socket, buffer, sizeof(AccountData), 0);
-                    }while(readbytes < sizeof(AccountData));
+                        readbytes += recv(socket, buffer, sizeof(AccountData) + sizeof(int), 0);
+                    }while(readbytes < sizeof(AccountData) + sizeof(int));
                     printf("XD");
                     fflush(stdout);
-                    for(i = 0; i < sizeof(AccountData); ++i)
+                    for(i = 0; i < sizeof(AccountData) + sizeof(int); ++i)
                     {
                         args[i] = buffer[i];
                     }
@@ -156,7 +194,7 @@ int createNewThread(int* socket)
     int i;
     for(i = 0; i < MAX_THREADS_COUNT; ++i)
     {
-        if(threads[i] == 0)
+        if(threads[i] == -1)
         {
             if(pthread_create(&threads[i], NULL, services, socket))
             {
@@ -168,4 +206,32 @@ int createNewThread(int* socket)
     }
     fprintf(stderr, "Couldn't find free thread\n");
     return MAX_THREADS_LIMIT_ERROR;
+}
+
+int createNewSocket()
+{
+    int i;
+    for(i = 0; i < MAX_SOCKETS_COUNT; ++i)
+    {
+        if(sockets[i] == -1)
+        {
+            return i;
+        }
+    }
+    fprintf(stderr, "All sockets are taken\n");
+    return MAX_SOCKETS_LIMIT_ERROR;
+}
+
+int socketToPlayerId(int socket)
+{
+    int i;
+    for(i = 0; i < MAX_SOCKETS_COUNT; ++i)
+    {
+        if(sockets[i] == socket)
+        {
+            return i;
+        }
+    }
+    fprintf(stderr,"Couldn't find playerid for given socket\n");
+    return PLAYER_ID_NOT_FOUND;
 }
