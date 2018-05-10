@@ -6,6 +6,9 @@ extern "C"
 }
 #include "MenuViewModel.h"
 #include <iostream>
+
+using namespace std;
+
 int main()
 {
     MenuViewModel menu;
@@ -31,9 +34,20 @@ int main()
             if (event.type == sf::Event::Closed)
                 window.close();
         }
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+        {
+            sf::Vector2i coords = sf::Mouse::getPosition(window);
+            if (menu.isActive())
+                menu.checkButtonsPressed(coords.x, coords.y);
+            else if (menu.loginviewmodel.isActive())
+                menu.loginviewmodel.checkButtonsPressed(coords.x, coords.y);
+        }
+        if(menu.exitGame())
+            window.close();
 
         window.clear();
         window.draw(menu);
+        window.draw(menu.loginviewmodel);
         window.display();
     }
     return 0;

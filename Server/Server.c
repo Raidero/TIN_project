@@ -121,12 +121,12 @@ void* services(void *i)
             {
                 case 48:
                 {
-                    send(socket, "wait for args", 14, NULL);
+                    send(socket, "wait for args", 14, 0);
                     int i;
                     char* args = (char*)malloc(sizeof(AccountData));
                     readbytes = 0;
                     do{
-                        readbytes += recv(socket, buffer, sizeof(AccountData), NULL);
+                        readbytes += recv(socket, buffer, sizeof(AccountData), 0);
                     }while(readbytes < sizeof(AccountData));
                     printf("XD");
                     fflush(stdout);

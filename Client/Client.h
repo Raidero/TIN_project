@@ -11,13 +11,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <arpa/inet.h>
+#include "Defines.h"
 
-#define ERROR_OPENING_SOCKET 1
-#define ERROR_GETTING_HOST_NAME 2
-#define ERROR_CONNECTING_CLIENT 3
-#define ERROR_WRITING_TO_SOCKET 4
-#define ERROR_READING_FROM_SOCKET 5
-#define BUFFER_SIZE 1024
+
+
 
 #define DEFAULT_PORT 8001
 #define DEFAULT_IP "10.0.2.15"
