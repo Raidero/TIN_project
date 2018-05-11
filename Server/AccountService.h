@@ -30,6 +30,7 @@ extern FILE* datafile;
 void initAccountService();
 AccountData* initAccoundData(char* login, char* passwordhash, uint32_t currentip, int votercounter);
 void disposeAccountData(int i);
+void disposeAllAccounts();
 int logInService(AccountData* account, int playerid);    //there needs to be added max login length and max passhash length
 int logOutService(uint32_t ip); //fully done, someone please check
 int createAccountService(AccountData* account); //max..

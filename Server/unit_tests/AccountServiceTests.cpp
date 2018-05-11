@@ -1,7 +1,9 @@
 extern "C"
 {
-#include "../AccountService.h"
 #include "../Defines.h"
+
+#include "../AccountService.h"
+#include "../RoomService.h"
 
 }
 
@@ -13,48 +15,221 @@ extern "C"
 
 BOOST_AUTO_TEST_SUITE(AccountServiceTests)
 
-//int add( int i, int j ) { return i+j; }
 
-
-BOOST_AUTO_TEST_CASE( GivenAccountData_TryingToCreateAccount_ProcessIsSuccessful )
+// createAccountService
+BOOST_AUTO_TEST_CASE( GivenAccountData_WhenTryingToCreateAccount_UserIsRegistered )
 {
-	/// zmienic totalnie - AccountData* init()
-	deleteDataFile();	// empty or create empty datafile
+	deleteDataFile();
 
-	BOOST_REQUIRE(initDataFile() == 0);
+	initAccountService();
+	AccountData* account = initAccoundData((char*)"login1",(char*)"pass1",1,0);
 
-	AccountData account;
-	strcpy(account.login, "login1");
-	strcpy(account.passwordhash, "hashed1");
+	BOOST_REQUIRE(createAccountService(account) == 0);
 
-	BOOST_REQUIRE(createAccountService(&account) == 0);
+	BOOST_CHECK(verifyLoginAndPassword(account) == 1);
 
+	deleteDataFile();
 
+}
 
+BOOST_AUTO_TEST_CASE( GivenAccountDataWithRegisteredUser_WhenTryingToCreateAccount_ReturnError )
+{
+	deleteDataFile();
 
-    // seven ways to detect and report the same error:
-    /*BOOST_CHECK( add( 2,2 ) == 4 );        // #1 continues on error
+	initAccountService();
+	AccountData* account = initAccoundData((char*)"login1",(char*)"pass1",1,0);
 
-    BOOST_REQUIRE( add( 2,2 ) == 4 );      // #2 throws on error
+	BOOST_REQUIRE(createAccountService(account) == 0);
 
-    if( add( 2,2 ) != 4 )
-      BOOST_ERROR( "Ouch..." );            // #3 continues on error
+	BOOST_CHECK(createAccountService(account) == CREATE_ACCOUNT_ERROR);
 
-    if( add( 2,2 ) != 4 )
-      BOOST_FAIL( "Ouch..." );             // #4 throws on error
+	deleteDataFile();
 
-    if( add( 2,2 ) != 4 ) throw "Ouch..."; // #5 throws on error
+}
 
-    BOOST_CHECK_MESSAGE( add( 2,2 ) == 4,  // #6 continues on error
-                         "add(..) result: " << add( 2,2 ) );
+BOOST_AUTO_TEST_CASE( GivenNonExistentDataFile_WhenTryingToCreateAccount_ReturnError )
+{
+	deleteDataFile();
 
-    BOOST_CHECK_EQUAL( add( 2,2 ), 4 );	  // #7 continues on error*/
+	AccountData* account = initAccoundData((char*)"login1",(char*)"pass1",1,0);
+
+	BOOST_CHECK(createAccountService(account) == FILE_NOT_OPEN);
+
 }
 
 
-BOOST_AUTO_TEST_CASE( GivenSameAccountDatas_WhenTryingToCreate2Accounts_ProcessIsUnsuccessful )
+// deleteAccountService
+BOOST_AUTO_TEST_CASE( GivenNonEmptyAccountDataFile_WhenTryingToDeleteUser_UserNoLongerExists )
+{
+	deleteDataFile();
+
+	initAccountService();
+	AccountData* account = initAccoundData((char*)"login1",(char*)"pass1",1,0);
+
+	BOOST_REQUIRE(createAccountService(account) == 0);
+
+	BOOST_CHECK(deleteAccountService(account) == 0);
+
+	account = initAccoundData((char*)"login1",(char*)"pass1",1,0);
+	BOOST_CHECK(verifyLoginAndPassword(account) == 0);
+
+	deleteDataFile();
+
+
+}
+
+BOOST_AUTO_TEST_CASE( GivenLoggedInUser_WhenTryingToDeleteItsData_ReturnError )
 {
 // TODO
+
+}
+
+BOOST_AUTO_TEST_CASE( GivenNonEmptyAccountDataFile_WhenTryingToDeleteNonExistentUser_ReturnError )
+{
+	deleteDataFile();
+
+	initAccountService();
+	AccountData* account = initAccoundData((char*)"login1",(char*)"pass1",1,0);
+
+	BOOST_REQUIRE(createAccountService(account) == 0);
+
+	account = initAccoundData((char*)"login2",(char*)"pass1",1,0);
+	BOOST_CHECK(deleteAccountService(account) == DELETE_ACCOUNT_ERROR);
+
+	deleteDataFile();
+
+}
+
+BOOST_AUTO_TEST_CASE( GivenEmptyAccountDataFile_WhenTryingToDeleteUser_ReturnError )
+{
+	deleteDataFile();
+
+	initAccountService();
+	AccountData* account = initAccoundData((char*)"login1",(char*)"pass1",1,0);
+
+	BOOST_CHECK(deleteAccountService(account) == DELETE_ACCOUNT_ERROR);
+
+	deleteDataFile();
+
+}
+
+BOOST_AUTO_TEST_CASE( GivenWrongPassword_WhenTryingToDeleteUser_UserStillExists )
+{
+	deleteDataFile();
+
+	initAccountService();
+	AccountData* account = initAccoundData((char*)"login1",(char*)"pass1",1,0);
+
+	BOOST_REQUIRE(createAccountService(account) == 0);
+
+	account = initAccoundData((char*)"login1",(char*)"pass2",1,0);
+
+	BOOST_CHECK(deleteAccountService(account) == WRONG_LOGIN_OR_PASSWORD);
+
+	account = initAccoundData((char*)"login1",(char*)"pass1",1,0);
+
+	BOOST_CHECK(verifyLoginAndPassword(account) == 1);
+
+	deleteDataFile();
+
+}
+
+BOOST_AUTO_TEST_CASE( GivenNonExistentAccountDataFile_WhenTryingToDeleteUser_ReturnError )
+{
+	deleteDataFile();
+
+	AccountData* account = initAccoundData((char*)"login1",(char*)"pass1",1,0);
+
+	BOOST_CHECK(deleteAccountService(account) == FILE_NOT_OPEN);
+}
+
+
+// changePasswordService
+BOOST_AUTO_TEST_CASE( GivenNotLoggedInUser_WhenTryingToChangePassword_ReturnError )
+{
+	deleteDataFile();
+
+	initAccountService();
+	AccountData* account = initAccoundData((char*)"login1",(char*)"pass1",1,0);
+
+	BOOST_REQUIRE(createAccountService(account) == 0);
+
+	BOOST_CHECK(changePasswordService(account, (char*)"pass2") == LOGGED_OUT_ERROR);
+
+	account = initAccoundData((char*)"login1",(char*)"pass2",1,0);
+	BOOST_CHECK(verifyLoginAndPassword(account) == 0);
+
+	deleteDataFile();
+
+}
+
+BOOST_AUTO_TEST_CASE( GivenAccountDataFile_WhenTryingToChangePassword_PasswordIsChanged )
+{
+	deleteDataFile();
+
+	initAccountService();
+	AccountData* account = initAccoundData((char*)"login1",(char*)"pass1",1,0);
+	int playerid = 1;
+
+	BOOST_REQUIRE(createAccountService(account) == 0);
+
+	BOOST_CHECK(logInService(account, playerid) == playerid);
+
+	BOOST_REQUIRE(isLoggedIn(account->currentip) == 1);
+
+	BOOST_CHECK(changePasswordService(account, (char*)"pass2") == 0);
+
+	account = initAccoundData((char*)"login1",(char*)"pass2",1,0);
+	BOOST_CHECK(verifyLoginAndPassword(account) == 1);
+
+	deleteDataFile();
+
+}
+
+BOOST_AUTO_TEST_CASE( GivenEmptyAccountDataFile_WhenTryingToChangePassword_ReturnError )
+{
+	deleteDataFile();
+
+	initAccountService();
+	AccountData* account = initAccoundData((char*)"login1",(char*)"pass1",1,0);
+
+	BOOST_CHECK(changePasswordService(account, (char*)"pass2") != 0);
+
+}
+
+BOOST_AUTO_TEST_CASE( GivenAccountDataWithWrongPassword_WhenTryingToChangePassword_ReturnError )
+{
+	deleteDataFile();
+
+	initAccountService();
+	AccountData* account = initAccoundData((char*)"login1",(char*)"pass1",1,0);
+	int playerid = 1;
+
+	BOOST_REQUIRE(createAccountService(account) == 0);
+
+	BOOST_CHECK(logInService(account, playerid) == playerid);
+
+	BOOST_REQUIRE(isLoggedIn(account->currentip) == 1);
+
+	account = initAccoundData((char*)"login1",(char*)"pass2",1,0);
+	BOOST_CHECK(changePasswordService(account, (char*)"pass3") == WRONG_LOGIN_OR_PASSWORD);
+
+	BOOST_CHECK(verifyLoginAndPassword(account) == 0);
+
+
+	deleteDataFile();
+
+}
+
+BOOST_AUTO_TEST_CASE( GivenNonExistentAccountDataFile_WhenTryingToChangePassword_ReturnError )
+{
+	deleteDataFile();
+
+	AccountData* account = initAccoundData((char*)"login1",(char*)"pass1",1,0);
+
+	BOOST_CHECK(changePasswordService(account, (char*)"pass2") == FILE_NOT_OPEN);
+
+	deleteDataFile();
 
 }
 
@@ -62,19 +237,56 @@ BOOST_AUTO_TEST_CASE( GivenSameAccountDatas_WhenTryingToCreate2Accounts_ProcessI
 // logIn
 BOOST_AUTO_TEST_CASE( GivenNonEmptyAccountDataFile_WhenTryingToLogIn_UserIsLoggedIn )
 {
-// TODO
+	deleteDataFile();
+
+	initAccountService();
+	AccountData* account = initAccoundData((char*)"login1",(char*)"pass1",1,0);
+	int playerid = 1;	// in case of logInService() return value change to fixed 0
+
+	BOOST_REQUIRE(createAccountService(account) == 0);
+
+	BOOST_CHECK(logInService(account, playerid) == playerid);	// imitation of socketToPlayerId(); also this return is nonsense imo
+
+	BOOST_CHECK(isLoggedIn(account->currentip) == 1);			// those returns man..
+
+	deleteDataFile();
 
 }
 
 BOOST_AUTO_TEST_CASE( GivenNonEmptyAccountDataFile_WhenTryingToLogIn_UserIsNotRegistered )
 {
-// TODO
+	deleteDataFile();
+
+	initAccountService();
+	AccountData* account = initAccoundData((char*)"login1",(char*)"pass1",1,0);
+	int playerid = 1;
+
+	BOOST_REQUIRE(createAccountService(account) == 0);
+
+	account = initAccoundData((char*)"login2",(char*)"pass2",1,0);
+	BOOST_CHECK(logInService(account, playerid) == WRONG_LOGIN_OR_PASSWORD);
+
+	deleteDataFile();
 
 }
 
 BOOST_AUTO_TEST_CASE( GivenLoggedInUser_WhenTryingToLogIn_UserIsAlreadyLoggedIn )
 {
-// TODO
+	deleteDataFile();
+
+	initAccountService();
+	AccountData* account = initAccoundData((char*)"login1",(char*)"pass1",1,0);
+	int playerid = 1;
+
+	BOOST_REQUIRE(createAccountService(account) == 0);
+
+	BOOST_CHECK(logInService(account, playerid) == playerid);
+
+	BOOST_REQUIRE(isLoggedIn(account->currentip) == 1);
+
+	BOOST_CHECK(logInService(account, playerid) == LOGGED_IN_ERROR);
+
+	deleteDataFile();
 
 }
 
@@ -88,117 +300,211 @@ BOOST_AUTO_TEST_CASE( GivenFullServer_WhenTryingToLogIn_ReturnError )
 // logOut
 BOOST_AUTO_TEST_CASE( GivenNonEmptyServer_WhenTryingToLogOut_UserIsLoggedOut )
 {
-// TODO
+	deleteDataFile();
+
+	initAccountService();
+	AccountData* account = initAccoundData((char*)"login1",(char*)"pass1",1,0);
+	int playerid = 1;
+
+	BOOST_REQUIRE(createAccountService(account) == 0);
+
+	BOOST_CHECK(logInService(account, playerid) == playerid);
+
+	BOOST_REQUIRE(isLoggedIn(account->currentip) == 1);
+
+	BOOST_CHECK(logOutService(account->currentip) == 0);
+
+	BOOST_CHECK(isLoggedIn(account->currentip) == 0);
+
+	deleteDataFile();
 
 }
 
-BOOST_AUTO_TEST_CASE( GivenNonEmptyServer_WhenTryingToLogOut_ReturnErrorUserIsNotLoggedIn )
+BOOST_AUTO_TEST_CASE( GivenEmptyServer_WhenTryingToLogOut_ReturnErrorUserIsNotLoggedIn )
 {
-// TODO
+	deleteDataFile();
+
+	initAccountService();
+	AccountData* account = initAccoundData((char*)"login1",(char*)"pass1",1,0);
+
+	BOOST_REQUIRE(createAccountService(account) == 0);
+
+	BOOST_CHECK(logOutService(account->currentip) == LOGGED_OUT_ERROR);
+
+	BOOST_CHECK(isLoggedIn(account->currentip) == 0);
+
+	deleteDataFile();
 
 }
 
 BOOST_AUTO_TEST_CASE( GivenNonEmptyServer_WhenTryingToLogOut_UserIsNotRegistered )
 {
-// TODO
+	deleteDataFile();
+
+	initAccountService();
+	AccountData* account = initAccoundData((char*)"login1",(char*)"pass1",1,0);
+	int playerid = 1;
+
+	BOOST_REQUIRE(createAccountService(account) == 0);
+
+	BOOST_CHECK(logInService(account, playerid) == playerid);
+
+	BOOST_REQUIRE(isLoggedIn(account->currentip) == 1);
+
+
+	account = initAccoundData((char*)"login1",(char*)"pass2",2,0);
+	BOOST_CHECK(logOutService(account->currentip) == LOGGED_OUT_ERROR);
+
+	BOOST_CHECK(isLoggedIn(account->currentip) == 0);
+
+	deleteDataFile();
 
 }
 
-BOOST_AUTO_TEST_CASE( GivenEmptyServer_WhenTryingToLogOut_ReturnError )
+
+BOOST_AUTO_TEST_SUITE_END()
+
+
+
+
+/*=====================================================*/
+// RoomServiceTests
+
+BOOST_AUTO_TEST_SUITE(RoomServiceTests)
+
+
+BOOST_AUTO_TEST_CASE( GivenEmptyRoom_WhenTryingToConnect_UserIsConnected)
+{
+// TODO
+	initRoomService();
+	rooms[0] = initRoom();
+	BOOST_REQUIRE(rooms[0] != NULL);	// initRoom should take into account that malloc() can fail
+
+
+	disposeAllRooms();
+
+}
+
+BOOST_AUTO_TEST_CASE( GivenRoomInGame_WhenTryingToConnect_PlayerLandsInNewRoom)
 {
 // TODO
 
+
 }
 
-
-// createAccountService
-BOOST_AUTO_TEST_CASE( GivenAccountData_WhenTryingToCreateAccount_UserIsRegistered )
+BOOST_AUTO_TEST_CASE( GivenFullRoom_WhenTryingToConnect_PlayerLandsInNewRoom)
 {
 // TODO
 
+
 }
 
-BOOST_AUTO_TEST_CASE( GivenAccountDataWithRegisteredUser_WhenTryingToCreateAccount_ReturnError )
+
+BOOST_AUTO_TEST_CASE( GivenRoomWithAPlayer_WhenTryingToDisconnect_RoomIsEmpty)
 {
 // TODO
 
+
 }
 
-BOOST_AUTO_TEST_CASE( GivenNonExistentDataFile_WhenTryingToCreateAccount_ReturnError )
+
+
+BOOST_AUTO_TEST_SUITE_END()
+
+
+/*=====================================================*/
+// MenuServiceTests
+
+BOOST_AUTO_TEST_SUITE(MenuServiceTests)
+
+
+BOOST_AUTO_TEST_CASE( GivenNonEmptyServer_WhenTryingToLogOut_ReturnErrorUserIsNotLoggedIn )
 {
 // TODO
 
+
 }
 
 
-// deleteAccountService
-BOOST_AUTO_TEST_CASE( GivenNonEmptyAccountDataFile_WhenTryingToDeleteUser_UserNoLongerExists )
+
+
+
+
+
+BOOST_AUTO_TEST_SUITE_END()
+
+
+
+
+/*=====================================================*/
+// PrivateCommunicationServiceTests
+
+BOOST_AUTO_TEST_SUITE(PrivateCommunicationServiceTests)
+
+
+BOOST_AUTO_TEST_CASE( GivenNonEmptyServer_WhenTryingToLogOut_ReturnErrorUserIsNotLoggedIn )
 {
 // TODO
 
+
+
+
 }
 
-BOOST_AUTO_TEST_CASE( GivenLoggedInUser_WhenTryingToDeleteItsData_ReturnError )
+
+
+
+
+
+
+BOOST_AUTO_TEST_SUITE_END()
+
+
+/*=====================================================*/
+// ServerTests
+
+BOOST_AUTO_TEST_SUITE(ServerTests)
+
+
+BOOST_AUTO_TEST_CASE( GivenNonEmptyServer_WhenTryingToLogOut_ReturnErrorUserIsNotLoggedIn )
 {
 // TODO
 
+
+
+
 }
 
-BOOST_AUTO_TEST_CASE( GivenNonEmptyAccountDataFile_WhenTryingToDeleteNonExistentUser_ReturnError )
+
+
+
+
+
+
+BOOST_AUTO_TEST_SUITE_END()
+
+
+
+
+/*=====================================================*/
+// QueueTests
+
+BOOST_AUTO_TEST_SUITE(QueueTests)
+
+
+BOOST_AUTO_TEST_CASE( GivenNonEmptyServer_WhenTryingToLogOut_ReturnErrorUserIsNotLoggedIn )
 {
 // TODO
 
-}
 
-BOOST_AUTO_TEST_CASE( GivenEmptyAccountDataFile_WhenTryingToDeleteUser_ReturnError )
-{
-// TODO
 
-}
-
-BOOST_AUTO_TEST_CASE( GivenWrongPassword_WhenTryingToDeleteUser_UserStillExists )
-{
-// TODO
-
-}
-
-BOOST_AUTO_TEST_CASE( GivenNonExistentAccountDataFile_WhenTryingToDeleteUser_ReturnError )
-{
-// TODO
 
 }
 
 
-// changePasswordService
-BOOST_AUTO_TEST_CASE( GivenAccountDataFile_WhenTryingToChangePassword_PasswordIsChanged )
-{
-// TODO
 
-}
 
-BOOST_AUTO_TEST_CASE( GivenEmptyAccountDataFile_WhenTryingToChangePassword_ReturnError )
-{
-// TODO
 
-}
-
-BOOST_AUTO_TEST_CASE( GivenNotLoggedInUser_WhenTryingToChangePassword_ReturnError )
-{
-// TODO
-
-}
-
-BOOST_AUTO_TEST_CASE( GivenAccountDataWithWrongPassword_WhenTryingToChangePassword_ReturnError )
-{
-// TODO
-
-}
-
-BOOST_AUTO_TEST_CASE( GivenNonExistentAccountDataFile_WhenTryingToChangePassword_ReturnError )
-{
-// TODO
-
-}
 
 
 BOOST_AUTO_TEST_SUITE_END()
