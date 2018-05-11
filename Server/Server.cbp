@@ -39,15 +39,15 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="AccountService.h" />
+		<Unit filename="CommunicationService.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CommunicationService.h" />
 		<Unit filename="Defines.h" />
 		<Unit filename="MenuService.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="MenuService.h" />
-		<Unit filename="PrivateCommunicationService.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="PrivateCommunicationService.h" />
 		<Unit filename="Queue.c">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -113,61 +113,60 @@
 	<stdio.h>
 	<string.h>
 
-1523549964 source:/home/kjaszczuk/Desktop/TIN/TIN_project/Server/PrivateCommunicationService.c
+1526048397 source:/home/kjaszczuk/Desktop/TIN/TIN_project/Server/PrivateCommunicationService.c
+	"PrivateCommunicationService.h"
 
-1524078673 source:/home/kjaszczuk/Desktop/TIN/TIN_project/Server/AccountService.c
+1526036065 source:/home/kjaszczuk/Desktop/TIN/TIN_project/Server/AccountService.c
 	"AccountService.h"
 	<stdio.h>
 	<string.h>
 
-1524078830 /home/kjaszczuk/Desktop/TIN/TIN_project/Server/AccountService.h
+1526036065 /home/kjaszczuk/Desktop/TIN/TIN_project/Server/AccountService.h
 	<stdint.h>
 	<stdlib.h>
 	"Defines.h"
 	<stdio.h>
 	<string.h>
 
-1524078381 source:/home/kjaszczuk/Desktop/TIN/TIN_project/Server/main.c
+1526036065 source:/home/kjaszczuk/Desktop/TIN/TIN_project/Server/main.c
 	<stdlib.h>
 	<stdio.h>
+	<arpa/inet.h>
 	"Server.h"
 
-1524078945 /home/kjaszczuk/Desktop/TIN/TIN_project/Server/MenuService.h
+1526036065 /home/kjaszczuk/Desktop/TIN/TIN_project/Server/MenuService.h
 	<stdio.h>
 	<string.h>
 	"RoomService.h"
 	"AccountService.h"
 	"Defines.h"
 
-1524079099 /home/kjaszczuk/Desktop/TIN/TIN_project/Server/RoomService.h
+1526036065 /home/kjaszczuk/Desktop/TIN/TIN_project/Server/RoomService.h
 	<stdio.h>
 	<string.h>
 	"AccountService.h"
 	"Defines.h"
 
-1524078381 /home/kjaszczuk/Desktop/TIN/TIN_project/Server/PrivateCommunicationService.h
+1526049304 /home/kjaszczuk/Desktop/TIN/TIN_project/Server/PrivateCommunicationService.h
+	<sys/types.h>
+	<sys/socket.h>
+	"AccountService.h"
 
-1524078911 source:/home/kjaszczuk/Desktop/TIN/TIN_project/Server/MenuService.c
+1526036065 source:/home/kjaszczuk/Desktop/TIN/TIN_project/Server/MenuService.c
 	"MenuService.h"
 	<stdio.h>
 	<string.h>
 
-1524079040 source:/home/kjaszczuk/Desktop/TIN/TIN_project/Server/RoomService.c
+1526036065 source:/home/kjaszczuk/Desktop/TIN/TIN_project/Server/RoomService.c
 	"RoomService.h"
 	<stdio.h>
 	<string.h>
 
-1524079519 source:/home/kjaszczuk/Desktop/TIN/TIN_project/Server/Server.c
+1526036065 source:/home/kjaszczuk/Desktop/TIN/TIN_project/Server/Server.c
 	"Server.h"
-	<sys/types.h>
-	<sys/socket.h>
-	<netdb.h>
-	<netinet/in.h>
-	<stdio.h>
-	<pthread.h>
 	"Defines.h"
 
-1524078381 /home/kjaszczuk/Desktop/TIN/TIN_project/Server/Server.h
+1526051466 /home/kjaszczuk/Desktop/TIN/TIN_project/Server/Server.h
 	<sys/types.h>
 	<sys/socket.h>
 	<netdb.h>
@@ -176,10 +175,13 @@
 	<pthread.h>
 	<strings.h>
 	<unistd.h>
+	<arpa/inet.h>
+	<signal.h>
+	"Queue.h"
 	"MenuService.h"
-	"PrivateCommunicationService.h"
+	"CommunicationService.h"
 
-1524078381 /home/kjaszczuk/Desktop/TIN/TIN_project/Server/Defines.h
+1526052692 /home/kjaszczuk/Desktop/TIN/TIN_project/Server/Defines.h
 
 1523827808 source:/home/grzegorz/Desktop/TIN_project/Server/MenuService.c
 	"MenuService.h"
@@ -249,5 +251,29 @@
 	<netinet/in.h>
 	<stdio.h>
 	<pthread.h>
+	"Defines.h"
+
+1526036065 /home/kjaszczuk/Desktop/TIN/TIN_project/Server/Queue.h
+	"Defines.h"
+	"AccountService.h"
+	<sys/types.h>
+	<sys/socket.h>
+	<netdb.h>
+	<netinet/in.h>
+	<pthread.h>
+	<stdio.h>
+	<stdlib.h>
+
+1526036065 source:/home/kjaszczuk/Desktop/TIN/TIN_project/Server/Queue.c
+	"Queue.h"
+
+1526056298 source:/home/kjaszczuk/Desktop/TIN/TIN_project/Server/CommunicationService.c
+	"CommunicationService.h"
+
+1526056454 /home/kjaszczuk/Desktop/TIN/TIN_project/Server/CommunicationService.h
+	<sys/types.h>
+	<sys/socket.h>
+	"AccountService.h"
+	"RoomService.h"
 	"Defines.h"
 

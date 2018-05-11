@@ -11,9 +11,10 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <signal.h>
+
 #include "Queue.h"
 #include "MenuService.h"
-//#include "PrivateCommunicationService.h"
+#include "CommunicationService.h"
 
 #define DEFAULT_PORT 8001
 #define DEFAULT_IP "10.0.2.15"
