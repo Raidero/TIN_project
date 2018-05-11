@@ -37,6 +37,16 @@ void disposeRoom(int roomid)
     }
 }
 
+void disposeAllRooms()
+{
+	int i;
+	for(i = 0; i < MAX_ROOM_COUNT; ++i)
+	{
+		free(rooms[i]);
+        rooms[i] = NULL;
+	}
+}
+
 void checkIfRoomIsEmptyAndDispose(int roomid)
 {
     bool empty = 1;
@@ -102,19 +112,19 @@ int createRoomForAccount(AccountData* playerdata)
 	return MAX_ROOM_LIMIT_ERROR;
 }
 
-char* refreshRoomService(AccountData* playerdata, int roomid)
+int refreshRoomService(AccountData* playerdata, int roomid, char** loginlist)
 {
 	int i;
 	bool foundhim = 0;
-	static char loginlist[MAX_PLAYER_COUNT][MAX_LOGIN_LENGTH];
+	char ll[MAX_PLAYER_COUNT][MAX_LOGIN_LENGTH];
 	if(roomid < 0 || roomid >= MAX_ROOM_COUNT || rooms[roomid] == NULL)
 	{
         fprintf(stderr, "Room ID out of range: %d\n", roomid);
-        return NULL;
+        return OUT_OF_RANGE;
 	}
 	for (i = 0; i < MAX_PLAYER_COUNT; ++i)
 	{
-		strcpy(loginlist[i], rooms[roomid]->players[i]->login);
+		strcpy(ll[i], rooms[roomid]->players[i]->login);
 
 		if(rooms[roomid]->players[i]->currentip == playerdata->currentip)
 		{
@@ -124,12 +134,19 @@ char* refreshRoomService(AccountData* playerdata, int roomid)
 	}
 
 	if (!foundhim)		// if you couldnt find the player then its a trap - dont give him anything
-		return NULL;
+		return PLAYER_NOT_FOUND;
 
 	for (; i < MAX_PLAYER_COUNT; ++i)	// continue copying
-		strcpy(loginlist[i], rooms[roomid]->players[i]->login);
+		strcpy(ll[i], rooms[roomid]->players[i]->login);
+
+	memcpy(loginlist, ll, MAX_PLAYER_COUNT*MAX_LOGIN_LENGTH*sizeof(char));   // I hope this works :V
 
 	return 0;
+}
+
+int exitRoomService(AccountData* playerdata, int roomid)
+{
+    return sweepPlayer(playerdata, roomid);     // idk if sweepPlayer will be used somewhere else
 }
 
 int sweepPlayer(AccountData* playerdata, int roomid)

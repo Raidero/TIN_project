@@ -22,11 +22,13 @@ extern Room* rooms[MAX_ROOM_COUNT];
 void initRoomService();
 Room* initRoom();
 void disposeRoom(int roomid);
+void disposeAllRooms();
 void checkIfRoomIsEmptyAndDispose(int roomid);
 int findFreeRoomForAccount(AccountData* playerdata);
 int connectAccountToRoom(Room* room, AccountData* playerdata, int index);
 int createRoomForAccount(AccountData* playerdata);
-char* refreshRoomService(AccountData* playerdata, int roomid);
+int refreshRoomService(AccountData* playerdata, int roomid, char** loginlist);
+int exitRoomService(AccountData* playerdata, int roomid);
 
 int sweepPlayer(AccountData* playerdata, int roomid);	// function looks for a player and removes it from a room
 //create function that check if all the players are still in the room

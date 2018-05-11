@@ -100,20 +100,8 @@ void intHandler(int sig_num)
             close(sockets[i]);
         }
     }
-    for(i = 0; i < MAX_ACCOUNTS_COUNT; ++i)
-    {
-        if(loggedaccounts[i] != NULL)
-        {
-            free(loggedaccounts[i]);
-        }
-    }
-    for(i = 0; i < MAX_ROOM_COUNT; ++i)
-    {
-        if(rooms[i] != NULL)
-        {
-            free(rooms[i]);
-        }
-    }
+    disposeAllAccounts();
+    disposeAllRooms();
     if(serversocketfd != -1)
     {
         close(serversocketfd);

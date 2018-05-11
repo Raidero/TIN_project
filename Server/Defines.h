@@ -48,7 +48,7 @@
 #define MAX_MESSAGE_LENGTH 1024
 
 #define DATA_FILE_NAME "accountdata"
-#define DATA_FILE_MODE "a+b"
+#define DATA_FILE_MODE "r+b"
 
 #define REQUEST_LOGIN 1
 #define REQUEST_LOGOUT 2

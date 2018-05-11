@@ -5,7 +5,7 @@
 		<Option title="unit_tests" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
-		<Option virtualFolders="Sources/;Headers/;Headers/src/;Sources/src/;Sources/;" />
+		<Option virtualFolders="Sources/;Headers/;Headers/;Sources/;Sources/;Headers/;Sources/;Headers/;Sources/;Headers/;Sources/;Headers/;Sources/;Headers/src/;Sources/src/;" />
 		<Build>
 			<Target title="Debug">
 				<Option output="bin/Debug/unit_tests" prefix_auto="1" extension_auto="1" />
@@ -64,6 +64,10 @@
 		<Unit filename="../PrivateCommunicationService.h">
 			<Option virtualFolder="Headers/src/" />
 		</Unit>
+		<Unit filename="../Queue.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Queue.h" />
 		<Unit filename="../RoomService.c">
 			<Option compilerVar="CC" />
 			<Option virtualFolder="Sources/src/" />
@@ -79,6 +83,7 @@
 			<Option virtualFolder="Headers/src/" />
 		</Unit>
 		<Unit filename="AccountServiceTests.cpp" />
+		<Unit filename="RoomServiceTests.cpp" />
 		<Unit filename="test_main.cpp" />
 		<Extensions>
 			<code_completion />
