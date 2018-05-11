@@ -31,17 +31,21 @@
 #define MAX_THREADS_LIMIT_ERROR -503
 #define MAX_SOCKETS_LIMIT_ERROR -504
 
+#define PLAYER_ID_OUT_OF_RANGE -601
+#define ERROR_SENDING_MESSAGE -602
+#define ERROR_IDENTIFYING_ROOM -603
+
 #define MAX_LOGIN_LENGTH 32
 #define MAX_PASSHASH_LENGTH 256  //???have to change it later, to the value that hash function will return
 #define MAX_ROOM_COUNT 16
 #define MAX_PLAYER_COUNT 16 //in room
-#define MAX_MESSAGE_LENGTH 32
 #define MAX_CONNECTION_LIMIT 128 //how many clients can wait in queue on accept connection
 #define MAX_ACCOUNTS_COUNT 512
 #define MAX_THREADS_COUNT 512
 #define MAX_SOCKETS_COUNT 512
 #define MAX_QUEUE_LENGTH 1024
 #define BUFFER_SIZE 1024
+#define MAX_MESSAGE_LENGTH 1024
 
 #define DATA_FILE_NAME "accountdata"
 #define DATA_FILE_MODE "a+b"
