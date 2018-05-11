@@ -1,7 +1,6 @@
 #ifndef MENUVIEWMODEL_H
 #define MENUVIEWMODEL_H
-#include "LoginViewModel.h"
-
+#include "ViewModel.h"
 #define START_GAME 0
 #define EXIT_GAME 1
 #define LOG 2
@@ -9,11 +8,13 @@
 class MenuViewModel: public ViewModel
 {
 public:
-    MenuViewModel();
+    MenuViewModel(int soc);
     virtual ~MenuViewModel();
     bool exitGame() { return exit; }
-    virtual int checkButtonsPressed(float x, float y);
-    LoginViewModel loginviewmodel;
+    void linkLoginViewModel(ViewModel* lvm) { loginviewmodel = lvm; }
+    virtual void addLetter(char c) {}
+    virtual void refresh(int message);
+    ViewModel* loginviewmodel;
 private:
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const
     {
@@ -34,9 +35,6 @@ private:
     }
     virtual void buttonPressed(int i);
 
-
-
-    sf::RectangleShape buttons[NUMBER_OF_BUTTONS_MENU];
     sf::Text startgame;
     sf::Text exitgame;
     sf::Text createaccount;

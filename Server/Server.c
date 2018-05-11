@@ -145,9 +145,9 @@ void* services(void *i)
         {
             switch(buffer[0])
             {
-                case 48:
+                case REQUEST_LOGIN:
                 {
-                    send(socket, "wait for args", 14, 0);
+                    send(socket, "Login?", 14, 0);
                     int i;
                     char* args = (char*)malloc(sizeof(AccountData));
                     readbytes = 0;

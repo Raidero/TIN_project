@@ -1,7 +1,9 @@
 #include "MenuViewModel.h"
 
-MenuViewModel::MenuViewModel()
+MenuViewModel::MenuViewModel(int soc)
 {
+    mainsocket = soc;
+    initButtons(6);
     exit = false;
     isloggedin = false;
     isvisible = true;
@@ -25,30 +27,7 @@ MenuViewModel::MenuViewModel()
 
 MenuViewModel::~MenuViewModel()
 {
-    //dtor
-}
-
-
-
-
-
-
-
-int MenuViewModel::checkButtonsPressed(float x, float y)
-{
-    for(int i = 0; i < NUMBER_OF_BUTTONS_MENU; ++i)
-    {
-
-        if(buttons[i].getPosition().x < x &&
-            buttons[i].getPosition().y < y &&
-            buttons[i].getSize().x + buttons[i].getPosition().x > x &&
-            buttons[i].getSize().y + buttons[i].getPosition().y > y)
-        {
-            buttonPressed(i);
-        }
-
-    }
-    return NO_BUTTON_IS_PRESSED;
+    disposeButtons();
 }
 
 void MenuViewModel::buttonPressed(int i)
@@ -57,18 +36,51 @@ void MenuViewModel::buttonPressed(int i)
     {
         case START_GAME:
             break;
-
         case EXIT_GAME:
             exit = true;
             break;
-
         case LOG:
-            loginviewmodel.setActivity(true);
-            loginviewmodel.setVisibility(true);
-            this->setActivity(false);
+            if(!isloggedin)
+            {
+                loginviewmodel->setActivity(true);
+                loginviewmodel->setVisibility(true);
+                this->setActivity(false);
+            }
+            else
+            {
+                int n = sizeof(uint32_t);
+                buffer[0] = REQUEST_LOGOUT;
+                while(!send(mainsocket, buffer, 1, 0)) {}
+                //buffer =
+                while(n > 0)
+                {
+                    n -= send(mainsocket, buffer, sizeof(uint32_t), 0);
+                }
+
+                refresh(PLAYER_LOGGED_OUT);
+            }
             break;
 
 
+    }
+}
+
+void MenuViewModel::refresh(int message)
+{
+    switch(message)
+    {
+        case PLAYER_LOGGED_IN:
+            buttonChangedName(log, "Log out", buttons[2]);
+            enableButton(changepassword);
+            enableButton(startgame);
+            isloggedin = true;
+            break;
+        case PLAYER_LOGGED_OUT:
+            buttonChangedName(log, "Log in", buttons[2]);
+            disableButton(changepassword);
+            disableButton(startgame);
+            isloggedin = false;
+            break;
     }
 }
 
