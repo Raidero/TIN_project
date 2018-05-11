@@ -16,8 +16,6 @@
 #include "MenuService.h"
 #include "CommunicationService.h"
 #include "Serialization.h"
-
-#define DEFAULT_PORT 8001
 #define DEFAULT_IP "10.0.2.15"
 
 pthread_t threads[MAX_THREADS_COUNT];
