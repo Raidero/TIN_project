@@ -36,7 +36,8 @@
 #define ERROR_IDENTIFYING_ROOM -603
 
 #define MAX_LOGIN_LENGTH 32
-#define MAX_PASSHASH_LENGTH 256  //???have to change it later, to the value that hash function will return
+#define MAX_PASSWORD_LENGTH 32
+#define MAX_PASSHASH_LENGTH 32
 #define MAX_ROOM_COUNT 16
 #define MAX_PLAYER_COUNT 16 //in room
 #define MAX_CONNECTION_LIMIT 128 //how many clients can wait in queue on accept connection
@@ -63,5 +64,9 @@
 #define ERROR_WRITING_TO_SOCKET -603
 #define ERROR_READING_FROM_SOCKET -604
 
+
+///views communication
+#define PLAYER_LOGGED_IN 1
+#define PLAYER_LOGGED_OUT 2
 #endif // DEFINES_H
 
