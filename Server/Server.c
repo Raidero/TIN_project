@@ -57,8 +57,9 @@ int startServer(struct sockaddr_in server_address)
     struct sockaddr_in client_address;
     unsigned int client_length = sizeof(client_address);
     int socketindex;
+    pthread_t eventhandler;
     signal(SIGINT, intHandler); //starting function to handle Ctrl-C signal
-
+    pthread_create(&eventhandler, NULL, startEventHandler, NULL);
     while(1)
     {
         socketindex = createNewSocket();
@@ -127,11 +128,10 @@ void* services(void *i)
     {
         fprintf(stderr, "Player id not found\n");
         close(socket);
-        free(i);
         pthread_exit(NULL);
     }
     printf("New client connected: %d\n", socket);
-    char buffer[BUFFER_SIZE];
+    unsigned char buffer[BUFFER_SIZE];
     int readbytes;
     while(1)
     {
@@ -149,7 +149,6 @@ void* services(void *i)
                 checkIfRoomIsEmptyAndDispose(roomid);
             }
             close(socket);
-            free(i);
             pthread_exit(NULL);
             //break;//bye
         }
@@ -159,35 +158,29 @@ void* services(void *i)
             {
                 case REQUEST_LOGIN:
                 {
-                    send(socket, "Login?", 14, 0);
-                    int i, bytestoread, size;
+                    int i, alldata, size;
                     size = sizeof(AccountData) + sizeof(int);
                     unsigned char* args = (unsigned char*)malloc(size);
                     readbytes = 0;
-                    bytestoread = size;
+                    alldata = sizeof(AccountData);
                     do{
-                        readbytes += recv(socket, buffer+readbytes, bytestoread, MSG_WAITALL);
-                        bytestoread -= readbytes;
-                    }while(readbytes < size);
-                    printf("XD");
-                    fflush(stdout);
+                        readbytes += recv(socket, buffer+readbytes, alldata - readbytes, MSG_WAITALL);
+                    }while(readbytes < alldata);
+                    serializeInt(buffer+readbytes, accountid);
+
                     for(i = 0; i < size; ++i)
                     {
                         args[i] = buffer[i];
                     }
                     Event* event = createEvent((void (*)(void))logInService, args, socket, REQUEST_LOGIN);
                     addNewElement(event);
-                    printf("XD");
-                    fflush(stdout);
+                    readbytes = 0;
                     break;
                 }
                 ///TODO....
             }
         }
-
-        printf("%s", buffer);
         bzero(buffer, BUFFER_SIZE);
-        write(socket, "got your message", 17);
     }
     return NULL;
 }

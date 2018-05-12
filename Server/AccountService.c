@@ -78,7 +78,7 @@ int logInService(AccountData* account, int playerid)
     {
         loggedaccounts[playerid] = account;
         printf("Player %s logged in", account->login);
-        return playerid;
+        return 0;
     }
     fprintf(stderr, "Place is already taken\n");
     return ACCOUNT_PLACE_TAKEN_ERROR;

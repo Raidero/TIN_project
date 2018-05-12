@@ -9,7 +9,7 @@ int main()
     struct sockaddr_in serveraddress;
     initAccountService();
     initRoomService();
-
+    initQueue();
     initServer(&serveraddress);
     startServer(serveraddress);
 
