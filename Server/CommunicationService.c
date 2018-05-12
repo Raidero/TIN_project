@@ -1,6 +1,6 @@
 #include "CommunicationService.h"
 
-
+//function to send message from player to player (1 to 1)
 int sendMessageToPlayerService(char* login, char* message)
 {
     //getting player id from login to use it as socket
@@ -16,7 +16,7 @@ int sendMessageToPlayerService(char* login, char* message)
     return 0;
 }
 
-//function to be sure that everything got sent
+//function to be sure that every character in message got sent
 int send_all(int socket, char *buffer, size_t length)
 {
     //pointer to index of message dividing sent and not sent part
@@ -24,7 +24,8 @@ int send_all(int socket, char *buffer, size_t length)
     while (length > 0)
     {
         int i = send(socket, ptr, length, 0);
-        if (i < 0)
+        //error if send returns i less than 0
+        if (i < 1)//1 because we don't want it to send messages with 0 characters
         {
             fprintf(stderr, "Couldn't send message to player\n");
             return ERROR_SENDING_MESSAGE;
@@ -35,10 +36,10 @@ int send_all(int socket, char *buffer, size_t length)
     return 0;
 }
 
+//function to send message to all players in room (1 to multiple)
 int sendMessageToRoomService(char* senderlogin, int roomid, char* message)
 {
     int i;
-    int numberofplayers;
     //check if room with given roomid exists
     if (roomid< 0 || roomid > MAX_ROOM_COUNT)
     {
@@ -46,13 +47,16 @@ int sendMessageToRoomService(char* senderlogin, int roomid, char* message)
         return ERROR_IDENTIFYING_ROOM;
     }
     //sending message to all players in room with given id
-    numberofplayers = sizeof(rooms[roomid]->players)/sizeof(rooms[roomid]->players[0]);
-    //for (i = 0; rooms[roomid]->players[i]; i++)
-    for (i = 0; numberofplayers; i++)
+    for (i = 0; i < MAX_PLAYER_COUNT; i++)
     {
-        if (senderlogin!= rooms[roomid]->players[i]->login)
+        //checking if this player exists
+        if(rooms[roomid]->players[i])
         {
-        sendMessageToPlayerService(rooms[roomid]->players[i]->login, message);
+            //don't send message to sender - if strcmp returns 0 (the same logins) then it bypasses sending
+            if (strcmp(senderlogin, rooms[roomid]->players[i]->login))
+            {
+                sendMessageToPlayerService(rooms[roomid]->players[i]->login, message);
+            }
         }
     }
     return 0;
