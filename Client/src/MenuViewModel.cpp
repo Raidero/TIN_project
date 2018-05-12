@@ -59,7 +59,7 @@ void MenuViewModel::buttonPressed(int i)
                 buffer[0] = REQUEST_LOGOUT;
                 while(!send(mainsocket, buffer, 1, 0)) {}
                 unsigned char* bufferptr = buffer;
-                serializeUint_32_t(buffer, accountdata.currentip);
+                bufferptr = serializeUint_32_t(bufferptr, accountdata.currentip);
                 int alldata = bufferptr - buffer;
                 int sendbytes = 0;
                 while(sendbytes < alldata)

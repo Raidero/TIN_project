@@ -1,7 +1,7 @@
 #include "MenuViewModel.h"
 #include "LoginViewModel.h"
-
-#define NUMBER_OF_VIEW_MODELS 2
+#include "CreateAccountViewModel.h"
+#define NUMBER_OF_VIEW_MODELS 3
 using namespace std;
 
 int main()
@@ -21,8 +21,9 @@ int main()
     ViewModel* viewmodels[NUMBER_OF_VIEW_MODELS];
     viewmodels[0] = new MenuViewModel(clientsocket, serveraddress.sin_addr.s_addr);
     viewmodels[1] = new LoginViewModel(viewmodels[0]);
+    viewmodels[2] = new CreateAccountViewModel(viewmodels[0]);
     dynamic_cast<MenuViewModel*>(viewmodels[0])->linkLoginViewModel(viewmodels[1]);
-
+    dynamic_cast<MenuViewModel*>(viewmodels[0])->linkCreateAccountViewModel(viewmodels[2]);
     while (window.isOpen())
     {
         sf::Event event;
@@ -62,5 +63,6 @@ int main()
 
     delete viewmodels[0];
     delete viewmodels[1];
+    delete viewmodels[2];
     return 0;
 }

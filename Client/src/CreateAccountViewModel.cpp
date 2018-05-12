@@ -3,7 +3,7 @@
 CreateAccountViewModel::CreateAccountViewModel(ViewModel* mvm): LoginViewModel(mvm)
 {
     title.setString("Sign up");
-    loginbutton.setString("Create");
+    createButton(loginbutton, buttons[0], "create", title.getPosition().y + 3*TEXT_STEP, title.getPosition().x);
 }
 
 CreateAccountViewModel::~CreateAccountViewModel()

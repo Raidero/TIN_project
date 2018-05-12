@@ -6,9 +6,13 @@ LoginViewModel::LoginViewModel(ViewModel* mvm)
     menuviewmodel = mvm;
     loginpos = 0;
     passwordpos = 0;
-    for(int i; i < MAX_LOGIN_LENGTH; ++i)
+    for(int i = 0; i < MAX_LOGIN_LENGTH; ++i)
     {
         login[i] = 0;
+    }
+    for(int i = 0; i < MAX_PASSWORD_LENGTH; ++i)
+    {
+        password[i] = 0;
     }
     writeaccess = -1;
     background.setFillColor(sf::Color(50,50,50));
@@ -56,7 +60,7 @@ void LoginViewModel::buttonPressed(int i)
         case 0: //login button
             if(loginpos != 0 && passwordpos != 0)
             {
-                SHA256((unsigned char*)password, passwordpos, (unsigned char*)passwordhash);
+                SHA256((unsigned char*)&password, passwordpos, (unsigned char*)&passwordhash);
 
                 for(int i = 0; i < MAX_PASSHASH_LENGTH; ++i)
                 {
