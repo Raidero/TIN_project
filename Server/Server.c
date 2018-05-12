@@ -7,22 +7,28 @@ int serversocketfd = -1;
 int initServer(struct sockaddr_in* serveraddress)
 {
     int i;
+    //preparing threads array
     for(i = 0; i < MAX_THREADS_COUNT; ++i)
     {
         threads[i] = -1;
     }
+    //preparing sockets array
     for(i = 0; i < MAX_SOCKETS_COUNT; ++i)
     {
         sockets[i] = -1;
     }
-    /*first call to socket function*/
-    int option = 1;
+    int option = 1; //option is to use in setsockopt, by a pointer to this value
+
+    //creating socket
     serversocketfd = socket(AF_INET, SOCK_STREAM, 0);
     if(serversocketfd < 0)
     {
         fprintf(stderr, "Couldn't open a socket\n");
         return ERROR_OPENING_SOCKET;
     }
+    //setting socket options
+    //level is set to SOL_SOCKET to manipulate options at the sockets API level
+    //SO_REUSEADDR to allow reuse of local addresses in bind()
     if(setsockopt(serversocketfd, SOL_SOCKET, SO_REUSEADDR, (char*)&option, sizeof(option)) < 0)
     {
         fprintf(stderr, "setsockopt failed\n");
@@ -30,17 +36,18 @@ int initServer(struct sockaddr_in* serveraddress)
     }
     bzero((char *) serveraddress, sizeof(*serveraddress));
 
-    /*initialize socket structure*/
-    serveraddress->sin_family = AF_INET;
-    serveraddress->sin_addr.s_addr = INADDR_ANY;
-    serveraddress->sin_port = htons(DEFAULT_PORT);
+    //preparing sockaddr_in structure
+    serveraddress->sin_family = AF_INET; //set address family to Internet Protocol v4 addresses
+    serveraddress->sin_addr.s_addr = INADDR_ANY; //set destination ip number
+    serveraddress->sin_port = htons(DEFAULT_PORT); //set destination port number
 
-    /*bind host address using bind call*/
+    //binding server to address
     if(bind(serversocketfd, (struct sockaddr *) serveraddress, sizeof(*serveraddress)) < 0)
     {
         fprintf(stderr, "Couldn't bind server to address\n");
         return ERROR_BINDING_SOCKET;
     }
+    //start listening for connections on socket
     listen(serversocketfd, MAX_CONNECTION_LIMIT);
     return 0;
 }
@@ -50,7 +57,7 @@ int startServer(struct sockaddr_in server_address)
     struct sockaddr_in client_address;
     unsigned int client_length = sizeof(client_address);
     int socketindex;
-    signal(SIGINT, intHandler);
+    signal(SIGINT, intHandler); //starting function to handle Ctrl-C signal
 
     while(1)
     {
@@ -61,12 +68,14 @@ int startServer(struct sockaddr_in server_address)
             sleep(10);
             continue;
         }
+        //creating a new connected socket for connection request
         sockets[socketindex] = accept(serversocketfd, (struct sockaddr *) &client_address, &client_length);
         if(sockets[socketindex] < 0)
         {
             fprintf(stderr, "Couldn't accept connection\n");
             return ERROR_STARTING_SERVER;
         }
+        //call to function which creates new thread and adds it to treads array
         if(createNewThread(&sockets[socketindex]) < 0)
         {
             fprintf(stderr, "Couldn't create new thread");
