@@ -1,6 +1,7 @@
 #include "Server.h"
 #include "Defines.h"
 
+pthread_t eventhandler;
 pthread_t newClientThread;
 int serversocketfd = -1;
 
@@ -57,9 +58,9 @@ int startServer(struct sockaddr_in server_address)
     struct sockaddr_in client_address;
     unsigned int client_length = sizeof(client_address);
     int socketindex;
-    pthread_t eventhandler;
-    signal(SIGINT, intHandler); //starting function to handle Ctrl-C signal
     pthread_create(&eventhandler, NULL, startEventHandler, NULL);
+    signal(SIGINT, intHandler); //starting function to handle Ctrl-C signal
+
     while(1)
     {
         socketindex = createNewSocket();
@@ -96,6 +97,7 @@ void intHandler(int sig_num)
             pthread_join(threads[i], NULL);
         }
     }*/
+    pthread_kill(eventhandler, 0);
     for(i = 0; i < MAX_THREADS_COUNT; ++i)
     {
         if(threads[i] != -1)

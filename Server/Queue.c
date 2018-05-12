@@ -78,13 +78,12 @@ void* startEventHandler()
         event = popElement();
         if(event != NULL)
         {
-            printf("New Event\n");
+            printf("New Event: ");
             switch(event->message)
             {
                 case REQUEST_LOGIN:
                 {
-                    printf("request");
-                    fflush(stdout);
+                    printf("login\n");
                     unsigned char answer;
                     int (*func)(AccountData*, int) = (int (*)(AccountData*, int))event->functionpointer;
                     AccountData* accdata = (AccountData*)malloc(sizeof(AccountData));
@@ -100,6 +99,8 @@ void* startEventHandler()
                         answer = LOGIN_SUCCESSFUL;
                     }
                     while(!send(event->socket, &answer, 1, 0)) {}
+                    free(accdata);
+                    free(playerid);
                     free(event->argumentsbuffer);
                     free(event);
                     event = NULL;
@@ -107,39 +108,89 @@ void* startEventHandler()
                 }
                 case REQUEST_LOGOUT:
                 {
-                    int result;
+                    printf("logout\n");
+                    unsigned char answer;
                     int (*func)(uint32_t) = (int (*)(uint32_t))event->functionpointer;
-                    uint32_t* ip = (uint32_t*)event->argumentsbuffer;
-                    result = func(*ip);
-                    send(event->socket, &result, sizeof(int), 0);
+                    uint32_t* ip = (uint32_t*)malloc(sizeof(uint32_t));
+                    deserializeUint_32_t(event->argumentsbuffer, ip);
+                    if(func(*ip))
+                    {
+                        answer = FAILED_TO_LOGOUT;
+                    }
+                    else
+                    {
+                        answer = LOGOUT_SUCCESSFUL;
+                    }
+                    while(!send(event->socket, &answer, 1, 0)) {}
+                    free(ip);
+                    free(event->argumentsbuffer);
+                    free(event);
                     break;
                 }
                 case REQUEST_CREATE_ACCOUNT:
                 {
-                    int result;
+                    printf("create account\n");
+                    unsigned char answer;
                     int (*func)(AccountData*) = (int (*)(AccountData*))event->functionpointer;
-                    AccountData* accdata = (AccountData*)event->argumentsbuffer;
-                    result = func(accdata);
-                    send(event->socket, &result, sizeof(int), 0);
+                    AccountData* accdata = (AccountData*)malloc(sizeof(AccountData));
+                    deserializeAccountData(event->argumentsbuffer, accdata);
+                    if(func(accdata))
+                    {
+                        answer = FAILED_TO_CREATE_ACCOUNT;
+                    }
+                    else
+                    {
+                        answer = CREATE_ACCOUNT_SUCCESSFUL;
+                    }
+                    while(!send(event->socket, &answer, 1, 0)) {}
+                    free(accdata);
+                    free(event->argumentsbuffer);
+                    free(event);
                     break;
                 }
                 case REQUEST_DELETE_ACCOUNT:
                 {
-                    int result;
+                    printf("delete account\n");
+                    unsigned char answer;
                     int (*func)(AccountData*) = (int (*)(AccountData*))event->functionpointer;
-                    AccountData* accdata = (AccountData*)event->argumentsbuffer;
-                    result = func(accdata);
-                    send(event->socket, &result, sizeof(int), 0);
+                    AccountData* accdata = (AccountData*)malloc(sizeof(AccountData));
+                    deserializeAccountData(event->argumentsbuffer, accdata);
+                    if(func(accdata))
+                    {
+                        answer = FAILED_TO_DELETE_ACCOUNT;
+                    }
+                    else
+                    {
+                        answer = DELETE_ACCOUNT_SUCCESSFUL;
+                    }
+                    while(!send(event->socket, &answer, 1, 0)) {}
+                    free(accdata);
+                    free(event->argumentsbuffer);
+                    free(event);
                     break;
                 }
                 case REQUEST_CHANGE_PASSWORD:
                 {
-                    int result;
+                    printf("delete account\n");
+                    unsigned char answer;
                     int (*func)(AccountData*, unsigned char*) = (int (*)(AccountData*, unsigned char*))event->functionpointer;
-                    AccountData* accdata = (AccountData*)event->argumentsbuffer;
-                    unsigned char* newpasshash = &event->argumentsbuffer[sizeof(AccountData)];
-                    result = func(accdata, newpasshash);
-                    send(event->socket, &result, sizeof(int), 0);
+                    AccountData* accdata = (AccountData*)malloc(sizeof(AccountData));
+                    unsigned char* passwordhash = (unsigned char*)malloc(MAX_PASSHASH_LENGTH*sizeof(unsigned char));
+                    deserializeAccountData(event->argumentsbuffer, accdata);
+                    deserializeUnsignedCharArray(event->argumentsbuffer, passwordhash, MAX_PASSHASH_LENGTH);
+                    if(func(accdata, passwordhash))
+                    {
+                        answer = FAILED_TO_CHANGE_PASSWORD;
+                    }
+                    else
+                    {
+                        answer = CHANGE_PASSWORD_SUCCESSFUL;
+                    }
+                    while(!send(event->socket, &answer, 1, 0)) {}
+                    free(accdata);
+                    free(passwordhash);
+                    free(event->argumentsbuffer);
+                    free(event);
                     break;
                 }
                 ///TODO, there are many other messages that need being handled

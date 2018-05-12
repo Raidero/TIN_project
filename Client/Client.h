@@ -13,9 +13,6 @@
 #include <arpa/inet.h>
 #include "Defines.h"
 
-
-
-
 #define DEFAULT_PORT 8001
 #define DEFAULT_IP "10.0.2.15"
 

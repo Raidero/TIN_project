@@ -16,6 +16,7 @@
 					<Add option="-g" />
 					<Add directory="include" />
 					<Add directory="../Server" />
+					<Add directory="Client/include" />
 				</Compiler>
 				<Linker>
 					<Add library="pthread" />
@@ -34,6 +35,7 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add directory="include" />
+					<Add directory="Client/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -43,6 +45,7 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="../Server/Defines.h" />
 		<Unit filename="../Server/Serialization.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -51,10 +54,12 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Client.h" />
+		<Unit filename="include/CreateAccountViewModel.h" />
 		<Unit filename="include/LoginViewModel.h" />
 		<Unit filename="include/MenuViewModel.h" />
 		<Unit filename="include/ViewModel.h" />
 		<Unit filename="main.cpp" />
+		<Unit filename="src/CreateAccountViewModel.cpp" />
 		<Unit filename="src/LoginViewModel.cpp" />
 		<Unit filename="src/MenuViewModel.cpp" />
 		<Unit filename="src/ViewModel.cpp" />
