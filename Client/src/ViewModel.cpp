@@ -2,6 +2,7 @@
 
 int mainsocket;
 AccountData accountdata;
+
 unsigned char buffer[BUFFER_SIZE];
 
 ViewModel::ViewModel()

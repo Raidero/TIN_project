@@ -5,12 +5,12 @@
 class LoginViewModel: public ViewModel
 {
 public:
-    LoginViewModel(ViewModel* mvm, uint32_t ip);
+    LoginViewModel(ViewModel* mvm);
     virtual ~LoginViewModel();
     virtual void addLetter(char c);
-    virtual void refresh(int message) {}
+    virtual void refresh(int message);
     ViewModel* menuviewmodel;
-private:
+protected:
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const
     {
         if(isvisible)
@@ -25,11 +25,14 @@ private:
             target.draw(cancelbutton);
             target.draw(loginview);
             target.draw(passwordview);
+            target.draw(message);
         }
     }
     virtual void buttonPressed(int i);
 
     sf::RectangleShape background;
+
+    sf::Text message;
 
     sf::Text loginbutton;
     sf::Text cancelbutton;

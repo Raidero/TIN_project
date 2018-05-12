@@ -6,6 +6,7 @@ extern "C"
     #include <stdlib.h>
     #include "../Client.h"
     #include "Serialization.h"
+    #include "Defines.h"
 }
 #include <string>
 #include <iostream>
@@ -14,7 +15,6 @@ extern "C"
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
-#include "Defines.h"
 #include <openssl/sha.h>
 
 #define WIDTH 640

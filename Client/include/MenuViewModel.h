@@ -1,20 +1,19 @@
 #ifndef MENUVIEWMODEL_H
 #define MENUVIEWMODEL_H
 #include "ViewModel.h"
-#define START_GAME 0
-#define EXIT_GAME 1
-#define LOG 2
 
 class MenuViewModel: public ViewModel
 {
 public:
-    MenuViewModel(int soc);
+    MenuViewModel(int soc, uint32_t ip);
     virtual ~MenuViewModel();
     bool exitGame() { return exit; }
     void linkLoginViewModel(ViewModel* lvm) { loginviewmodel = lvm; }
+    void linkCreateAccountViewModel(ViewModel* cavm) { createaccountviewmodel = cavm; }
     virtual void addLetter(char c) {}
     virtual void refresh(int message);
     ViewModel* loginviewmodel;
+    ViewModel* createaccountviewmodel;
 private:
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const
     {
@@ -31,10 +30,11 @@ private:
             target.draw(log);
             target.draw(deleteaccount);
             target.draw(changepassword);
+            target.draw(loggedinas);
         }
     }
     virtual void buttonPressed(int i);
-
+    sf::Text loggedinas;
     sf::Text startgame;
     sf::Text exitgame;
     sf::Text createaccount;

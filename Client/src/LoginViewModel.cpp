@@ -1,9 +1,7 @@
 #include "LoginViewModel.h"
 
-LoginViewModel::LoginViewModel(ViewModel* mvm, uint32_t ip)
+LoginViewModel::LoginViewModel(ViewModel* mvm)
 {
-    accountdata.currentip = ip;
-    accountdata.votercounter = 0;
     initButtons(4);
     menuviewmodel = mvm;
     loginpos = 0;
@@ -37,7 +35,9 @@ LoginViewModel::LoginViewModel(ViewModel* mvm, uint32_t ip)
     passwordview.setFont(font);
     passwordview.setCharacterSize(FONT_SMALL);
     passwordview.setColor(sf::Color(0,0,0));
-
+    message.setCharacterSize(FONT_SMALL);
+    message.setFont(font);
+    message.setPosition(background.getPosition().x - 20, title.getPosition().y + 5);
 }
 
 LoginViewModel::~LoginViewModel()
@@ -49,6 +49,7 @@ void LoginViewModel::buttonPressed(int i)
 {
     buttons[2].setFillColor(sf::Color(255,255,255));
     buttons[3].setFillColor(sf::Color(255,255,255));
+    message.setString(std::string(""));
     writeaccess = -1;
     switch(i)
     {
@@ -78,14 +79,18 @@ void LoginViewModel::buttonPressed(int i)
                 }
                 while(!recv(mainsocket, buffer, 1, MSG_WAITALL)) {}
                 if(buffer[0] == FAILED_TO_LOGIN)
-                    std::cout<<"XD" << std::endl;
-                this->setVisibility(false);
-                this->setActivity(false);
-                menuviewmodel->setActivity(true);
-                menuviewmodel->refresh(PLAYER_LOGGED_IN);
+                {
+                    message.setString(std::string("Wrong login or password"));
+                }
+                else if(buffer[0] == LOGIN_SUCCESSFUL)
+                {
+                    this->refresh(PLAYER_LOGGED_IN);
+                    menuviewmodel->refresh(PLAYER_LOGGED_IN);
+                }
             }
             else
             {
+                message.setString(std::string("Login or password empty"));
                 std::cerr << "Login or password field is empty\n";
             }
             break;
@@ -102,7 +107,6 @@ void LoginViewModel::buttonPressed(int i)
             buttons[3].setFillColor(sf::Color(255,200,200));
             writeaccess = 3;
             break;
-
     }
 }
 
@@ -148,6 +152,19 @@ void LoginViewModel::addLetter(char c)
                 s += '*';
             passwordview.setString(s);
             break;
+        }
+    }
+}
+
+void LoginViewModel::refresh(int message)
+{
+    switch(message)
+    {
+        case PLAYER_LOGGED_IN:
+        {
+            this->setVisibility(false);
+            this->setActivity(false);
+            menuviewmodel->setActivity(true);
         }
     }
 }

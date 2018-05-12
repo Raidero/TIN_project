@@ -14,13 +14,13 @@ int main()
     if(startClient(clientsocket, serveraddress))
     {
         std::cout << "Couldn't connect to server. Try again later\n";
-        //return 1;
+        return 1;
     }
 
     sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "Maze Shooter");
     ViewModel* viewmodels[NUMBER_OF_VIEW_MODELS];
-    viewmodels[0] = new MenuViewModel(clientsocket);
-    viewmodels[1] = new LoginViewModel(viewmodels[0], serveraddress.sin_addr.s_addr);
+    viewmodels[0] = new MenuViewModel(clientsocket, serveraddress.sin_addr.s_addr);
+    viewmodels[1] = new LoginViewModel(viewmodels[0]);
     dynamic_cast<MenuViewModel*>(viewmodels[0])->linkLoginViewModel(viewmodels[1]);
 
     while (window.isOpen())
