@@ -18,7 +18,7 @@ void initAccountService()
     }
 }
 
-AccountData* initAccoundData(char* login, char* passwordhash, uint32_t currentip, int votercounter)
+AccountData* initAccoundData(char* login, unsigned char* passwordhash, uint32_t currentip, int votercounter)
 {
     int i = 0;
     AccountData* acc = (AccountData*)malloc(sizeof(AccountData));
@@ -164,7 +164,7 @@ int deleteAccountService(AccountData* account)
     return 0;
 }
 
-int changePasswordService(AccountData* account, char* newpasshash)
+int changePasswordService(AccountData* account, unsigned char* newpasshash)
 {
     int i = 0;
 	if(datafile == NULL)

@@ -56,6 +56,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="RoomService.h" />
+		<Unit filename="Serialization.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Serialization.h" />
 		<Unit filename="Server.c">
 			<Option compilerVar="CC" />
 		</Unit>

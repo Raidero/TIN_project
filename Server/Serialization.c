@@ -46,22 +46,22 @@ int serializeAccountData(unsigned char* buffer, AccountData* accountdata)
     return buffer - start;
 }
 
-unsigned char* deserializeInt(unsigned char* buffer, int output)
+unsigned char* deserializeInt(unsigned char* buffer, int* output)
 {
-    output = 0;
-    output |= buffer[0] << 24;
-    output |= buffer[0] << 16;
-    output |= buffer[0] << 8;
-    output |= buffer[0];
+    *output = 0;
+    *output |= buffer[0] << 24;
+    *output |= buffer[0] << 16;
+    *output |= buffer[0] << 8;
+    *output |= buffer[0];
     return buffer + sizeof(int);
 }
-unsigned char* deserializeUint_32_t(unsigned char* buffer, uint32_t output)
+unsigned char* deserializeUint_32_t(unsigned char* buffer, uint32_t* output)
 {
-    output = 0;
-    output |= buffer[0] << 24;
-    output |= buffer[0] << 16;
-    output |= buffer[0] << 8;
-    output |= buffer[0];
+    *output = 0;
+    *output |= buffer[0] << 24;
+    *output |= buffer[0] << 16;
+    *output |= buffer[0] << 8;
+    *output |= buffer[0];
     return buffer + sizeof(uint32_t);
 }
 unsigned char* deserializeCharArray(unsigned char* buffer, char* array, int size)
@@ -84,12 +84,11 @@ unsigned char* deserializeUnsignedCharArray(unsigned char* buffer, unsigned char
     return buffer + size;
 }
 
-int deserializeAccountData(unsigned char* buffer, AccountData* accountdata)
+unsigned char* deserializeAccountData(unsigned char* buffer, AccountData* accountdata)
 {
-    unsigned char* start = buffer;
-    buffer = deserializeUint_32_t(buffer, accountdata->currentip);
+    buffer = deserializeUint_32_t(buffer, &accountdata->currentip);
     buffer = deserializeCharArray(buffer, accountdata->login, MAX_LOGIN_LENGTH);
     buffer = deserializeUnsignedCharArray(buffer, accountdata->passwordhash, MAX_PASSHASH_LENGTH);
-    buffer = deserializeInt(buffer, accountdata->votercounter);
-    return buffer - start;
+    buffer = deserializeInt(buffer, &accountdata->votercounter);
+    return buffer;
 }
