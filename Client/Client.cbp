@@ -23,6 +23,7 @@
 					<Add library="sfml-window" />
 					<Add library="sfml-system" />
 					<Add library="crypto" />
+					<Add directory="../Server" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -42,6 +43,10 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="../Server/Serialization.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Server/Serialization.h" />
 		<Unit filename="Client.c">
 			<Option compilerVar="CC" />
 		</Unit>

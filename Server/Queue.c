@@ -1,5 +1,6 @@
 #include "Queue.h"
-extern Event* queue[MAX_QUEUE_LENGTH];
+#include <unistd.h>
+Event* queue[MAX_QUEUE_LENGTH];
 unsigned int lastindex = 0;
 unsigned int firstindex = 0;
 int isfull = 0;
@@ -38,8 +39,9 @@ void addNewElement(Event* element)
     pthread_mutex_unlock(&queuelock);
 }
 
-void popElement(Event* element)
+Event* popElement()
 {
+    Event* element = NULL;
     pthread_mutex_lock(&queuelock);
     if(lastindex == firstindex && !isfull)
     {
@@ -55,6 +57,7 @@ void popElement(Event* element)
         }
     }
     pthread_mutex_unlock(&queuelock);
+    return element;
 }
 
 Event* createEvent(void (*func)(void), unsigned char* args, int socket, char message)
@@ -72,22 +75,34 @@ void* startEventHandler()
     Event* event = NULL;
     for(;;)
     {
-        popElement(event);
+        event = popElement();
         if(event != NULL)
         {
+            printf("New Event\n");
             switch(event->message)
             {
                 case REQUEST_LOGIN:
                 {
-                    int result;
+                    printf("request");
+                    fflush(stdout);
+                    unsigned char answer;
                     int (*func)(AccountData*, int) = (int (*)(AccountData*, int))event->functionpointer;
                     AccountData* accdata = (AccountData*)malloc(sizeof(AccountData));
                     deserializeAccountData(event->argumentsbuffer, accdata);
                     int* playerid = (int*)malloc(sizeof(int));
                     deserializeInt(event->argumentsbuffer, playerid);
-                    ///serialize this
-                    ///result = func(accdata, *playerid);
-                    ///send(event->socket, &result, sizeof(int), 0);
+                    if(func(accdata, *playerid))
+                    {
+                        answer = FAILED_TO_LOGIN;
+                    }
+                    else
+                    {
+                        answer = LOGIN_SUCCESSFUL;
+                    }
+                    while(!send(event->socket, &answer, 1, 0)) {}
+                    free(event->argumentsbuffer);
+                    free(event);
+                    event = NULL;
                     break;
                 }
                 case REQUEST_LOGOUT:
@@ -129,6 +144,11 @@ void* startEventHandler()
                 }
                 ///TODO, there are many other messages that need being handled
             }
+            free(event);
+        }
+        else
+        {
+            sleep(1);
         }
 
     }

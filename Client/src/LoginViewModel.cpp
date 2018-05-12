@@ -59,13 +59,26 @@ void LoginViewModel::buttonPressed(int i)
 
                 for(int i = 0; i < MAX_PASSHASH_LENGTH; ++i)
                 {
-                        accountdata.passwordhash[i] = this->passwordhash[i];
+                    accountdata.passwordhash[i] = this->passwordhash[i];
                 }
                 for(int i = 0; i < loginpos; ++i)
                 {
                     accountdata.login[i] = login[i];
                 }
                 accountdata.login[loginpos] = 0;
+                buffer[0] = REQUEST_LOGIN;
+                while(!send(mainsocket, buffer, 1, 0)) {}
+                unsigned char* bufferptr = buffer;
+                bufferptr = serializeAccountData(bufferptr, &accountdata);
+                int alldata = bufferptr - buffer;
+                int sendbytes = 0;
+                while(sendbytes < alldata)
+                {
+                    sendbytes += send(mainsocket, buffer + sendbytes, alldata - sendbytes, 0);
+                }
+                while(!recv(mainsocket, buffer, 1, MSG_WAITALL)) {}
+                if(buffer[0] == FAILED_TO_LOGIN)
+                    std::cout<<"XD" << std::endl;
                 this->setVisibility(false);
                 this->setActivity(false);
                 menuviewmodel->setActivity(true);
