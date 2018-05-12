@@ -8,9 +8,13 @@
 #include "RoomService.h"
 #include "Defines.h"
 
+//function to send message from player to player (1 to 1)
 int sendMessageToPlayerService(char* login, char* message);
+
+//function to be sure that every character in message got sent
 int send_all(int socket, char *buffer, size_t length);
 
+//function to send message to all players in room (1 to multiple)
 int sendMessageToRoomService(char* senderlogin, int roomid, char* message);
 
 #endif // PRIVATE_COMMUNICATION_SERVICE_H
