@@ -6,9 +6,13 @@ LoginViewModel::LoginViewModel(ViewModel* mvm)
     menuviewmodel = mvm;
     loginpos = 0;
     passwordpos = 0;
-    for(int i; i < MAX_LOGIN_LENGTH; ++i)
+    for(int i = 0; i < MAX_LOGIN_LENGTH; ++i)
     {
         login[i] = 0;
+    }
+    for(int i = 0; i < MAX_PASSWORD_LENGTH; ++i)
+    {
+        password[i] = 0;
     }
     writeaccess = -1;
     background.setFillColor(sf::Color(50,50,50));
