@@ -5,6 +5,7 @@ extern "C"
     #include <stdio.h>
     #include <stdlib.h>
     #include "../Client.h"
+    #include "Serialization.h"
 }
 #include <string>
 #include <iostream>
@@ -15,7 +16,6 @@ extern "C"
 #include <SFML/Graphics/RectangleShape.hpp>
 #include "Defines.h"
 #include <openssl/sha.h>
-#include <inttypes.h>
 
 #define WIDTH 640
 #define HEIGHT 480
@@ -28,17 +28,9 @@ extern "C"
 #define NUMBER_OF_BUTTONS_MENU 6
 #define NO_BUTTON_IS_PRESSED -1
 
-typedef struct
-{
-    char login[MAX_LOGIN_LENGTH];
-    unsigned char passwordhash[MAX_PASSHASH_LENGTH];
-    uint32_t currentip;                     //changed so it now reflects ip from in_addr struct
-    int votercounter;
-}AccountData;
-
 extern AccountData accountdata;
 extern int mainsocket;
-extern char buffer[BUFFER_SIZE];
+extern unsigned char buffer[BUFFER_SIZE];
 
 class ViewModel: public sf::Drawable
 {

@@ -36,14 +36,13 @@ unsigned char* serializeUnsignedCharArray(unsigned char* buffer, unsigned char* 
     return buffer + size;
 }
 
-int serializeAccountData(unsigned char* buffer, AccountData* accountdata)
+unsigned char* serializeAccountData(unsigned char* buffer, AccountData* accountdata)
 {
-    unsigned char* start = buffer;
     buffer = serializeUint_32_t(buffer, accountdata->currentip);
     buffer = serializeCharArray(buffer, accountdata->login, MAX_LOGIN_LENGTH);
     buffer = serializeUnsignedCharArray(buffer, accountdata->passwordhash, MAX_PASSHASH_LENGTH);
     buffer = serializeInt(buffer, accountdata->votercounter);
-    return buffer - start;
+    return buffer;
 }
 
 unsigned char* deserializeInt(unsigned char* buffer, int* output)
