@@ -132,9 +132,12 @@ void* services(void *i)
         {
             if(accountid >= 0)
             {
+                disposeAccountData(accountid);
+            }
+            if(roomid >= 0)
+            {
                 sweepPlayer(loggedaccounts[accountid], roomid);
                 checkIfRoomIsEmptyAndDispose(roomid);
-                disposeAccountData(accountid);
             }
             close(socket);
             free(i);
@@ -148,15 +151,18 @@ void* services(void *i)
                 case REQUEST_LOGIN:
                 {
                     send(socket, "Login?", 14, 0);
-                    int i;
-                    char* args = (char*)malloc(sizeof(AccountData));
+                    int i, bytestoread, size;
+                    size = sizeof(AccountData) + sizeof(int);
+                    unsigned char* args = (unsigned char*)malloc(size);
                     readbytes = 0;
+                    bytestoread = size;
                     do{
-                        readbytes += recv(socket, buffer, sizeof(AccountData) + sizeof(int), 0);
-                    }while(readbytes < sizeof(AccountData) + sizeof(int));
+                        readbytes += recv(socket, buffer+readbytes, bytestoread, MSG_WAITALL);
+                        bytestoread -= readbytes;
+                    }while(readbytes < size);
                     printf("XD");
                     fflush(stdout);
-                    for(i = 0; i < sizeof(AccountData) + sizeof(int); ++i)
+                    for(i = 0; i < size; ++i)
                     {
                         args[i] = buffer[i];
                     }

@@ -57,7 +57,7 @@ void popElement(Event* element)
     pthread_mutex_unlock(&queuelock);
 }
 
-Event* createEvent(void (*func)(void), char* args, int socket, char message)
+Event* createEvent(void (*func)(void), unsigned char* args, int socket, char message)
 {
     Event* event = (Event*)malloc(sizeof(Event));
     event->functionpointer = func;
@@ -81,10 +81,13 @@ void* startEventHandler()
                 {
                     int result;
                     int (*func)(AccountData*, int) = (int (*)(AccountData*, int))event->functionpointer;
-                    AccountData* accdata = (AccountData*)event->argumentsbuffer;
-                    int* playerid = (int*)&event->argumentsbuffer[sizeof(AccountData)];
-                    result = func(accdata, *playerid);
-                    send(event->socket, &result, sizeof(int), 0);
+                    AccountData* accdata = (AccountData*)malloc(sizeof(AccountData));
+                    deserializeAccountData(event->argumentsbuffer, accdata);
+                    int* playerid = (int*)malloc(sizeof(int));
+                    deserializeInt(event->argumentsbuffer, playerid);
+                    ///serialize this
+                    ///result = func(accdata, *playerid);
+                    ///send(event->socket, &result, sizeof(int), 0);
                     break;
                 }
                 case REQUEST_LOGOUT:
@@ -117,9 +120,9 @@ void* startEventHandler()
                 case REQUEST_CHANGE_PASSWORD:
                 {
                     int result;
-                    int (*func)(AccountData*, char*) = (int (*)(AccountData*, char*))event->functionpointer;
+                    int (*func)(AccountData*, unsigned char*) = (int (*)(AccountData*, unsigned char*))event->functionpointer;
                     AccountData* accdata = (AccountData*)event->argumentsbuffer;
-                    char* newpasshash = &event->argumentsbuffer[sizeof(AccountData)];
+                    unsigned char* newpasshash = &event->argumentsbuffer[sizeof(AccountData)];
                     result = func(accdata, newpasshash);
                     send(event->socket, &result, sizeof(int), 0);
                     break;

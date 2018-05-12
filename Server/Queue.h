@@ -9,10 +9,11 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "Serialization.h"
 typedef struct
 {
     void (*functionpointer)(void);
-    char* argumentsbuffer;
+    unsigned char* argumentsbuffer;
     int socket;
     char message;
 }Event;
@@ -23,7 +24,7 @@ void initQueue();
 void disposeQueue();
 void addNewElement(Event* element);
 void popElement(Event* element);
-Event* createEvent(void (*func)(void), char* args, int socket, char message);
+Event* createEvent(void (*func)(void), unsigned char* args, int socket, char message);
 void* startEventHandler();
 
 #endif // QUEUE_H
