@@ -28,7 +28,7 @@ int initServer(struct sockaddr_in* serveraddress)
     }
     //setting socket options
     //level is set to SOL_SOCKET to manipulate options at the sockets API level
-    //SO_REUSEADDR to allow reuse of local addresses in bind()
+    //SO_REUSEADDR to allow reusing local addresses in bind()
     if(setsockopt(serversocketfd, SOL_SOCKET, SO_REUSEADDR, (char*)&option, sizeof(option)) < 0)
     {
         fprintf(stderr, "setsockopt failed\n");
@@ -76,7 +76,7 @@ int startServer(struct sockaddr_in server_address)
             fprintf(stderr, "Couldn't accept connection\n");
             return ERROR_STARTING_SERVER;
         }
-        //call to function which creates new thread and adds it to treads array
+        //call to function which creates new thread and adds it to threads array
         if(createNewThread(&sockets[socketindex]) < 0)
         {
             fprintf(stderr, "Couldn't create new thread");
@@ -150,9 +150,8 @@ void* services(void *i)
             }
             close(socket);
             pthread_exit(NULL);
-            //break;//bye
         }
-        else if(readbytes >= 1) //here we come
+        else if(readbytes >= 1)
         {
             switch(buffer[0])
             {
@@ -164,7 +163,7 @@ void* services(void *i)
                     readbytes = 0;
                     alldata = sizeof(AccountData);
                     do{
-                        readbytes += recv(socket, buffer+readbytes, alldata - readbytes, MSG_WAITALL);
+                        readbytes += recv(socket, buffer+readbytes, alldata-readbytes, MSG_WAITALL);
                     }while(readbytes < alldata);
                     serializeInt(buffer+readbytes, accountid);
 
@@ -177,7 +176,88 @@ void* services(void *i)
                     readbytes = 0;
                     break;
                 }
-                ///TODO....
+
+                case REQUEST_LOGOUT:
+                {
+                    int i, alldata, size;
+                    size = sizeof(AccountData) + sizeof(uint32_t);
+                    unsigned char* args = (unsigned char*)malloc(size);
+                    readbytes = 0;
+                    //alldata = sizeof(AccountData);
+                    do{
+                        readbytes += recv(socket, buffer+readbytes, size-readbytes, MSG_WAITALL);
+                    }while(readbytes < size);
+
+                    for(i = 0; i < size; ++i)
+                    {
+                        args[i] = buffer[i];
+                    }
+                    Event* event = createEvent((void (*)(void))logOutService, args, socket, REQUEST_LOGOUT);
+                    addNewElement(event);
+                    readbytes = 0;
+                    break;
+                }
+
+                case REQUEST_CREATE_ACCOUNT:
+                {
+                    int i, size;
+                    size = sizeof(AccountData);
+                    unsigned char* args = (unsigned char*)malloc(size);
+                    readbytes = 0;
+                    do{
+                        readbytes += recv(socket, buffer+readbytes, size-readbytes, MSG_WAITALL);
+                    }while(readbytes < size);
+
+                    for(i = 0; i < size; ++i)
+                    {
+                        args[i] = buffer[i];
+                    }
+                    Event* event = createEvent((void (*)(void))createAccountService, args, socket, REQUEST_CREATE_ACCOUNT);
+                    addNewElement(event);
+                    readbytes = 0;
+                    break;
+                }
+
+                case REQUEST_DELETE_ACCOUNT:
+                {
+                    int i, size;
+                    size = sizeof(AccountData);
+                    unsigned char* args = (unsigned char*)malloc(size);
+                    readbytes = 0;
+                    do{
+                        readbytes += recv(socket, buffer+readbytes, size-readbytes, MSG_WAITALL);
+                    }while(readbytes < size);
+
+                    for(i = 0; i < size; ++i)
+                    {
+                        args[i] = buffer[i];
+                    }
+                    Event* event = createEvent((void (*)(void))deleteAccountService, args, socket, REQUEST_DELETE_ACCOUNT);
+                    addNewElement(event);
+                    readbytes = 0;
+                    break;
+                }
+
+                case REQUEST_CHANGE_PASSWORD:
+                {
+                    int i, size;
+                    size = sizeof(AccountData) + sizeof(unsigned char*);
+                    unsigned char* args = (unsigned char*)malloc(size);
+                    readbytes = 0;
+                    //alldata = sizeof(AccountData);
+                    do{
+                        readbytes += recv(socket, buffer+readbytes, size-readbytes, MSG_WAITALL);
+                    }while(readbytes < size);
+
+                    for(i = 0; i < size; ++i)
+                    {
+                        args[i] = buffer[i];
+                    }
+                    Event* event = createEvent((void (*)(void))changePasswordService, args, socket, REQUEST_CHANGE_PASSWORD);
+                    addNewElement(event);
+                    readbytes = 0;
+                    break;
+                }
             }
         }
         bzero(buffer, BUFFER_SIZE);
