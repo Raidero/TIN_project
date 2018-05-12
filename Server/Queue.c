@@ -87,9 +87,10 @@ void* startEventHandler()
                     unsigned char answer;
                     int (*func)(AccountData*, int) = (int (*)(AccountData*, int))event->functionpointer;
                     AccountData* accdata = (AccountData*)malloc(sizeof(AccountData));
-                    deserializeAccountData(event->argumentsbuffer, accdata);
+                    unsigned char* bufferptr = event->argumentsbuffer;
+                    bufferptr = deserializeAccountData(bufferptr, accdata);
                     int* playerid = (int*)malloc(sizeof(int));
-                    deserializeInt(event->argumentsbuffer, playerid);
+                    deserializeInt(bufferptr, playerid);
                     if(func(accdata, *playerid))
                     {
                         answer = FAILED_TO_LOGIN;
@@ -99,11 +100,7 @@ void* startEventHandler()
                         answer = LOGIN_SUCCESSFUL;
                     }
                     while(!send(event->socket, &answer, 1, 0)) {}
-                    free(accdata);
                     free(playerid);
-                    free(event->argumentsbuffer);
-                    free(event);
-                    event = NULL;
                     break;
                 }
                 case REQUEST_LOGOUT:
@@ -123,8 +120,6 @@ void* startEventHandler()
                     }
                     while(!send(event->socket, &answer, 1, 0)) {}
                     free(ip);
-                    free(event->argumentsbuffer);
-                    free(event);
                     break;
                 }
                 case REQUEST_CREATE_ACCOUNT:
@@ -144,8 +139,6 @@ void* startEventHandler()
                     }
                     while(!send(event->socket, &answer, 1, 0)) {}
                     free(accdata);
-                    free(event->argumentsbuffer);
-                    free(event);
                     break;
                 }
                 case REQUEST_DELETE_ACCOUNT:
@@ -165,8 +158,6 @@ void* startEventHandler()
                     }
                     while(!send(event->socket, &answer, 1, 0)) {}
                     free(accdata);
-                    free(event->argumentsbuffer);
-                    free(event);
                     break;
                 }
                 case REQUEST_CHANGE_PASSWORD:
@@ -176,8 +167,9 @@ void* startEventHandler()
                     int (*func)(AccountData*, unsigned char*) = (int (*)(AccountData*, unsigned char*))event->functionpointer;
                     AccountData* accdata = (AccountData*)malloc(sizeof(AccountData));
                     unsigned char* passwordhash = (unsigned char*)malloc(MAX_PASSHASH_LENGTH*sizeof(unsigned char));
-                    deserializeAccountData(event->argumentsbuffer, accdata);
-                    deserializeUnsignedCharArray(event->argumentsbuffer, passwordhash, MAX_PASSHASH_LENGTH);
+                    unsigned char* bufferptr = event->argumentsbuffer;
+                    bufferptr = deserializeAccountData(bufferptr, accdata);
+                    deserializeUnsignedCharArray(bufferptr, passwordhash, MAX_PASSHASH_LENGTH);
                     if(func(accdata, passwordhash))
                     {
                         answer = FAILED_TO_CHANGE_PASSWORD;
@@ -189,13 +181,13 @@ void* startEventHandler()
                     while(!send(event->socket, &answer, 1, 0)) {}
                     free(accdata);
                     free(passwordhash);
-                    free(event->argumentsbuffer);
-                    free(event);
                     break;
                 }
                 ///TODO, there are many other messages that need being handled
             }
+            free(event->argumentsbuffer);
             free(event);
+            event = NULL;
         }
         else
         {

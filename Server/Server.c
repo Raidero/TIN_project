@@ -182,10 +182,9 @@ void* services(void *i)
                 case REQUEST_LOGOUT:
                 {
                     int i, alldata, size;
-                    size = sizeof(AccountData) + sizeof(uint32_t);
+                    size = sizeof(uint32_t);
                     unsigned char* args = (unsigned char*)malloc(size);
                     readbytes = 0;
-                    //alldata = sizeof(AccountData);
                     do{
                         readbytes += recv(socket, buffer+readbytes, size-readbytes, MSG_WAITALL);
                     }while(readbytes < size);

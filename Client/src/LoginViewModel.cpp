@@ -56,7 +56,7 @@ void LoginViewModel::buttonPressed(int i)
         case 0: //login button
             if(loginpos != 0 && passwordpos != 0)
             {
-                SHA256((unsigned char*)password, passwordpos, (unsigned char*)passwordhash);
+                SHA256((unsigned char*)&password, passwordpos, (unsigned char*)&passwordhash);
 
                 for(int i = 0; i < MAX_PASSHASH_LENGTH; ++i)
                 {
