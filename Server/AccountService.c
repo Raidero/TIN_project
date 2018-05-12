@@ -77,7 +77,7 @@ int logInService(AccountData* account, int playerid)
     if(loggedaccounts[playerid] == NULL)
     {
         loggedaccounts[playerid] = account;
-        printf("Player %s logged in", account->login);
+        printf("Player %s logged in\n", account->login);
         return 0;
     }
     fprintf(stderr, "Place is already taken\n");
@@ -93,7 +93,7 @@ int logOutService(uint32_t ip)
         {
             free(loggedaccounts[i]);    //only one person can logout own account, so it is safe not to use any mutex
             loggedaccounts[i] = NULL;
-            printf("Player logged out");
+            printf("Player logged out\n");
             return 0;
         }
     }
@@ -146,9 +146,7 @@ int deleteAccountService(AccountData* account)
         return WRONG_LOGIN_OR_PASSWORD;
     } //look at the comment in function below (changePAsswordService)
 
-    int where = ftell(datafile);
     fseek(datafile, -sizeof(*account), SEEK_CUR);
-    where = ftell(datafile);
     bzero(account, sizeof(*account));
     if(fwrite(account, sizeof(*account), 1, datafile) != 1)
     {
@@ -259,7 +257,7 @@ bool verifyLoginAndPassword(AccountData* account)
     {
         if(fread(&tocompare, sizeof(tocompare), 1, datafile) < 1)
         {
-			fprintf(stderr, "fread fail\n");
+			fprintf(stderr, "fread - nothing to read - it's not an error - just sayin'\n");
 			return 0;
         }
         if(ferror(datafile))
