@@ -47,6 +47,10 @@
 		<Unit filename="../AccountService.h">
 			<Option virtualFolder="Headers/src/" />
 		</Unit>
+		<Unit filename="../CommunicationService.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../CommunicationService.h" />
 		<Unit filename="../Defines.h">
 			<Option virtualFolder="Headers/src/" />
 		</Unit>
@@ -55,13 +59,6 @@
 			<Option virtualFolder="Sources/src/" />
 		</Unit>
 		<Unit filename="../MenuService.h">
-			<Option virtualFolder="Headers/src/" />
-		</Unit>
-		<Unit filename="../PrivateCommunicationService.c">
-			<Option compilerVar="CC" />
-			<Option virtualFolder="Sources/src/" />
-		</Unit>
-		<Unit filename="../PrivateCommunicationService.h">
 			<Option virtualFolder="Headers/src/" />
 		</Unit>
 		<Unit filename="../Queue.c">
@@ -75,6 +72,10 @@
 		<Unit filename="../RoomService.h">
 			<Option virtualFolder="Headers/src/" />
 		</Unit>
+		<Unit filename="../Serialization.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Serialization.h" />
 		<Unit filename="../Server.c">
 			<Option compilerVar="CC" />
 			<Option virtualFolder="Sources/src/" />
@@ -83,7 +84,6 @@
 			<Option virtualFolder="Headers/src/" />
 		</Unit>
 		<Unit filename="AccountServiceTests.cpp" />
-		<Unit filename="RoomServiceTests.cpp" />
 		<Unit filename="test_main.cpp" />
 		<Extensions>
 			<code_completion />

@@ -19,6 +19,12 @@ Room* initRoom()
 {
     int i;
     Room* room = (Room*)malloc(sizeof(Room));
+    if (room == NULL)
+    {
+		fprintf(stderr, "malloc() failed");
+		return NULL;
+	}
+
     room->isingame = 0;
     for(i = 0; i < MAX_PLAYER_COUNT; ++i)
     {
@@ -77,6 +83,11 @@ int findFreeRoomForAccount(AccountData* playerdata)
     {
         for(j = 0; j < MAX_PLAYER_COUNT; ++j)
         {
+			if(rooms[i] == NULL)
+			{
+				break;	// room doesn't exist yet
+			}
+
             if(rooms[i]->players[j] == NULL)
             {
 				if(!rooms[i]->isingame)
@@ -116,7 +127,10 @@ int refreshRoomService(AccountData* playerdata, int roomid, char** loginlist)
 {
 	int i;
 	bool foundhim = 0;
-	char ll[MAX_PLAYER_COUNT][MAX_LOGIN_LENGTH];
+
+	for (i = 0; i < MAX_PLAYER_COUNT; ++i)
+		bzero(*(loginlist+i*sizeof(char)), MAX_LOGIN_LENGTH*sizeof(char));
+
 	if(roomid < 0 || roomid >= MAX_ROOM_COUNT || rooms[roomid] == NULL)
 	{
         fprintf(stderr, "Room ID out of range: %d\n", roomid);
@@ -124,22 +138,28 @@ int refreshRoomService(AccountData* playerdata, int roomid, char** loginlist)
 	}
 	for (i = 0; i < MAX_PLAYER_COUNT; ++i)
 	{
-		strcpy(ll[i], rooms[roomid]->players[i]->login);
+		if (rooms[roomid]->players[i] == NULL)	// taking care of not existing players in room
+			continue;
+
+		strcpy(*(loginlist+i*sizeof(char)), rooms[roomid]->players[i]->login);
 
 		if(rooms[roomid]->players[i]->currentip == playerdata->currentip)
 		{
 			foundhim = 1;
+			++i;
 			break;
 		}
 	}
 
-	if (!foundhim)		// if you couldnt find the player then its a trap - dont give him anything
+	if (!foundhim)		// gotta check it if we don't want to give info about rooms to other players
 		return PLAYER_NOT_FOUND;
 
 	for (; i < MAX_PLAYER_COUNT; ++i)	// continue copying
-		strcpy(ll[i], rooms[roomid]->players[i]->login);
-
-	memcpy(loginlist, ll, MAX_PLAYER_COUNT*MAX_LOGIN_LENGTH*sizeof(char));   // I hope this works :V
+	{
+		if (rooms[roomid]->players[i] == NULL)	// taking care of not existing players in room
+			continue;
+		strcpy(*(loginlist+i*sizeof(char)), rooms[roomid]->players[i]->login);
+	}
 
 	return 0;
 }
