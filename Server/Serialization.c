@@ -49,18 +49,18 @@ unsigned char* deserializeInt(unsigned char* buffer, int* output)
 {
     *output = 0;
     *output |= buffer[0] << 24;
-    *output |= buffer[0] << 16;
-    *output |= buffer[0] << 8;
-    *output |= buffer[0];
+    *output |= buffer[1] << 16;
+    *output |= buffer[2] << 8;
+    *output |= buffer[3];
     return buffer + sizeof(int);
 }
 unsigned char* deserializeUint_32_t(unsigned char* buffer, uint32_t* output)
 {
     *output = 0;
     *output |= buffer[0] << 24;
-    *output |= buffer[0] << 16;
-    *output |= buffer[0] << 8;
-    *output |= buffer[0];
+    *output |= buffer[1] << 16;
+    *output |= buffer[2] << 8;
+    *output |= buffer[3];
     return buffer + sizeof(uint32_t);
 }
 unsigned char* deserializeCharArray(unsigned char* buffer, char* array, int size)

@@ -84,6 +84,12 @@
 			<Option virtualFolder="Headers/src/" />
 		</Unit>
 		<Unit filename="AccountServiceTests.cpp" />
+		<Unit filename="CommunicationServiceTests.cpp" />
+		<Unit filename="ManuServiceTests.cpp" />
+		<Unit filename="QueueTests.cpp" />
+		<Unit filename="RoomServiceTests.cpp" />
+		<Unit filename="SerializationTests.cpp" />
+		<Unit filename="ServerTests.cpp" />
 		<Unit filename="test_main.cpp" />
 		<Extensions>
 			<code_completion />
