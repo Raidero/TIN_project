@@ -10,16 +10,16 @@ public:
     bool exitGame() { return exit; }
     void linkLoginViewModel(ViewModel* lvm) { loginviewmodel = lvm; }
     void linkCreateAccountViewModel(ViewModel* cavm) { createaccountviewmodel = cavm; }
+    void linkDeleteAccountViewModel(ViewModel* davm) { deleteaccountviewmodel = davm; }
+    void linkChangePasswordViewModel(ViewModel* chpvm) { changepasswordviewmodel = chpvm; }
     virtual void addLetter(char c) {}
     virtual void refresh(int message);
-    ViewModel* loginviewmodel;
-    ViewModel* createaccountviewmodel;
 private:
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const
     {
         if(isvisible)
         {
-            for(int i = 0; i < NUMBER_OF_BUTTONS_MENU; ++i)
+            for(int i = 0; i < numberofbuttons; ++i)
             {
                 target.draw(buttons[i]);
             }
@@ -43,6 +43,11 @@ private:
     sf::Text changepassword;
     bool isloggedin;
     bool exit;
+
+    ViewModel* loginviewmodel;
+    ViewModel* createaccountviewmodel;
+    ViewModel* deleteaccountviewmodel;
+    ViewModel* changepasswordviewmodel;
 };
 
 #endif // MENUVIEWMODEL_H

@@ -1,67 +1,51 @@
-#include "LoginViewModel.h"
+#include "ChangePasswordViewModel.h"
 
-LoginViewModel::LoginViewModel(ViewModel* mvm)
-{
-    initButtons(4);
-    menuviewmodel = mvm;
-    loginpos = 0;
-    passwordpos = 0;
-    for(int i = 0; i < MAX_LOGIN_LENGTH; ++i)
-    {
-        login[i] = 0;
-    }
-    for(int i = 0; i < MAX_PASSWORD_LENGTH; ++i)
-    {
-        password[i] = 0;
-    }
-    writeaccess = -1;
-    background.setFillColor(sf::Color(50,50,50));
-    background.setOutlineColor(sf::Color(100,0,0));
-    background.setOutlineThickness(3);
-    background.setSize(sf::Vector2f(BACKGROUND_WIDTH, BACKGROUND_HEIGHT));
-    background.setOrigin(sf::Vector2f(BACKGROUND_WIDTH/2, BACKGROUND_HEIGHT/2));
-    background.setPosition(sf::Vector2f(WIDTH/2, HEIGHT/2));
-    title.setString("Sign in:");
-    title.setCharacterSize(FONT_SMALL);
-    title.setFont(font);
-    title.setPosition(background.getPosition().x - BACKGROUND_WIDTH/2 + MARGIN, background.getPosition().y - BACKGROUND_HEIGHT/2 + MARGIN);
-    createButton(loginbutton, buttons[0], "login", title.getPosition().y + 3*TEXT_STEP, title.getPosition().x);
-    createButton(cancelbutton, buttons[1], "cancel", loginbutton.getPosition().y, loginbutton.getPosition().x + loginbutton.getLocalBounds().width + 10);
-    buttons[2].setSize(sf::Vector2f(background.getSize().x - 2*MARGIN, FONT_SMALL + MARGIN));
-    buttons[2].setPosition(sf::Vector2f(title.getPosition().x, title.getPosition().y + 1*TEXT_STEP));
-    loginview.setPosition(sf::Vector2f(buttons[2].getPosition().x + 2, buttons[2].getPosition().y + 2));
-    loginview.setFont(font);
-    loginview.setCharacterSize(FONT_SMALL);
-    loginview.setColor(sf::Color(0,0,0));
-    buttons[3].setSize(sf::Vector2f(background.getSize().x - 2*MARGIN, FONT_SMALL + MARGIN));
-    buttons[3].setPosition(sf::Vector2f(title.getPosition().x, title.getPosition().y + 2*TEXT_STEP));
-    passwordview.setPosition(sf::Vector2f(buttons[3].getPosition().x + 2, buttons[3].getPosition().y + 2));
-    passwordview.setFont(font);
-    passwordview.setCharacterSize(FONT_SMALL);
-    passwordview.setColor(sf::Color(0,0,0));
-    message.setCharacterSize(FONT_SMALL);
-    message.setFont(font);
-    message.setPosition(background.getPosition().x - 20, title.getPosition().y + 5);
-}
-
-LoginViewModel::~LoginViewModel()
+ChangePasswordViewModel::ChangePasswordViewModel(ViewModel* mvm): LoginViewModel(mvm)
 {
     disposeButtons();
+    initButtons(5);
+    newpasswordpos = 0;
+    for(int i = 0; i < MAX_PASSWORD_LENGTH; ++i)
+    {
+        newpassword[i] = 0;
+    }
+    background.setSize(sf::Vector2f(BACKGROUND_WIDTH, BACKGROUND_HEIGHT + 20));
+    background.setOrigin(sf::Vector2f(BACKGROUND_WIDTH/2, BACKGROUND_HEIGHT/2));
+    background.setPosition(sf::Vector2f(WIDTH/2, HEIGHT/2));
+    title.setString("Change password");
+    createButton(loginbutton, buttons[0], "change password", title.getPosition().y + 4*TEXT_STEP, title.getPosition().x);
+    createButton(cancelbutton, buttons[1], "back", loginbutton.getPosition().y, loginbutton.getPosition().x + loginbutton.getLocalBounds().width + 10);
+    buttons[2].setSize(sf::Vector2f(background.getSize().x - 2*MARGIN, FONT_SMALL + MARGIN));
+    buttons[2].setPosition(sf::Vector2f(title.getPosition().x, title.getPosition().y + 1*TEXT_STEP));
+    buttons[3].setSize(sf::Vector2f(background.getSize().x - 2*MARGIN, FONT_SMALL + MARGIN));
+    buttons[3].setPosition(sf::Vector2f(title.getPosition().x, title.getPosition().y + 2*TEXT_STEP));
+    buttons[4].setSize(sf::Vector2f(background.getSize().x - 2*MARGIN, FONT_SMALL + MARGIN));
+    buttons[4].setPosition(sf::Vector2f(title.getPosition().x, title.getPosition().y + 3*TEXT_STEP));
+    newpasswordview.setPosition(sf::Vector2f(buttons[4].getPosition().x + MARGIN/2, buttons[4].getPosition().y + MARGIN/2));
+    newpasswordview.setFont(font);
+    newpasswordview.setCharacterSize(FONT_SMALL);
+    newpasswordview.setColor(sf::Color(0,0,0));
 }
 
-void LoginViewModel::buttonPressed(int i)
+ChangePasswordViewModel::~ChangePasswordViewModel()
+{
+    //dtor
+}
+
+void ChangePasswordViewModel::buttonPressed(int i)
 {
     buttons[2].setFillColor(sf::Color(255,255,255));
     buttons[3].setFillColor(sf::Color(255,255,255));
+    buttons[4].setFillColor(sf::Color(255,255,255));
     message.setString(std::string(""));
     writeaccess = -1;
     switch(i)
     {
-        case 0: //login button
-            if(loginpos != 0 && passwordpos != 0)
+        case 0: //change password button
+            if(loginpos != 0 && passwordpos != 0 && newpasswordpos != 0)
             {
-                SHA256((unsigned char*)&password, passwordpos, (unsigned char*)&passwordhash);
-
+                SHA256((unsigned char*)password, passwordpos, (unsigned char*)passwordhash);
+                SHA256((unsigned char*)newpassword, newpasswordpos, (unsigned char*)newpasswordhash);
                 for(int i = 0; i < MAX_PASSHASH_LENGTH; ++i)
                 {
                     accountdata.passwordhash[i] = this->passwordhash[i];
@@ -71,10 +55,11 @@ void LoginViewModel::buttonPressed(int i)
                     accountdata.login[i] = login[i];
                 }
                 accountdata.login[loginpos] = 0;
-                buffer[0] = REQUEST_LOGIN;
+                buffer[0] = REQUEST_CHANGE_PASSWORD;
                 while(!send(mainsocket, buffer, 1, 0)) {}
                 unsigned char* bufferptr = buffer;
                 bufferptr = serializeAccountData(bufferptr, &accountdata);
+                bufferptr = serializeUnsignedCharArray(bufferptr, newpasswordhash, MAX_PASSHASH_LENGTH);
                 int alldata = bufferptr - buffer;
                 int sendbytes = 0;
                 while(sendbytes < alldata)
@@ -82,29 +67,28 @@ void LoginViewModel::buttonPressed(int i)
                     sendbytes += send(mainsocket, buffer + sendbytes, alldata - sendbytes, 0);
                 }
                 while(!recv(mainsocket, buffer, 1, MSG_WAITALL)) {}
-                if(buffer[0] == FAILED_TO_LOGIN)
+                if(buffer[0] == FAILED_TO_CHANGE_PASSWORD)
                 {
-                    message.setString(std::string("Wrong login or password"));
+                    message.setString(std::string("Failed to change password"));
                     message.setPosition(
-                        background.getGlobalBounds().left + BACKGROUND_WIDTH - message.getLocalBounds().width - MARGIN,
-                        background.getGlobalBounds().top + MARGIN);
+                     background.getGlobalBounds().left + BACKGROUND_WIDTH - message.getLocalBounds().width - MARGIN,
+                     background.getGlobalBounds().top + MARGIN);
                 }
-                else if(buffer[0] == LOGIN_SUCCESSFUL)
+                else if(buffer[0] == CHANGE_PASSWORD_SUCCESSFUL)
                 {
-                    this->refresh(PLAYER_LOGGED_IN);
-                    menuviewmodel->refresh(PLAYER_LOGGED_IN);
+                    this->refresh(CHANGED_PASSWORD);
                 }
             }
             else
             {
-                message.setString(std::string("Login or password empty"));
+                message.setString(std::string("Login or password fields empty"));
                 message.setPosition(
-                 background.getGlobalBounds().left + BACKGROUND_WIDTH - message.getLocalBounds().width - MARGIN,
-                 background.getGlobalBounds().top + MARGIN);
+                     background.getGlobalBounds().left + BACKGROUND_WIDTH - message.getLocalBounds().width - MARGIN,
+                     background.getGlobalBounds().top + MARGIN);
                 std::cerr << "Login or password field is empty\n";
             }
             break;
-        case 1: // cancel button
+        case 1: // back button
             this->setVisibility(false);
             this->setActivity(false);
             menuviewmodel->setActivity(true);
@@ -125,14 +109,22 @@ void LoginViewModel::buttonPressed(int i)
             buttons[3].setFillColor(sf::Color(255,200,200));
             writeaccess = 3;
             break;
+        case 4: //newpasswordbutton
+            message.setString(std::string("Enter new password"));
+            message.setPosition(
+                 background.getGlobalBounds().left + BACKGROUND_WIDTH - message.getLocalBounds().width - MARGIN,
+                 background.getGlobalBounds().top + MARGIN);
+            buttons[4].setFillColor(sf::Color(255,200,200));
+            writeaccess = 4;
+            break;
     }
 }
 
-void LoginViewModel::addLetter(char c)
+void ChangePasswordViewModel::addLetter(char c)
 {
     if(c == '\t')
     {
-        if(writeaccess < 3)
+        if(writeaccess < 4)
         {
             buttons[writeaccess++].setFillColor(sf::Color(255,255,255));
             buttons[writeaccess].setFillColor(sf::Color(255,200,200));
@@ -171,18 +163,35 @@ void LoginViewModel::addLetter(char c)
             passwordview.setString(s);
             break;
         }
+        case 4: ///newpassword text box
+        {
+            if(c == 8 && newpasswordpos > 0)
+            {
+                newpassword[--newpasswordpos] = '\0';
+            }
+            else if(c != 8 && newpasswordpos < MAX_PASSWORD_LENGTH - 1)
+            {
+                newpassword[newpasswordpos++] = c;
+            }
+            std::string s;
+            for(int i = 0; i < newpasswordpos; ++i)
+                s += '*';
+            newpasswordview.setString(s);
+            break;
+        }
     }
 }
 
-void LoginViewModel::refresh(int message)
+void ChangePasswordViewModel::refresh(int message)
 {
     switch(message)
     {
-        case PLAYER_LOGGED_IN:
+        case CHANGED_PASSWORD:
         {
-            this->setVisibility(false);
-            this->setActivity(false);
-            menuviewmodel->setActivity(true);
+            this->message.setString(std::string("Password has changed"));
+            this->message.setPosition(
+             background.getGlobalBounds().left + BACKGROUND_WIDTH - this->message.getLocalBounds().width - MARGIN,
+             background.getGlobalBounds().top + MARGIN);
         }
     }
 }

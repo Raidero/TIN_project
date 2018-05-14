@@ -28,6 +28,9 @@ extern "C"
 #define NUMBER_OF_BUTTONS_MENU 6
 #define NO_BUTTON_IS_PRESSED -1
 
+#define BACKGROUND_WIDTH 400
+#define BACKGROUND_HEIGHT 120
+
 extern AccountData accountdata;
 extern int mainsocket;
 extern unsigned char buffer[BUFFER_SIZE];
