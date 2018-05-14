@@ -16,7 +16,7 @@ protected:
         if(isvisible)
         {
             target.draw(background);
-            for(int i = 0; i < NUMBER_OF_BUTTONS_LOGIN; ++i)
+            for(int i = 0; i < numberofbuttons; ++i)
             {
                 target.draw(buttons[i]);
             }

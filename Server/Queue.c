@@ -162,7 +162,7 @@ void* startEventHandler()
                 }
                 case REQUEST_CHANGE_PASSWORD:
                 {
-                    printf("delete account\n");
+                    printf("change password\n");
                     unsigned char answer;
                     int (*func)(AccountData*, unsigned char*) = (int (*)(AccountData*, unsigned char*))event->functionpointer;
                     AccountData* accdata = (AccountData*)malloc(sizeof(AccountData));

@@ -1,19 +1,20 @@
-#include "CreateAccountViewModel.h"
+#include "DeleteAccountViewModel.h"
 
-CreateAccountViewModel::CreateAccountViewModel(ViewModel* mvm): LoginViewModel(mvm)
+DeleteAccountViewModel::DeleteAccountViewModel(ViewModel* mvm): LoginViewModel(mvm)
 {
-    title.setString("Sign up");
-    createButton(loginbutton, buttons[0], "create", title.getPosition().y + 3*TEXT_STEP, title.getPosition().x);
+    title.setString("Delete account");
+    createButton(loginbutton, buttons[0], "delete", title.getPosition().y + 3*TEXT_STEP, title.getPosition().x);
     createButton(cancelbutton, buttons[1], "cancel", loginbutton.getPosition().y, loginbutton.getPosition().x + loginbutton.getLocalBounds().width + 10);
-    message.setPosition(background.getPosition().x - 35, title.getPosition().y + 5);
+    message.setCharacterSize(FONT_SMALL);
+    message.setPosition(background.getPosition().x - 20, title.getPosition().y + 5);
 }
 
-CreateAccountViewModel::~CreateAccountViewModel()
+DeleteAccountViewModel::~DeleteAccountViewModel()
 {
     //dtor
 }
 
-void CreateAccountViewModel::buttonPressed(int i)
+void DeleteAccountViewModel::buttonPressed(int i)
 {
     buttons[2].setFillColor(sf::Color(255,255,255));
     buttons[3].setFillColor(sf::Color(255,255,255));
@@ -21,7 +22,7 @@ void CreateAccountViewModel::buttonPressed(int i)
     writeaccess = -1;
     switch(i)
     {
-        case 0: //login button
+        case 0: //delete button
             if(loginpos != 0 && passwordpos != 0)
             {
                 SHA256((unsigned char*)password, passwordpos, (unsigned char*)passwordhash);
@@ -35,7 +36,7 @@ void CreateAccountViewModel::buttonPressed(int i)
                     accountdata.login[i] = login[i];
                 }
                 accountdata.login[loginpos] = 0;
-                buffer[0] = REQUEST_CREATE_ACCOUNT;
+                buffer[0] = REQUEST_DELETE_ACCOUNT;
                 while(!send(mainsocket, buffer, 1, 0)) {}
                 unsigned char* bufferptr = buffer;
                 bufferptr = serializeAccountData(bufferptr, &accountdata);
@@ -46,17 +47,17 @@ void CreateAccountViewModel::buttonPressed(int i)
                     sendbytes += send(mainsocket, buffer + sendbytes, alldata - sendbytes, 0);
                 }
                 while(!recv(mainsocket, buffer, 1, MSG_WAITALL)) {}
-                if(buffer[0] == FAILED_TO_CREATE_ACCOUNT)
+                if(buffer[0] == FAILED_TO_DELETE_ACCOUNT)
                 {
-                    message.setString(std::string("Failed to create account"));
+                    message.setString(std::string("Failed to delete account"));
                     message.setPosition(
                         background.getGlobalBounds().left + BACKGROUND_WIDTH - message.getLocalBounds().width - MARGIN,
                         background.getGlobalBounds().top + MARGIN);
                 }
-                else if(buffer[0] == CREATE_ACCOUNT_SUCCESSFUL)
+                else if(buffer[0] == DELETE_ACCOUNT_SUCCESSFUL)
                 {
-                    this->refresh(ACCOUNT_CREATED);
-                    menuviewmodel->refresh(ACCOUNT_CREATED);
+                    this->refresh(ACCOUNT_DELETED);
+                    menuviewmodel->refresh(ACCOUNT_DELETED);
                 }
             }
             else
@@ -92,11 +93,11 @@ void CreateAccountViewModel::buttonPressed(int i)
     }
 }
 
-void CreateAccountViewModel::refresh(int message)
+void DeleteAccountViewModel::refresh(int message)
 {
     switch(message)
     {
-        case ACCOUNT_CREATED:
+        case ACCOUNT_DELETED:
         {
             this->setVisibility(false);
             this->setActivity(false);

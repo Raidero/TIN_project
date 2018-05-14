@@ -39,10 +39,15 @@ void MenuViewModel::buttonPressed(int i)
     {
         case 0: ///start game
         {
+            if(isloggedin)
+            {
+
+            }
             break;
         }
         case 1: ///exit game
         {
+            send(mainsocket, NULL, 0, 0);
             exit = true;
             break;
         }
@@ -85,6 +90,22 @@ void MenuViewModel::buttonPressed(int i)
             this->setActivity(false);
             break;
         }
+        case 4:
+        {
+            deleteaccountviewmodel->setActivity(true);
+            deleteaccountviewmodel->setVisibility(true);
+            this->setActivity(false);
+            break;
+        }
+        case 5:
+        {
+            if(isloggedin)
+            {
+                changepasswordviewmodel->setActivity(true);
+                changepasswordviewmodel->setVisibility(true);
+                this->setActivity(false);
+            }
+        }
     }
 }
 
@@ -116,7 +137,13 @@ void MenuViewModel::refresh(int message)
         }
         case ACCOUNT_CREATED:
         {
-            loggedinas.setString(std::string("Account created"));
+            loggedinas.setString(std::string("Account successfully created"));
+            loggedinas.setPosition(WIDTH - loggedinas.getLocalBounds().width - 10, 10);
+            break;
+        }
+        case ACCOUNT_DELETED:
+        {
+            loggedinas.setString(std::string("Account successfully deleted"));
             loggedinas.setPosition(WIDTH - loggedinas.getLocalBounds().width - 10, 10);
             break;
         }

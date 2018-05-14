@@ -77,7 +77,7 @@ int logInService(AccountData* account, int playerid)
     if(loggedaccounts[playerid] == NULL)
     {
         loggedaccounts[playerid] = account;
-        printf("Player %s logged in\n", account->login);
+        printf("Player with %d id, %s logged in\n", playerid, account->login);
         return 0;
     }
     fprintf(stderr, "Place is already taken\n");
@@ -130,10 +130,13 @@ int deleteAccountService(AccountData* account)
         fprintf(stderr, "File is not open\n");
         return FILE_NOT_OPEN;
     }
-    if(isLoggedIn(account->currentip))
+    for(int i = 0; i < MAX_ACCOUNTS_COUNT; ++i)
     {
-        fprintf(stderr, "Player %s logged in, cannot delete logged in account\n", account->login);
-        return LOGGED_IN_ERROR;
+        if(loggedaccounts[i] != NULL && !strcmp(account->login, loggedaccounts[i]->login))
+        {
+            fprintf(stderr, "Player %s logged in, cannot delete logged in account\n", account->login);
+            return LOGGED_IN_ERROR;
+        }
     }
     if(!isLoginUsed(account->login))
     {
@@ -158,7 +161,7 @@ int deleteAccountService(AccountData* account)
         fprintf(stderr, "Cannot write to file\n");
         return FILE_WRITE_ERROR;
     }
-    printf("Deleted account");
+    printf("Deleted account\n");
     return 0;
 }
 

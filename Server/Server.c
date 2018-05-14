@@ -129,10 +129,11 @@ void* services(void *i)
     if(accountid < 0)
     {
         fprintf(stderr, "Player id not found\n");
+        disposeSocket(socket);
         close(socket);
         pthread_exit(NULL);
     }
-    printf("New client connected: %d\n", socket);
+    printf("New client connected: %d socket, %d id\n", socket, accountid);
     unsigned char buffer[BUFFER_SIZE];
     int readbytes;
     while(1)
@@ -141,6 +142,7 @@ void* services(void *i)
         readbytes = recv(socket, buffer, 1, MSG_WAITALL);
         if(readbytes <= 0)
         {
+            printf("Player with %d id quit\n", accountid);
             if(accountid >= 0)
             {
                 disposeAccountData(accountid);
@@ -150,6 +152,7 @@ void* services(void *i)
                 sweepPlayer(loggedaccounts[accountid], roomid);
                 checkIfRoomIsEmptyAndDispose(roomid);
             }
+            disposeSocket(socket);
             close(socket);
             pthread_exit(NULL);
         }
@@ -242,7 +245,7 @@ void* services(void *i)
                 case REQUEST_CHANGE_PASSWORD:
                 {
                     int i, size;
-                    size = sizeof(AccountData) + sizeof(unsigned char*);
+                    size = sizeof(AccountData) + MAX_PASSHASH_LENGTH*sizeof(unsigned char);
                     unsigned char* args = (unsigned char*)malloc(size);
                     readbytes = 0;
                     //alldata = sizeof(AccountData);
@@ -311,4 +314,19 @@ int socketToPlayerId(int socket)
     }
     fprintf(stderr,"Couldn't find playerid for given socket\n");
     return PLAYER_ID_NOT_FOUND;
+}
+
+int disposeSocket(int socket)
+{
+    int i;
+    for(i = 0; i < MAX_SOCKETS_COUNT; ++i)
+    {
+        if(sockets[i] == socket)
+        {
+            sockets[i] = -1;
+            return 0;
+        }
+    }
+    fprintf(stderr,"Couldn't find open socket with given value\n");
+    return SOCKET_NOT_FOUND;
 }

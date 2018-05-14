@@ -29,5 +29,5 @@ void* services(void *i);
 int createNewThread(int* socket);
 int createNewSocket(); //return index of first free socket, it will be playerid
 int socketToPlayerId(int socket);
-
+int disposeSocket(int socket);
 #endif // SERVER_H
