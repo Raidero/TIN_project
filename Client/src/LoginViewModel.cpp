@@ -46,7 +46,6 @@ LoginViewModel::LoginViewModel(ViewModel* mvm)
 
 LoginViewModel::~LoginViewModel()
 {
-    disposeButtons();
 }
 
 void LoginViewModel::buttonPressed(int i)
@@ -93,6 +92,11 @@ void LoginViewModel::buttonPressed(int i)
                 {
                     this->refresh(PLAYER_LOGGED_IN);
                     menuviewmodel->refresh(PLAYER_LOGGED_IN);
+                    for(int i = 0; i < MAX_LOGIN_LENGTH; ++i)
+                    {
+                        playeraccountdata.login[i] = accountdata.login[i];
+                    }
+                    playeraccountdata.currentip = accountdata.currentip;
                 }
             }
             else

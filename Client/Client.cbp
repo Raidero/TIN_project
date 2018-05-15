@@ -59,6 +59,7 @@
 		<Unit filename="include/DeleteAccountViewModel.h" />
 		<Unit filename="include/LoginViewModel.h" />
 		<Unit filename="include/MenuViewModel.h" />
+		<Unit filename="include/RoomViewModel.h" />
 		<Unit filename="include/ViewModel.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="src/ChangePasswordViewModel.cpp" />
@@ -66,6 +67,7 @@
 		<Unit filename="src/DeleteAccountViewModel.cpp" />
 		<Unit filename="src/LoginViewModel.cpp" />
 		<Unit filename="src/MenuViewModel.cpp" />
+		<Unit filename="src/RoomViewModel.cpp" />
 		<Unit filename="src/ViewModel.cpp" />
 		<Extensions>
 			<code_completion />

@@ -12,6 +12,7 @@ public:
     void linkCreateAccountViewModel(ViewModel* cavm) { createaccountviewmodel = cavm; }
     void linkDeleteAccountViewModel(ViewModel* davm) { deleteaccountviewmodel = davm; }
     void linkChangePasswordViewModel(ViewModel* chpvm) { changepasswordviewmodel = chpvm; }
+    void linkRoomViewModel(ViewModel* rvm) { roomviewmodel = rvm; }
     virtual void addLetter(char c) {}
     virtual void refresh(int message);
 private:
@@ -48,6 +49,7 @@ private:
     ViewModel* createaccountviewmodel;
     ViewModel* deleteaccountviewmodel;
     ViewModel* changepasswordviewmodel;
+    ViewModel* roomviewmodel;
 };
 
 #endif // MENUVIEWMODEL_H

@@ -30,7 +30,6 @@ MenuViewModel::MenuViewModel(int soc, uint32_t ip)
 
 MenuViewModel::~MenuViewModel()
 {
-    disposeButtons();
 }
 
 void MenuViewModel::buttonPressed(int i)
@@ -39,8 +38,30 @@ void MenuViewModel::buttonPressed(int i)
     {
         case 0: ///start game
         {
-            if(isloggedin)
+            if (isloggedin)
             {
+                buffer[0] = REQUEST_START_GAME;
+                while(!send(mainsocket, buffer, 1, 0)) {}
+                unsigned char* bufferptr = buffer;
+
+                serializeAccountData(bufferptr, &playeraccountdata);
+                int alldata = bufferptr - buffer;
+                int sendbytes = 0;
+                while(sendbytes < alldata)
+                {
+                    sendbytes = send(mainsocket, buffer + sendbytes, alldata - sendbytes, 0);
+                }
+                while(!recv(mainsocket, buffer, 1, MSG_WAITALL)) {}
+                if(buffer[0] == FAILED_TO_START_GAME)
+                {
+                    std::cerr << "Failed to start game\n";
+                }
+                else if(buffer[0] == START_GAME_SUCCESSFUL)
+                {
+                    refresh(PLAYER_STARTED_GAME);
+                }
+
+
 
             }
             break;
@@ -78,7 +99,7 @@ void MenuViewModel::buttonPressed(int i)
                 }
                 else if(buffer[0] == LOGOUT_SUCCESSFUL)
                 {
-                    refresh(PLAYER_LOGGED_OUT);
+                    refresh(PLAYER_STARTED_GAME);
                 }
             }
             break;
@@ -130,6 +151,11 @@ void MenuViewModel::refresh(int message)
         {
             loggedinas.setString(std::string(""));
             buttonChangedName(log, "Log in", buttons[2]);
+            for(int i = 0; i < MAX_LOGIN_LENGTH; ++i)
+            {
+                playeraccountdata.login[i] = 0;
+            }
+            playeraccountdata.currentip = 0;
             disableButton(changepassword);
             disableButton(startgame);
             isloggedin = false;
@@ -147,6 +173,15 @@ void MenuViewModel::refresh(int message)
             loggedinas.setPosition(WIDTH - loggedinas.getLocalBounds().width - 10, 10);
             break;
         }
+        case PLAYER_STARTED_GAME:
+        {
+            roomviewmodel->setActivity(true);
+            roomviewmodel->setVisibility(true);
+            this->setActivity(false);
+            this->setVisibility(false);
+            break;
+        }
+
     }
 }
 

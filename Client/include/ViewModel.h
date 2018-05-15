@@ -32,6 +32,7 @@ extern "C"
 #define BACKGROUND_HEIGHT 120
 
 extern AccountData accountdata;
+extern AccountData playeraccountdata;
 extern int mainsocket;
 extern unsigned char buffer[BUFFER_SIZE];
 

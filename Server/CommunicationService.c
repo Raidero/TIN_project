@@ -25,7 +25,7 @@ int send_all(int socket, char *buffer, size_t length)
     {
         int i = send(socket, ptr, length, 0);
         //error if send returns i less than 0
-        if (i < 1)//1 because we don't want it to send messages with 0 characters
+        if (i < 0)//0 because we let it send messages with 0 characters
         {
             fprintf(stderr, "Couldn't send message to player\n");
             return ERROR_SENDING_MESSAGE;

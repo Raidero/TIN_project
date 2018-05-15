@@ -2,6 +2,7 @@
 
 int mainsocket;
 AccountData accountdata;
+AccountData playeraccountdata;
 
 unsigned char buffer[BUFFER_SIZE];
 
@@ -14,7 +15,8 @@ ViewModel::ViewModel()
 
 ViewModel::~ViewModel()
 {
-    //dtor
+    disposeButtons();
+
 }
 
 void ViewModel::createButton(sf::Text& name, sf::RectangleShape& buttonrect, std::string text, float height, float width, int fontsize)
