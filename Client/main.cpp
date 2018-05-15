@@ -3,8 +3,9 @@
 #include "CreateAccountViewModel.h"
 #include "DeleteAccountViewModel.h"
 #include "ChangePasswordViewModel.h"
+#include "RoomViewModel.h"
 
-#define NUMBER_OF_VIEW_MODELS 5
+#define NUMBER_OF_VIEW_MODELS 6
 using namespace std;
 
 int main()
@@ -27,10 +28,12 @@ int main()
     viewmodels[2] = new CreateAccountViewModel(viewmodels[0]);
     viewmodels[3] = new DeleteAccountViewModel(viewmodels[0]);
     viewmodels[4] = new ChangePasswordViewModel(viewmodels[0]);
+    viewmodels[5] = new RoomViewModel(viewmodels[0]);
     dynamic_cast<MenuViewModel*>(viewmodels[0])->linkLoginViewModel(viewmodels[1]);
     dynamic_cast<MenuViewModel*>(viewmodels[0])->linkCreateAccountViewModel(viewmodels[2]);
     dynamic_cast<MenuViewModel*>(viewmodels[0])->linkDeleteAccountViewModel(viewmodels[3]);
     dynamic_cast<MenuViewModel*>(viewmodels[0])->linkChangePasswordViewModel(viewmodels[4]);
+    dynamic_cast<MenuViewModel*>(viewmodels[0])->linkRoomViewModel(viewmodels[5]);
     while (window.isOpen())
     {
         sf::Event event;
