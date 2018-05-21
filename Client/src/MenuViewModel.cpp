@@ -82,6 +82,8 @@ void MenuViewModel::buttonPressed(int i)
             }
             else
             {
+                recv(mainsocket, buffer, BUFFER_SIZE, MSG_DONTWAIT); ///clear the buffer
+                errno = ENOENT;
                 buffer[0] = REQUEST_LOGOUT;
                 while(!send(mainsocket, buffer, 1, 0)) {}
                 unsigned char* bufferptr = buffer;
@@ -92,14 +94,22 @@ void MenuViewModel::buttonPressed(int i)
                 {
                     sendbytes = send(mainsocket, buffer + sendbytes, alldata - sendbytes, 0);
                 }
-                while(!recv(mainsocket, buffer, 1, MSG_WAITALL)) {}
-                if(buffer[0] == FAILED_TO_LOGOUT)
+                while(recv(mainsocket, buffer, 1, 0) >= 0)
                 {
-                    std::cerr << "Failed to log out\n";
+                    if(buffer[0] == FAILED_TO_LOGOUT)
+                    {
+                        std::cerr << "Failed to log out\n";
+                        break;
+                    }
+                    else if(buffer[0] == LOGOUT_SUCCESSFUL)
+                    {
+                        refresh(PLAYER_STARTED_GAME);
+                        break;
+                    }
                 }
-                else if(buffer[0] == LOGOUT_SUCCESSFUL)
+                if(errno == EAGAIN || errno == EWOULDBLOCK)
                 {
-                    refresh(PLAYER_STARTED_GAME);
+                    std::cerr << "Can't reach server\n";
                 }
             }
             break;

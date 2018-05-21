@@ -35,6 +35,8 @@ void CreateAccountViewModel::buttonPressed(int i)
                     accountdata.login[i] = login[i];
                 }
                 accountdata.login[loginpos] = 0;
+                recv(mainsocket, buffer, BUFFER_SIZE, MSG_DONTWAIT); ///clear the buffer
+                errno = ENOENT;
                 buffer[0] = REQUEST_CREATE_ACCOUNT;
                 while(!send(mainsocket, buffer, 1, 0)) {}
                 unsigned char* bufferptr = buffer;
@@ -45,18 +47,29 @@ void CreateAccountViewModel::buttonPressed(int i)
                 {
                     sendbytes += send(mainsocket, buffer + sendbytes, alldata - sendbytes, 0);
                 }
-                while(!recv(mainsocket, buffer, 1, MSG_WAITALL)) {}
-                if(buffer[0] == FAILED_TO_CREATE_ACCOUNT)
+                while(recv(mainsocket, buffer, 1, 0) >= 0)
                 {
-                    message.setString(std::string("Failed to create account"));
+                    if(buffer[0] == FAILED_TO_CREATE_ACCOUNT)
+                    {
+                        message.setString(std::string("Failed to create account"));
+                        message.setPosition(
+                            background.getGlobalBounds().left + BACKGROUND_WIDTH - message.getLocalBounds().width - MARGIN,
+                            background.getGlobalBounds().top + MARGIN);
+                        break;
+                    }
+                    else if(buffer[0] == CREATE_ACCOUNT_SUCCESSFUL)
+                    {
+                        this->refresh(ACCOUNT_CREATED);
+                        menuviewmodel->refresh(ACCOUNT_CREATED);
+                        break;
+                    }
+                }
+                if(errno == EAGAIN || errno == EWOULDBLOCK)
+                {
+                    message.setString(std::string("Can't reach server"));
                     message.setPosition(
                         background.getGlobalBounds().left + BACKGROUND_WIDTH - message.getLocalBounds().width - MARGIN,
                         background.getGlobalBounds().top + MARGIN);
-                }
-                else if(buffer[0] == CREATE_ACCOUNT_SUCCESSFUL)
-                {
-                    this->refresh(ACCOUNT_CREATED);
-                    menuviewmodel->refresh(ACCOUNT_CREATED);
                 }
             }
             else

@@ -1,16 +1,21 @@
 #include "Client.h"
 
-int initClient(int* clientsocketfd, struct sockaddr_in* serveraddress)
+int initClient(int* clientsocketfd, struct sockaddr_in* serveraddress, struct timeval* timeout)
 {
     struct hostent *server;
 
     /*first call to socket function*/
     *clientsocketfd = socket(AF_INET, SOCK_STREAM, 0);
+
     if (clientsocketfd < 0)
     {
         fprintf(stderr, "ERROR opening socket\n");
         return ERROR_OPENING_SOCKET;
     }
+
+    timeout->tv_sec = 3;
+    timeout->tv_usec = 0;
+    setsockopt(*clientsocketfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)timeout, sizeof(struct timeval));
 
     server = gethostbyname(DEFAULT_IP);
 
