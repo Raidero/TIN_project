@@ -55,6 +55,8 @@ void ChangePasswordViewModel::buttonPressed(int i)
                     accountdata.login[i] = login[i];
                 }
                 accountdata.login[loginpos] = 0;
+                recv(mainsocket, buffer, BUFFER_SIZE, MSG_DONTWAIT); ///clear the buffer
+                errno = ENOENT;
                 buffer[0] = REQUEST_CHANGE_PASSWORD;
                 while(!send(mainsocket, buffer, 1, 0)) {}
                 unsigned char* bufferptr = buffer;
@@ -66,17 +68,28 @@ void ChangePasswordViewModel::buttonPressed(int i)
                 {
                     sendbytes += send(mainsocket, buffer + sendbytes, alldata - sendbytes, 0);
                 }
-                while(!recv(mainsocket, buffer, 1, MSG_WAITALL)) {}
-                if(buffer[0] == FAILED_TO_CHANGE_PASSWORD)
+                while(recv(mainsocket, buffer, 1, 0) >= 0)
                 {
-                    message.setString(std::string("Failed to change password"));
-                    message.setPosition(
-                     background.getGlobalBounds().left + BACKGROUND_WIDTH - message.getLocalBounds().width - MARGIN,
-                     background.getGlobalBounds().top + MARGIN);
+                    if(buffer[0] == FAILED_TO_CHANGE_PASSWORD)
+                    {
+                        message.setString(std::string("Failed to change password"));
+                        message.setPosition(
+                         background.getGlobalBounds().left + BACKGROUND_WIDTH - message.getLocalBounds().width - MARGIN,
+                         background.getGlobalBounds().top + MARGIN);
+                         break;
+                    }
+                    else if(buffer[0] == CHANGE_PASSWORD_SUCCESSFUL)
+                    {
+                        this->refresh(CHANGED_PASSWORD);
+                        break;
+                    }
                 }
-                else if(buffer[0] == CHANGE_PASSWORD_SUCCESSFUL)
+                if(errno == EAGAIN || errno == EWOULDBLOCK)
                 {
-                    this->refresh(CHANGED_PASSWORD);
+                    message.setString(std::string("Can't reach server"));
+                    message.setPosition(
+                        background.getGlobalBounds().left + BACKGROUND_WIDTH - message.getLocalBounds().width - MARGIN,
+                        background.getGlobalBounds().top + MARGIN);
                 }
             }
             else

@@ -12,8 +12,8 @@ int main()
 {
     int clientsocket;
     struct sockaddr_in serveraddress;
-
-    initClient(&clientsocket, &serveraddress);
+    struct timeval sockettimeout;
+    initClient(&clientsocket, &serveraddress, &sockettimeout);
 
     if(startClient(clientsocket, serveraddress))
     {

@@ -70,6 +70,8 @@ void LoginViewModel::buttonPressed(int i)
                     accountdata.login[i] = login[i];
                 }
                 accountdata.login[loginpos] = 0;
+                recv(mainsocket, buffer, BUFFER_SIZE, MSG_DONTWAIT); ///clear the buffer
+                errno = ENOENT;
                 buffer[0] = REQUEST_LOGIN;
                 while(!send(mainsocket, buffer, 1, 0)) {}
                 unsigned char* bufferptr = buffer;
@@ -80,23 +82,34 @@ void LoginViewModel::buttonPressed(int i)
                 {
                     sendbytes += send(mainsocket, buffer + sendbytes, alldata - sendbytes, 0);
                 }
-                while(!recv(mainsocket, buffer, 1, MSG_WAITALL)) {}
-                if(buffer[0] == FAILED_TO_LOGIN)
+                while(recv(mainsocket, buffer, 1, 0) >= 0)
                 {
-                    message.setString(std::string("Wrong login or password"));
+                    if(buffer[0] == FAILED_TO_LOGIN)
+                    {
+                        message.setString(std::string("Wrong login or password"));
+                        message.setPosition(
+                            background.getGlobalBounds().left + BACKGROUND_WIDTH - message.getLocalBounds().width - MARGIN,
+                            background.getGlobalBounds().top + MARGIN);
+                        break;
+                    }
+                    else if(buffer[0] == LOGIN_SUCCESSFUL)
+                    {
+                        this->refresh(PLAYER_LOGGED_IN);
+                        menuviewmodel->refresh(PLAYER_LOGGED_IN);
+                        for(int i = 0; i < MAX_LOGIN_LENGTH; ++i)
+                        {
+                            playeraccountdata.login[i] = accountdata.login[i];
+                        }
+                        playeraccountdata.currentip = accountdata.currentip;
+                        break;
+                    }
+                }
+                if(errno == EAGAIN || errno == EWOULDBLOCK)
+                {
+                    message.setString(std::string("Can't reach server"));
                     message.setPosition(
                         background.getGlobalBounds().left + BACKGROUND_WIDTH - message.getLocalBounds().width - MARGIN,
                         background.getGlobalBounds().top + MARGIN);
-                }
-                else if(buffer[0] == LOGIN_SUCCESSFUL)
-                {
-                    this->refresh(PLAYER_LOGGED_IN);
-                    menuviewmodel->refresh(PLAYER_LOGGED_IN);
-                    for(int i = 0; i < MAX_LOGIN_LENGTH; ++i)
-                    {
-                        playeraccountdata.login[i] = accountdata.login[i];
-                    }
-                    playeraccountdata.currentip = accountdata.currentip;
                 }
             }
             else
