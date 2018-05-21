@@ -40,6 +40,8 @@ void MenuViewModel::buttonPressed(int i)
         {
             if (isloggedin)
             {
+                recv(mainsocket, buffer, BUFFER_SIZE, MSG_DONTWAIT); ///clear the buffer
+                errno = ENOENT;
                 buffer[0] = REQUEST_START_GAME;
                 while(!send(mainsocket, buffer, 1, 0)) {}
                 unsigned char* bufferptr = buffer;
@@ -51,18 +53,24 @@ void MenuViewModel::buttonPressed(int i)
                 {
                     sendbytes = send(mainsocket, buffer + sendbytes, alldata - sendbytes, 0);
                 }
-                while(!recv(mainsocket, buffer, 1, MSG_WAITALL)) {}
-                if(buffer[0] == FAILED_TO_START_GAME)
+                while(!recv(mainsocket, buffer, 1, MSG_WAITALL))
                 {
-                    std::cerr << "Failed to start game\n";
+                    if(buffer[0] == FAILED_TO_START_GAME)
+                    {
+                        std::cerr << "Failed to start game\n";
+                        break;
+                    }
+                    else if(buffer[0] == START_GAME_SUCCESSFUL)
+                    {
+                        roomviewmodel->refresh(REFRESH_LOGINS);
+                        refresh(PLAYER_STARTED_GAME);
+                        break;
+                    }
                 }
-                else if(buffer[0] == START_GAME_SUCCESSFUL)
+                if(errno == EAGAIN || errno == EWOULDBLOCK)
                 {
-                    refresh(PLAYER_STARTED_GAME);
+                    std::cerr << "Can't reach server\n";
                 }
-
-
-
             }
             break;
         }
