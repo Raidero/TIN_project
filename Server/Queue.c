@@ -20,12 +20,13 @@ void disposeQueue()
 {
     pthread_mutex_destroy(&queuelock);
 }
-void addNewElement(Event* element)
+int addNewElement(Event* element)
 {
     pthread_mutex_lock(&queuelock);
     if(lastindex == firstindex && isfull)
     {
         fprintf(stderr, "Queue is full, can't add new events\n");
+        return ERROR_QUEUE_FULL;
     }
     else
     {
@@ -37,6 +38,7 @@ void addNewElement(Event* element)
         }
     }
     pthread_mutex_unlock(&queuelock);
+    return 0;
 }
 
 Event* popElement()
@@ -183,6 +185,29 @@ void* startEventHandler()
                     free(passwordhash);
                     break;
                 }
+
+                case REQUEST_START_GAME:
+                {
+                /// TODO get and send player list in room
+                    printf("start game\n");
+                    unsigned char answer;
+                    int (*func)(AccountData*) = (int (*)(AccountData*))event->functionpointer;
+                    AccountData* accdata = (AccountData*)malloc(sizeof(AccountData));
+                    unsigned char* bufferptr = event->argumentsbuffer;
+                    bufferptr = deserializeAccountData(bufferptr, accdata);
+                    if(func(accdata))
+                    {
+                        answer = FAILED_TO_CONNECT_TO_ROOM;
+                    }
+                    else
+                    {
+                        answer = CONNECT_TO_ROOM_SUCCESSFUL;
+                    }
+                    while(!send(event->socket, &answer, 1, 0)) {}
+                    free(accdata);
+                    break;
+                }
+
                 ///TODO, there are many other messages that need being handled
             }
             free(event->argumentsbuffer);
