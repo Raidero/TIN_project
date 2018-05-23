@@ -165,6 +165,7 @@ void* services(void *i)
                     int i, alldata, size;
                     size = sizeof(AccountData) + sizeof(int);
                     unsigned char* args = (unsigned char*)malloc(size);
+                    unsigned char answer =  ERROR_QUEUE_FULL;
                     readbytes = 0;
                     alldata = sizeof(AccountData);
                     do{
@@ -177,7 +178,10 @@ void* services(void *i)
                         args[i] = buffer[i];
                     }
                     Event* event = createEvent((void (*)(void))logInService, args, socket, REQUEST_LOGIN);
-                    addNewElement(event);
+                    if (addNewElement(event))
+                    {
+						while(!send(socket, &answer, 1, 0)) {}
+					}
                     readbytes = 0;
                     break;
                 }
@@ -187,6 +191,7 @@ void* services(void *i)
                     int i, alldata, size;
                     size = sizeof(uint32_t);
                     unsigned char* args = (unsigned char*)malloc(size);
+                    unsigned char answer =  ERROR_QUEUE_FULL;
                     readbytes = 0;
                     do{
                         readbytes += recv(socket, buffer+readbytes, size-readbytes, MSG_WAITALL);
@@ -197,7 +202,10 @@ void* services(void *i)
                         args[i] = buffer[i];
                     }
                     Event* event = createEvent((void (*)(void))logOutService, args, socket, REQUEST_LOGOUT);
-                    addNewElement(event);
+                    if (addNewElement(event))
+                    {
+						while(!send(socket, &answer, 1, 0)) {}
+					}
                     readbytes = 0;
                     break;
                 }
@@ -207,6 +215,7 @@ void* services(void *i)
                     int i, size;
                     size = sizeof(AccountData);
                     unsigned char* args = (unsigned char*)malloc(size);
+                    unsigned char answer =  ERROR_QUEUE_FULL;
                     readbytes = 0;
                     do{
                         readbytes += recv(socket, buffer+readbytes, size-readbytes, MSG_WAITALL);
@@ -217,7 +226,10 @@ void* services(void *i)
                         args[i] = buffer[i];
                     }
                     Event* event = createEvent((void (*)(void))createAccountService, args, socket, REQUEST_CREATE_ACCOUNT);
-                    addNewElement(event);
+                    if (addNewElement(event))
+                    {
+						while(!send(socket, &answer, 1, 0)) {}
+					}
                     readbytes = 0;
                     break;
                 }
@@ -227,6 +239,7 @@ void* services(void *i)
                     int i, size;
                     size = sizeof(AccountData);
                     unsigned char* args = (unsigned char*)malloc(size);
+                    unsigned char answer =  ERROR_QUEUE_FULL;
                     readbytes = 0;
                     do{
                         readbytes += recv(socket, buffer+readbytes, size-readbytes, MSG_WAITALL);
@@ -237,7 +250,10 @@ void* services(void *i)
                         args[i] = buffer[i];
                     }
                     Event* event = createEvent((void (*)(void))deleteAccountService, args, socket, REQUEST_DELETE_ACCOUNT);
-                    addNewElement(event);
+                    if (addNewElement(event))
+                    {
+						while(!send(socket, &answer, 1, 0)) {}
+					}
                     readbytes = 0;
                     break;
                 }
@@ -247,6 +263,7 @@ void* services(void *i)
                     int i, size;
                     size = sizeof(AccountData) + MAX_PASSHASH_LENGTH*sizeof(unsigned char);
                     unsigned char* args = (unsigned char*)malloc(size);
+                    unsigned char answer =  ERROR_QUEUE_FULL;
                     readbytes = 0;
                     //alldata = sizeof(AccountData);
                     do{
@@ -258,7 +275,35 @@ void* services(void *i)
                         args[i] = buffer[i];
                     }
                     Event* event = createEvent((void (*)(void))changePasswordService, args, socket, REQUEST_CHANGE_PASSWORD);
-                    addNewElement(event);
+					if (addNewElement(event))
+                    {
+						while(!send(socket, &answer, 1, 0)) {}
+					}
+                    readbytes = 0;
+                    break;
+                }
+
+                case REQUEST_START_GAME:
+                {
+					int i, size;
+                    size = sizeof(AccountData);
+                    unsigned char* args = (unsigned char*)malloc(size);
+                    unsigned char answer =  ERROR_QUEUE_FULL;
+                    readbytes = 0;
+                    //alldata = sizeof(AccountData);
+                    do{
+                        readbytes += recv(socket, buffer+readbytes, size-readbytes, MSG_WAITALL);
+                    }while(readbytes < size);
+
+                    for(i = 0; i < size; ++i)
+                    {
+                        args[i] = buffer[i];
+                    }
+                    Event* event = createEvent((void (*)(void))connectAccountToRoomService, args, socket, REQUEST_START_GAME);
+                    if (addNewElement(event))
+                    {
+						while(!send(socket, &answer, 1, 0)) {}
+					}
                     readbytes = 0;
                     break;
                 }
