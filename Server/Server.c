@@ -188,7 +188,7 @@ void* services(void *i)
 
                 case REQUEST_LOGOUT:
                 {
-                    int i, alldata, size;
+                    int i, size;
                     size = sizeof(uint32_t);
                     unsigned char* args = (unsigned char*)malloc(size);
                     unsigned char answer =  ERROR_QUEUE_FULL;
@@ -304,6 +304,27 @@ void* services(void *i)
                     {
 						while(!send(socket, &answer, 1, 0)) {}
 					}
+                    readbytes = 0;
+                    break;
+                }
+
+                case REQUEST_REFRESH_LOGINS:
+                {
+                    int i, size;
+                    size = sizeof(AccountData) + sizeof(int);
+                    unsigned char* args = (unsigned char*)malloc(size);
+                    readbytes = 0;
+                    do{
+                        readbytes += recv(socket, buffer+readbytes, size-readbytes, MSG_WAITALL);
+                    }while(readbytes < size);
+                    serializeInt(buffer + readbytes, roomid);
+
+                    for(i = 0; i < size; ++i)
+                    {
+                        args[i] = buffer[i];
+                    }
+                    Event* event = createEvent((void (*)(void))refreshRoomService, args, socket, REQUEST_REFRESH_LOGINS);
+                    addNewElement(event);
                     readbytes = 0;
                     break;
                 }

@@ -197,17 +197,52 @@ void* startEventHandler()
                     bufferptr = deserializeAccountData(bufferptr, accdata);
                     if(func(accdata))
                     {
-                        answer = FAILED_TO_CONNECT_TO_ROOM;
+                        answer = FAILED_TO_START_GAME;
                     }
                     else
                     {
-                        answer = CONNECT_TO_ROOM_SUCCESSFUL;
+                        answer = START_GAME_SUCCESSFUL;
                     }
                     while(!send(event->socket, &answer, 1, 0)) {}
                     free(accdata);
                     break;
                 }
 
+                case REQUEST_REFRESH_LOGINS:
+                {
+                    printf("refresh logins\n");
+                    int size = MAX_PLAYER_COUNT*MAX_LOGIN_LENGTH*sizeof(char);
+                    char answer;
+                    char* logins = (char*)malloc(size);
+                    int (*func)(AccountData*, int, char**) = (int (*)(AccountData*, int, char**))event->functionpointer;
+                    unsigned char* bufferptr = event->argumentsbuffer;
+                    AccountData* accdata = (AccountData*)malloc(sizeof(AccountData));
+                    int *roomid = (int*)malloc(sizeof(int));
+                    bufferptr = deserializeAccountData(bufferptr, accdata);
+                    bufferptr = deserializeInt(bufferptr, roomid);
+
+                    if(func(accdata, *roomid, (char**)logins))
+                    {
+                        answer = FAILED_TO_REFRESH_LOGINS;
+                        while(!send(event->socket, &answer, 1, 0)) {}
+                    }
+                    else
+                    {
+                        answer = REFRESH_LOGINS_SUCCESSFUL;
+                        while(!send(event->socket, &answer, 1, 0)) {}
+                        int sendbytes = 0;
+                        unsigned char* buffer = (unsigned char*)malloc(size);
+                        serializeCharArray(buffer, logins, size);
+                        while(sendbytes < size)
+                        {
+                            sendbytes = send(event->socket, buffer + sendbytes, size - sendbytes, 0);
+                        }
+                        free(buffer);
+                    }
+                    free(accdata);
+                    free(logins);
+                    break;
+                }
                 ///TODO, there are many other messages that need being handled
             }
             free(event->argumentsbuffer);

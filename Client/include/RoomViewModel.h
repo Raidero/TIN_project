@@ -2,7 +2,7 @@
 #define ROOMVIEWMODEL_H
 
 #include <ViewModel.h>
-
+#include <time.h>
 
 class RoomViewModel : public ViewModel
 {
@@ -11,14 +11,14 @@ public:
     virtual ~RoomViewModel();
     void buttonPressed(int i) {}
     void addLetter(char c) {}
-    void refresh(int i) {}
+    void refresh(int message);
 
 private:
     ViewModel* mvm;
     sf::Text logins;
     sf::Text exit;
     sf::CircleShape ready[MAX_PLAYER_COUNT];
-
+    clock_t lastloginrefresh;
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const
     {
         if(isvisible)

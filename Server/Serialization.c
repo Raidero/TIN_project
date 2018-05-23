@@ -45,6 +45,16 @@ unsigned char* serializeAccountData(unsigned char* buffer, AccountData* accountd
     return buffer;
 }
 
+unsigned char* serializePointer(unsigned char* buffer, void* input)
+{
+    int address = (int)input;
+    buffer[0] = address << 24;
+    buffer[1] = address << 16;
+    buffer[2] = address << 8;
+    buffer[3] = address;
+    return buffer + sizeof(void*);
+}
+
 unsigned char* deserializeInt(unsigned char* buffer, int* output)
 {
     *output = 0;
@@ -90,4 +100,15 @@ unsigned char* deserializeAccountData(unsigned char* buffer, AccountData* accoun
     buffer = deserializeUnsignedCharArray(buffer, accountdata->passwordhash, MAX_PASSHASH_LENGTH);
     buffer = deserializeInt(buffer, &accountdata->votercounter);
     return buffer;
+}
+
+unsigned char* deserializePointer(unsigned char* buffer, void* output)
+{
+    int address = 0;
+    address |= buffer[0] << 24;
+    address |= buffer[1] << 16;
+    address |= buffer[2] << 8;
+    address |= buffer[3];
+    output = (void*)address;
+    return buffer + sizeof(void*);
 }
