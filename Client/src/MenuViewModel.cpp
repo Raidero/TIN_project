@@ -44,16 +44,8 @@ void MenuViewModel::buttonPressed(int i)
                 errno = ENOENT;
                 buffer[0] = REQUEST_START_GAME;
                 while(!send(mainsocket, buffer, 1, 0)) {}
-                unsigned char* bufferptr = buffer;
 
-                serializeAccountData(bufferptr, &playeraccountdata);
-                int alldata = bufferptr - buffer;
-                int sendbytes = 0;
-                while(sendbytes < alldata)
-                {
-                    sendbytes = send(mainsocket, buffer + sendbytes, alldata - sendbytes, 0);
-                }
-                while(!recv(mainsocket, buffer, 1, MSG_WAITALL))
+                while(!recv(mainsocket, buffer, 1, 0) >= 0)
                 {
                     if(buffer[0] == FAILED_TO_START_GAME)
                     {
@@ -111,7 +103,7 @@ void MenuViewModel::buttonPressed(int i)
                     }
                     else if(buffer[0] == LOGOUT_SUCCESSFUL)
                     {
-                        refresh(PLAYER_STARTED_GAME);
+                        refresh(PLAYER_LOGGED_OUT);
                         break;
                     }
                 }

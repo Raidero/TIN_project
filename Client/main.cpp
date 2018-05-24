@@ -68,6 +68,8 @@ int main()
         {
             window.draw(*viewmodels[i]);
         }
+        if(viewmodels[5]->isActive())
+            viewmodels[5]->refresh(REFRESH_LOGINS);
         window.display();
     }
     close(mainsocket);
