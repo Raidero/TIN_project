@@ -44,7 +44,7 @@ private:
     sf::Text changepassword;
     bool isloggedin;
     bool exit;
-
+    int numberofplayers;
     ViewModel* loginviewmodel;
     ViewModel* createaccountviewmodel;
     ViewModel* deleteaccountviewmodel;

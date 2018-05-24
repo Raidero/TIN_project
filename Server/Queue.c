@@ -47,7 +47,7 @@ Event* popElement()
     pthread_mutex_lock(&queuelock);
     if(lastindex == firstindex && !isfull)
     {
-        printf("Nothing to do...\n");
+        //printf("Nothing to do...\n");
     }
     else
     {
@@ -191,20 +191,27 @@ void* startEventHandler()
                 /// TODO get and send player list in room
                     printf("start game\n");
                     unsigned char answer;
-                    int (*func)(AccountData*) = (int (*)(AccountData*))event->functionpointer;
-                    AccountData* accdata = (AccountData*)malloc(sizeof(AccountData));
+                    int (*func)(int) = (int (*)(int))event->functionpointer;
+                    int* roomid = NULL;
+                    int* address =(int*)malloc(sizeof(int));
+                    int* accountid = (int*)malloc(sizeof(int));
                     unsigned char* bufferptr = event->argumentsbuffer;
-                    bufferptr = deserializeAccountData(bufferptr, accdata);
-                    if(func(accdata))
+                    bufferptr = deserializeInt(bufferptr, accountid);
+                    bufferptr = deserializePointer(bufferptr, address);
+                    roomid = (int*)*address;
+                    *roomid = func(*accountid);
+                    if(*roomid < 0)
                     {
                         answer = FAILED_TO_START_GAME;
                     }
                     else
                     {
                         answer = START_GAME_SUCCESSFUL;
+                        printf("connected to room number: %d\n", *roomid);
                     }
                     while(!send(event->socket, &answer, 1, 0)) {}
-                    free(accdata);
+                    free(accountid);
+                    free(address);
                     break;
                 }
 
@@ -214,14 +221,15 @@ void* startEventHandler()
                     int size = MAX_PLAYER_COUNT*MAX_LOGIN_LENGTH*sizeof(char);
                     char answer;
                     char* logins = (char*)malloc(size);
-                    int (*func)(AccountData*, int, char**) = (int (*)(AccountData*, int, char**))event->functionpointer;
+                    int (*func)(int, int, char*) = (int (*)(int, int, char*))event->functionpointer;
                     unsigned char* bufferptr = event->argumentsbuffer;
-                    AccountData* accdata = (AccountData*)malloc(sizeof(AccountData));
+
                     int *roomid = (int*)malloc(sizeof(int));
-                    bufferptr = deserializeAccountData(bufferptr, accdata);
+                    int *accountid = (int*)malloc(sizeof(int));
+                    bufferptr = deserializeInt(bufferptr, accountid);
                     bufferptr = deserializeInt(bufferptr, roomid);
 
-                    if(func(accdata, *roomid, (char**)logins))
+                    if(func(*accountid, *roomid, logins))
                     {
                         answer = FAILED_TO_REFRESH_LOGINS;
                         while(!send(event->socket, &answer, 1, 0)) {}
@@ -239,7 +247,8 @@ void* startEventHandler()
                         }
                         free(buffer);
                     }
-                    free(accdata);
+                    free(accountid);
+                    free(roomid);
                     free(logins);
                     break;
                 }
@@ -251,7 +260,7 @@ void* startEventHandler()
         }
         else
         {
-            sleep(1);
+
         }
 
     }

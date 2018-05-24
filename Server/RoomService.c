@@ -64,7 +64,7 @@ void checkIfRoomIsEmptyAndDispose(int roomid)
 	}
     for(i = 0; i < MAX_PLAYER_COUNT; ++i)
     {
-        if(rooms[roomid]->players[i] != NULL)
+        if(rooms[roomid] != NULL && rooms[roomid]->players[i] != NULL)
         {
             empty = 0;
         }
@@ -75,112 +75,122 @@ void checkIfRoomIsEmptyAndDispose(int roomid)
     }
 }
 
-int findFreeRoomForAccount(AccountData* playerdata)
+int findFreeRoomForAccount(int accountid)
 {
     int i, j;
-
-    for(i = 0; i < MAX_ROOM_COUNT; ++i)
+    if(accountid >= 0 && accountid < MAX_ACCOUNTS_COUNT && loggedaccounts[accountid] != NULL)
     {
-        for(j = 0; j < MAX_PLAYER_COUNT; ++j)
+        for(i = 0; i < MAX_ROOM_COUNT; ++i)
         {
-			if(rooms[i] == NULL)
-			{
-				break;	// room doesn't exist yet
-			}
-
-            if(rooms[i]->players[j] == NULL)
+            for(j = 0; j < MAX_PLAYER_COUNT; ++j)
             {
-				if(!rooms[i]->isingame)
-				{
-					connectAccountToRoom(rooms[i], playerdata, j);
-					return i;
-				}
+                if(rooms[i] == NULL)
+                {
+                    break;	// room doesn't exist yet
+                }
+
+                if(rooms[i]->players[j] == NULL)
+                {
+                    if(!rooms[i]->isingame)
+                    {
+                        connectAccountToRoom(rooms[i], accountid, j);
+                        return i;
+                    }
+                }
             }
         }
+        return FREE_ROOM_NOT_FOUND;
     }
-    return FREE_ROOM_NOT_FOUND;
+    return OUT_OF_RANGE;
 }
 
-int connectAccountToRoom(Room* room, AccountData* playerdata, int index)
+int connectAccountToRoom(Room* room, int accountid, int index)
 {
-    room->players[index] = playerdata;
+    room->players[index] = loggedaccounts[accountid];
     room->isplayerready[index] = 0;
 	return 0;
 }
 
-int createRoomForAccount(AccountData* playerdata)
+int createRoomForAccount(int accountid)
 {
     int i;
-    for(i = 0; i < MAX_ROOM_COUNT; ++i)
+    if(accountid >= 0 && accountid < MAX_ACCOUNTS_COUNT && loggedaccounts[accountid] != NULL)
     {
-        if(rooms[i] == NULL)
+        for(i = 0; i < MAX_ROOM_COUNT; ++i)
         {
-            rooms[i] = initRoom();
-            connectAccountToRoom(rooms[i], playerdata, 0);
-            return i;
+            if(rooms[i] == NULL)
+            {
+                rooms[i] = initRoom();
+                connectAccountToRoom(rooms[i], accountid, 0);
+                return i;
+            }
         }
+        return MAX_ROOM_LIMIT_ERROR;
     }
-	return MAX_ROOM_LIMIT_ERROR;
+    return OUT_OF_RANGE;
 }
 
-int refreshRoomService(AccountData* playerdata, int roomid, char** loginlist)
+int refreshRoomService(int accountid, int roomid, char* loginlist)
 {
 	int i;
 	bool foundhim = 0;
+    if(accountid >= 0 && accountid < MAX_ACCOUNTS_COUNT && loggedaccounts[accountid] != NULL)
+    {
+        bzero(loginlist, MAX_LOGIN_LENGTH*MAX_PLAYER_COUNT*sizeof(char));
 
-	for (i = 0; i < MAX_PLAYER_COUNT; ++i)
-		bzero(*(loginlist+i*sizeof(char)), MAX_LOGIN_LENGTH*sizeof(char));
+        if(roomid < 0 || roomid >= MAX_ROOM_COUNT || rooms[roomid] == NULL)
+        {
+            fprintf(stderr, "Room ID out of range: %d\n", roomid);
+            return OUT_OF_RANGE;
+        }
+        for (i = 0; i < MAX_PLAYER_COUNT; ++i)
+        {
+            if (rooms[roomid]->players[i] == NULL)	// taking care of not existing players in room
+                continue;
 
-	if(roomid < 0 || roomid >= MAX_ROOM_COUNT || rooms[roomid] == NULL)
-	{
-        fprintf(stderr, "Room ID out of range: %d\n", roomid);
-        return OUT_OF_RANGE;
-	}
-	for (i = 0; i < MAX_PLAYER_COUNT; ++i)
-	{
-		if (rooms[roomid]->players[i] == NULL)	// taking care of not existing players in room
-			continue;
+            strcpy((loginlist+i*MAX_LOGIN_LENGTH*sizeof(char)), rooms[roomid]->players[i]->login);
 
-		strcpy(*(loginlist+i*sizeof(char)), rooms[roomid]->players[i]->login);
+            if(rooms[roomid]->players[i]->currentip == loggedaccounts[accountid]->currentip)
+            {
+                foundhim = 1;
+                ++i;
+                break;
+            }
+        }
 
-		if(rooms[roomid]->players[i]->currentip == playerdata->currentip)
-		{
-			foundhim = 1;
-			++i;
-			break;
-		}
-	}
+        if (!foundhim)		// gotta check it if we don't want to give info about rooms to other players
+            return PLAYER_NOT_FOUND;
 
-	if (!foundhim)		// gotta check it if we don't want to give info about rooms to other players
-		return PLAYER_NOT_FOUND;
-
-	for (; i < MAX_PLAYER_COUNT; ++i)	// continue copying
-	{
-		if (rooms[roomid]->players[i] == NULL)	// taking care of not existing players in room
-			continue;
-		strcpy(*(loginlist+i*sizeof(char)), rooms[roomid]->players[i]->login);
-	}
-
-	return 0;
+        for (; i < MAX_PLAYER_COUNT; ++i)	// continue copying
+        {
+            if (rooms[roomid]->players[i] == NULL)	// taking care of not existing players in room
+                continue;
+            strcpy((loginlist+i*MAX_LOGIN_LENGTH*sizeof(char)), rooms[roomid]->players[i]->login);
+        }
+        return 0;
+    }
+    return OUT_OF_RANGE;
 }
 
-int exitRoomService(AccountData* playerdata, int roomid)
+int exitRoomService(int accountid, int roomid)
 {
-    return sweepPlayer(playerdata, roomid);     // idk if sweepPlayer will be used somewhere else
+    return sweepPlayer(accountid, roomid);     // idk if sweepPlayer will be used somewhere else
 }
 
-int sweepPlayer(AccountData* playerdata, int roomid)
+int sweepPlayer(int accountid, int roomid)
 {
     int i;
-    if(roomid < 0 || roomid >= MAX_ROOM_COUNT || rooms[roomid] == NULL)
+
+    if(roomid < 0 || roomid >= MAX_ROOM_COUNT || rooms[roomid] == NULL ||
+    accountid < 0 || accountid >= MAX_ACCOUNTS_COUNT || loggedaccounts[accountid] == NULL)
 	{
-        fprintf(stderr, "Room ID out of range: %d\n", roomid);
+        fprintf(stderr, "Room ID or Account ID out of range: %d, %d\n", roomid, accountid);
         return OUT_OF_RANGE;
 	}
 
     for(i = 0; i < MAX_PLAYER_COUNT; ++i)
     {
-        if(rooms[roomid]->players[i] != NULL && rooms[roomid]->players[i]->currentip == playerdata->currentip)
+        if(rooms[roomid] != NULL && rooms[roomid]->players[i] != NULL && rooms[roomid]->players[i]->currentip == loggedaccounts[accountid]->currentip)
         {
             rooms[roomid]->players[i] = NULL;
             rooms[roomid]->isplayerready[i] = 0;

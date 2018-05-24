@@ -3,25 +3,24 @@
 #include <string.h>
 
 
-int connectAccountToRoomService(AccountData* account)
+int connectAccountToRoomService(int accountid)
 {
     int roomid = 0;
-    if(!isLoggedIn(account->currentip))
+    if(accountid >= 0 && accountid < MAX_ACCOUNTS_COUNT && loggedaccounts[accountid] != NULL)
     {
-        fprintf(stderr, "Player is not logged in\n");
-        return LOGGED_IN_ERROR;
-    }
-    roomid = findFreeRoomForAccount(account);
-    if(roomid < 0)
-    {
-        roomid = createRoomForAccount(account);
+        roomid = findFreeRoomForAccount(accountid);
         if(roomid < 0)
         {
-            fprintf(stderr, "Couldn't connect account to any room\n");
-            return roomid;
+            roomid = createRoomForAccount(accountid);
+            if(roomid < 0)
+            {
+                fprintf(stderr, "Couldn't connect account to any room\n");
+                return roomid;
+            }
         }
+        return roomid;
     }
-    return roomid;
+    return OUT_OF_RANGE;
 }
 
 int setReadyToStartService(uint32_t ip, int roomid)

@@ -143,14 +143,14 @@ void* services(void *i)
         if(readbytes <= 0)
         {
             printf("Player with %d id quit\n", accountid);
+            if(roomid >= 0)
+            {
+                sweepPlayer(accountid, roomid);
+                checkIfRoomIsEmptyAndDispose(roomid);
+            }
             if(accountid >= 0)
             {
                 disposeAccountData(accountid);
-            }
-            if(roomid >= 0)
-            {
-                sweepPlayer(loggedaccounts[accountid], roomid);
-                checkIfRoomIsEmptyAndDispose(roomid);
             }
             disposeSocket(socket);
             close(socket);
@@ -285,15 +285,13 @@ void* services(void *i)
 
                 case REQUEST_START_GAME:
                 {
-					int i, size;
-                    size = sizeof(AccountData);
+					int size, i;
+                    size = (sizeof(int)<<1);
                     unsigned char* args = (unsigned char*)malloc(size);
                     unsigned char answer =  ERROR_QUEUE_FULL;
-                    readbytes = 0;
-                    //alldata = sizeof(AccountData);
-                    do{
-                        readbytes += recv(socket, buffer+readbytes, size-readbytes, MSG_WAITALL);
-                    }while(readbytes < size);
+                    unsigned char* bufferptr = buffer;
+                    bufferptr = serializeInt(bufferptr, accountid);
+                    bufferptr = serializePointer(bufferptr, &roomid);
 
                     for(i = 0; i < size; ++i)
                     {
@@ -311,20 +309,21 @@ void* services(void *i)
                 case REQUEST_REFRESH_LOGINS:
                 {
                     int i, size;
-                    size = sizeof(AccountData) + sizeof(int);
+                    size = sizeof(int) + sizeof(int);
                     unsigned char* args = (unsigned char*)malloc(size);
-                    readbytes = 0;
-                    do{
-                        readbytes += recv(socket, buffer+readbytes, size-readbytes, MSG_WAITALL);
-                    }while(readbytes < size);
-                    serializeInt(buffer + readbytes, roomid);
-
+                    unsigned char answer =  ERROR_QUEUE_FULL;
+                    unsigned char* bufferptr =  buffer;
+                    bufferptr = serializeInt(bufferptr, accountid);
+                    bufferptr = serializeInt(bufferptr, roomid);
                     for(i = 0; i < size; ++i)
                     {
                         args[i] = buffer[i];
                     }
                     Event* event = createEvent((void (*)(void))refreshRoomService, args, socket, REQUEST_REFRESH_LOGINS);
-                    addNewElement(event);
+                    if (addNewElement(event))
+                    {
+						while(!send(socket, &answer, 1, 0)) {}
+					}
                     readbytes = 0;
                     break;
                 }

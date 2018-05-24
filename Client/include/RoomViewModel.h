@@ -12,13 +12,14 @@ public:
     void buttonPressed(int i) {}
     void addLetter(char c) {}
     void refresh(int message);
-
+    void setLogins(char* lgs);
 private:
     ViewModel* mvm;
     sf::Text logins;
     sf::Text exit;
     sf::CircleShape ready[MAX_PLAYER_COUNT];
     clock_t lastloginrefresh;
+    int numberofplayers;
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const
     {
         if(isvisible)
@@ -29,7 +30,7 @@ private:
             }
             target.draw(logins);
             target.draw(exit);
-            for(int i = 0; i < MAX_PLAYER_COUNT; ++i)
+            for(int i = 0; i < numberofplayers; ++i)
             {
                 target.draw(ready[i]);
             }

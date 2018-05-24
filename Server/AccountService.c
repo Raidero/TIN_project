@@ -64,11 +64,11 @@ void disposeAllAccounts()
 
 int logInService(AccountData* account, int playerid)
 {
-    if(isLoggedIn(account->currentip))
+    /*if(isLoggedIn(account->currentip))
     {
         fprintf(stderr, "Player %s already logged in\n", account->login);
         return LOGGED_IN_ERROR;
-    }
+    }*/
     if(!verifyLoginAndPassword(account))
     {
         fprintf(stderr, "Wrong login or password for login: %s\n", account->login);
