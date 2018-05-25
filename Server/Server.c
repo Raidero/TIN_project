@@ -327,6 +327,28 @@ void* services(void *i)
                     readbytes = 0;
                     break;
                 }
+
+                case REQUEST_TOGGLE_READY:
+                {
+                    int i, size;
+                    size = sizeof(int) + sizeof(int);
+                    unsigned char* args = (unsigned char*)malloc(size);
+                    unsigned char answer =  ERROR_QUEUE_FULL;
+                    unsigned char* bufferptr =  buffer;
+                    bufferptr = serializeInt(bufferptr, accountid);
+                    bufferptr = serializeInt(bufferptr, roomid);
+                    for(i = 0; i < size; ++i)
+                    {
+                        args[i] = buffer[i];
+                    }
+                    Event* event = createEvent((void (*)(void))refreshRoomService, args, socket, REQUEST_REFRESH_LOGINS);
+                    if (addNewElement(event))
+                    {
+						while(!send(socket, &answer, 1, 0)) {}
+					}
+                    readbytes = 0;
+                    break;
+                }
             }
         }
         bzero(buffer, BUFFER_SIZE);

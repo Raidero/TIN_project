@@ -252,6 +252,34 @@ void* startEventHandler()
                     free(logins);
                     break;
                 }
+                case REQUEST_TOGGLE_READY:
+                {
+					printf("toggle ready\n");
+                    char answer;
+                    int (*func)(int, int) = (int (*)(int, int))event->functionpointer;
+                    unsigned char* bufferptr = event->argumentsbuffer;
+
+                    int *roomid = (int*)malloc(sizeof(int));
+                    int *accountid = (int*)malloc(sizeof(int));
+                    bufferptr = deserializeInt(bufferptr, accountid);
+                    bufferptr = deserializeInt(bufferptr, roomid);
+
+                    if(func(*accountid, *roomid))
+                    {
+                        answer = FAILED_TO_TOGGLE_READYNESS;
+                    }
+                    else
+                    {
+                        answer = TOGGLE_READYNESS_SUCCESSFUL;
+                    }
+
+                    while(!send(event->socket, &answer, 1, 0)) {}
+
+                    free(accountid);
+                    free(roomid);
+
+                    break;
+                }
                 ///TODO, there are many other messages that need being handled
             }
             free(event->argumentsbuffer);

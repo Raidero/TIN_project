@@ -29,8 +29,9 @@ Room* initRoom()
     for(i = 0; i < MAX_PLAYER_COUNT; ++i)
     {
         room->players[i] = NULL;
-        room->isplayerready[i] = 0;
-    }
+        room->isplayerready[i] = 2;
+        room->hostindex = MAX_PLAYER_COUNT;
+	}
     return room;
 }
 
@@ -122,6 +123,7 @@ int createRoomForAccount(int accountid)
             {
                 rooms[i] = initRoom();
                 connectAccountToRoom(rooms[i], accountid, 0);
+                rooms[i]->hostindex  = 0;
                 return i;
             }
         }
@@ -172,14 +174,74 @@ int refreshRoomService(int accountid, int roomid, char* loginlist)
     return OUT_OF_RANGE;
 }
 
+char* refreshReadyUpService(int accountid, int roomid)
+{
+	int i;
+	bool foundhim = 0;
+    if(accountid >= 0 && accountid < MAX_ACCOUNTS_COUNT && loggedaccounts[accountid] != NULL)
+    {
+        if(roomid < 0 || roomid >= MAX_ROOM_COUNT || rooms[roomid] == NULL)
+        {
+            fprintf(stderr, "Room ID out of range: %d\n", roomid);
+            return NULL;
+        }
+        for (i = 0; i < MAX_PLAYER_COUNT; ++i)
+        {
+            if (rooms[roomid]->players[i] == NULL)	// taking care of not existing players in room
+                continue;
+
+            if(rooms[roomid]->players[i]->currentip == loggedaccounts[accountid]->currentip)
+            {
+                foundhim = 1;
+                break;
+            }
+        }
+
+        if (!foundhim)		// gotta check it if we don't want to give info about rooms to other players
+            return NULL;
+
+        return rooms[roomid]->isplayerready;
+    }
+    return NULL;
+}
+
+int toggleReadyService(int accountid, int roomid)
+{
+    int i;
+
+    if(roomid < 0 || roomid >= MAX_ROOM_COUNT || rooms[roomid] == NULL || accountid < 0 || accountid >= MAX_ACCOUNTS_COUNT || loggedaccounts[accountid] == NULL)
+    {
+        fprintf(stderr, "Room ID out of range: %d\n", roomid);
+        return OUT_OF_RANGE;
+    }
+
+    for (i = 0; i < MAX_PLAYER_COUNT; ++i)
+    {
+        if (rooms[roomid]->players[i] == NULL)	// taking care of not existing players in room
+            continue;
+
+        if(rooms[roomid]->players[i]->currentip == loggedaccounts[accountid]->currentip)
+        {
+            if (rooms[roomid]->isplayerready[i] == 1)
+                rooms[roomid]->isplayerready[i] = 0;
+            else
+                rooms[roomid]->isplayerready[i] = 1;
+            return 0;
+        }
+    }
+
+    return PLAYER_NOT_FOUND;
+}
+
 int exitRoomService(int accountid, int roomid)
 {
+    // usunac pusty pokoj - fcja wyzej
     return sweepPlayer(accountid, roomid);     // idk if sweepPlayer will be used somewhere else
 }
 
 int sweepPlayer(int accountid, int roomid)
 {
-    int i;
+    int i, j;
 
     if(roomid < 0 || roomid >= MAX_ROOM_COUNT || rooms[roomid] == NULL ||
     accountid < 0 || accountid >= MAX_ACCOUNTS_COUNT || loggedaccounts[accountid] == NULL)
@@ -190,10 +252,17 @@ int sweepPlayer(int accountid, int roomid)
 
     for(i = 0; i < MAX_PLAYER_COUNT; ++i)
     {
-        if(rooms[roomid] != NULL && rooms[roomid]->players[i] != NULL && rooms[roomid]->players[i]->currentip == loggedaccounts[accountid]->currentip)
+        if(rooms[roomid]->players[i] != NULL && rooms[roomid]->players[i]->currentip == loggedaccounts[accountid]->currentip)
         {
             rooms[roomid]->players[i] = NULL;
-            rooms[roomid]->isplayerready[i] = 0;
+            rooms[roomid]->isplayerready[i] = 2;
+            for (j = 0; i < MAX_PLAYER_COUNT; ++j)
+            {
+				if (rooms[roomid]->players[j] != NULL)
+				{
+					rooms[roomid]->hostindex = j;
+				}
+            }
             return 0;
         }
     }
