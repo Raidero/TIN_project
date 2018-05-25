@@ -21,7 +21,6 @@ typedef struct
     char login[MAX_LOGIN_LENGTH];
     unsigned char passwordhash[MAX_PASSHASH_LENGTH];
     uint32_t currentip;                     //changed so it now reflects ip from in_addr struct
-    int votercounter;
 } AccountData;
 
 extern AccountData* loggedaccounts[MAX_ACCOUNTS_COUNT];

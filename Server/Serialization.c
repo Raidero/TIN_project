@@ -41,7 +41,6 @@ unsigned char* serializeAccountData(unsigned char* buffer, AccountData* accountd
     buffer = serializeUint_32_t(buffer, accountdata->currentip);
     buffer = serializeCharArray(buffer, accountdata->login, MAX_LOGIN_LENGTH);
     buffer = serializeUnsignedCharArray(buffer, accountdata->passwordhash, MAX_PASSHASH_LENGTH);
-    buffer = serializeInt(buffer, accountdata->votercounter);
     return buffer;
 }
 
@@ -98,7 +97,6 @@ unsigned char* deserializeAccountData(unsigned char* buffer, AccountData* accoun
     buffer = deserializeUint_32_t(buffer, &accountdata->currentip);
     buffer = deserializeCharArray(buffer, accountdata->login, MAX_LOGIN_LENGTH);
     buffer = deserializeUnsignedCharArray(buffer, accountdata->passwordhash, MAX_PASSHASH_LENGTH);
-    buffer = deserializeInt(buffer, &accountdata->votercounter);
     return buffer;
 }
 

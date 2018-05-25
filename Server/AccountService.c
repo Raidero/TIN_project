@@ -36,7 +36,6 @@ AccountData* initAccoundData(char* login, unsigned char* passwordhash, uint32_t 
     }
     acc->passwordhash[i] = '\0';
     acc->currentip = currentip;
-    acc->votercounter = votercounter;
     return acc;
 }
 
