@@ -75,6 +75,7 @@ Event* createEvent(void (*func)(void), unsigned char* args, int socket, char mes
 void* startEventHandler()
 {
     Event* event = NULL;
+    unsigned char answer;
     for(;;)
     {
         event = popElement();
@@ -86,7 +87,6 @@ void* startEventHandler()
                 case REQUEST_LOGIN:
                 {
                     printf("login\n");
-                    unsigned char answer;
                     int (*func)(AccountData*, int) = (int (*)(AccountData*, int))event->functionpointer;
                     AccountData* accdata = (AccountData*)malloc(sizeof(AccountData));
                     unsigned char* bufferptr = event->argumentsbuffer;
@@ -108,7 +108,6 @@ void* startEventHandler()
                 case REQUEST_LOGOUT:
                 {
                     printf("logout\n");
-                    unsigned char answer;
                     int (*func)(uint32_t) = (int (*)(uint32_t))event->functionpointer;
                     uint32_t* ip = (uint32_t*)malloc(sizeof(uint32_t));
                     deserializeUint_32_t(event->argumentsbuffer, ip);
@@ -127,7 +126,6 @@ void* startEventHandler()
                 case REQUEST_CREATE_ACCOUNT:
                 {
                     printf("create account\n");
-                    unsigned char answer;
                     int (*func)(AccountData*) = (int (*)(AccountData*))event->functionpointer;
                     AccountData* accdata = (AccountData*)malloc(sizeof(AccountData));
                     deserializeAccountData(event->argumentsbuffer, accdata);
@@ -146,7 +144,6 @@ void* startEventHandler()
                 case REQUEST_DELETE_ACCOUNT:
                 {
                     printf("delete account\n");
-                    unsigned char answer;
                     int (*func)(AccountData*) = (int (*)(AccountData*))event->functionpointer;
                     AccountData* accdata = (AccountData*)malloc(sizeof(AccountData));
                     deserializeAccountData(event->argumentsbuffer, accdata);
@@ -165,7 +162,6 @@ void* startEventHandler()
                 case REQUEST_CHANGE_PASSWORD:
                 {
                     printf("change password\n");
-                    unsigned char answer;
                     int (*func)(AccountData*, unsigned char*) = (int (*)(AccountData*, unsigned char*))event->functionpointer;
                     AccountData* accdata = (AccountData*)malloc(sizeof(AccountData));
                     unsigned char* passwordhash = (unsigned char*)malloc(MAX_PASSHASH_LENGTH*sizeof(unsigned char));
@@ -188,28 +184,33 @@ void* startEventHandler()
 
                 case REQUEST_START_GAME:
                 {
-                /// TODO get and send player list in room
                     printf("start game\n");
-                    unsigned char answer;
-                    int (*func)(int) = (int (*)(int))event->functionpointer;
+                    int (*func)(int, bool*) = (int (*)(int, bool*))event->functionpointer;
                     int* roomid = NULL;
                     int* address =(int*)malloc(sizeof(int));
                     int* accountid = (int*)malloc(sizeof(int));
+                    bool* ishost = (bool*)malloc(sizeof(bool));
                     unsigned char* bufferptr = event->argumentsbuffer;
                     bufferptr = deserializeInt(bufferptr, accountid);
                     bufferptr = deserializePointer(bufferptr, address);
                     roomid = (int*)*address;
-                    *roomid = func(*accountid);
+                    *roomid = func(*accountid, ishost);
                     if(*roomid < 0)
                     {
                         answer = FAILED_TO_START_GAME;
                     }
-                    else
+                    else if(*ishost == 0)
                     {
                         answer = START_GAME_SUCCESSFUL;
                         printf("connected to room number: %d\n", *roomid);
                     }
+                    else
+                    {
+                        answer = START_GAME_SUCCESSFUL_AND_HOST;
+                        printf("Created and connected to room number: %d\n", *roomid);
+                    }
                     while(!send(event->socket, &answer, 1, 0)) {}
+                    free(ishost);
                     free(accountid);
                     free(address);
                     break;
@@ -219,7 +220,6 @@ void* startEventHandler()
                 {
                     printf("refresh logins\n");
                     int size = MAX_PLAYER_COUNT*MAX_LOGIN_LENGTH*sizeof(char);
-                    char answer;
                     char* logins = (char*)malloc(size);
                     int (*func)(int, int, char*) = (int (*)(int, int, char*))event->functionpointer;
                     unsigned char* bufferptr = event->argumentsbuffer;
@@ -252,10 +252,10 @@ void* startEventHandler()
                     free(logins);
                     break;
                 }
+
                 case REQUEST_TOGGLE_READY:
                 {
 					printf("toggle ready\n");
-                    char answer;
                     int (*func)(int, int) = (int (*)(int, int))event->functionpointer;
                     unsigned char* bufferptr = event->argumentsbuffer;
 
@@ -280,7 +280,104 @@ void* startEventHandler()
 
                     break;
                 }
-                ///TODO, there are many other messages that need being handled
+
+                case REQUEST_REFRESH_READYNESS:
+                {
+                    printf("refresh readyness\n");
+                    int size = MAX_PLAYER_COUNT*sizeof(char);
+                    char* isplayerready = NULL;
+                    char* (*func)(int, int) = (char* (*)(int, int))event->functionpointer;
+                    unsigned char* bufferptr = event->argumentsbuffer;
+
+                    int *roomid = (int*)malloc(sizeof(int));
+                    int *accountid = (int*)malloc(sizeof(int));
+                    bufferptr = deserializeInt(bufferptr, accountid);
+                    bufferptr = deserializeInt(bufferptr, roomid);
+                    isplayerready = func(*accountid, *roomid);
+                    if(isplayerready == NULL)
+                    {
+                        answer = FAILED_TO_REFRESH_READYNESS;
+                        while(!send(event->socket, &answer, 1, 0)) {}
+                    }
+                    else
+                    {
+                        answer = REFRESH_READYNESS_SUCCESSFUL;
+                        while(!send(event->socket, &answer, 1, 0)) {}
+                        int sendbytes = 0;
+                        unsigned char* buffer = (unsigned char*)malloc(size);
+                        serializeCharArray(buffer, isplayerready, size);
+                        while(sendbytes < size)
+                        {
+                            sendbytes = send(event->socket, buffer + sendbytes, size - sendbytes, 0);
+                        }
+                        free(buffer);
+                    }
+                    free(accountid);
+                    free(roomid);
+                    break;
+                }
+
+                case REQUEST_EXIT_ROOM:
+                {
+					printf("exit room\n");
+                    int (*func)(int, int*) = (int (*)(int, int*))event->functionpointer;
+                    unsigned char* bufferptr = event->argumentsbuffer;
+
+                    int *roomid = NULL;
+                    int* address =(int*)malloc(sizeof(int));
+                    int *accountid = (int*)malloc(sizeof(int));
+                    bufferptr = deserializeInt(bufferptr, accountid);
+                    bufferptr = deserializePointer(bufferptr, address);
+                    roomid = (int*)*address;
+                    if(func(*accountid, roomid))
+                    {
+                        answer = FAILED_TO_EXIT_ROOM;
+                    }
+                    else
+                    {
+                        answer = EXIT_ROOM_SUCCESSFUL;
+                    }
+
+                    while(!send(event->socket, &answer, 1, 0)) {}
+
+                    free(accountid);
+                    free(address);
+
+                    break;
+                }
+
+                case REQUEST_SEND_MESSAGE:
+                {
+					printf("send message to room\n");
+                    int (*func)(int, int, char*) = (int (*)(int, int, char*))event->functionpointer;
+                    unsigned char* bufferptr = event->argumentsbuffer;
+
+                    int *roomid = (int*)malloc(sizeof(int));
+                    int *accountid = (int*)malloc(sizeof(int));
+                    char *message = (char*)malloc((MAX_MESSAGEINBOX_LENGTH + MAX_LOGIN_LENGTH + 1)*sizeof(char));
+                    bufferptr = deserializeCharArray(bufferptr, message, MAX_MESSAGEINBOX_LENGTH + MAX_LOGIN_LENGTH + 1);
+                    bufferptr = deserializeInt(bufferptr, accountid);
+                    bufferptr = deserializeInt(bufferptr, roomid);
+
+                    if(func(*accountid, *roomid, message))
+                    {
+                        answer = FAILED_TO_SEND_MESSAGE;
+                    }
+                    else
+                    {
+                        answer = SEND_MESSAGE_SUCCESSFUL;
+                    }
+
+                    while(!send(event->socket, &answer, 1, 0)) {}
+
+                    free(accountid);
+                    free(roomid);
+                    free(message);
+                    break;
+                }
+
+
+                ///TODO, there are some other messages that need being handled
             }
             free(event->argumentsbuffer);
             free(event);

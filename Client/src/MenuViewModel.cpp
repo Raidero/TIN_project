@@ -3,6 +3,7 @@
 MenuViewModel::MenuViewModel(int soc, uint32_t ip)
 {
     mainsocket = soc;
+    communicationsocket = -1;
     accountdata.currentip = ip;
     initButtons(6);
     exit = false;
@@ -45,7 +46,12 @@ void MenuViewModel::buttonPressed(int i)
                 buffer[0] = REQUEST_START_GAME;
                 while(!send(mainsocket, buffer, 1, 0)) {}
 
-                while(!recv(mainsocket, buffer, 1, 0) >= 0)
+                if (initSocket(&communicationsocket, &serveraddress, &sockettimeout) < 0  ||
+                connect(communicationsocket, (struct sockaddr *) &serveraddress, sizeof(serveraddress)) < 0)
+                {
+                    std::cerr << "Couldn't connect communication socket\n";
+                }
+                while(recv(mainsocket, buffer, 1, 0) >= 0)
                 {
                     if(buffer[0] == FAILED_TO_START_GAME)
                     {
@@ -55,6 +61,13 @@ void MenuViewModel::buttonPressed(int i)
                     else if(buffer[0] == START_GAME_SUCCESSFUL)
                     {
                         roomviewmodel->refresh(REFRESH_LOGINS);
+                        refresh(PLAYER_STARTED_GAME);
+                        break;
+                    }
+                    else if(buffer[0] == START_GAME_SUCCESSFUL_AND_HOST)
+                    {
+                        roomviewmodel->refresh(REFRESH_LOGINS);
+                        roomviewmodel->refresh(SET_HOST);
                         refresh(PLAYER_STARTED_GAME);
                         break;
                     }

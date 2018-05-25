@@ -45,6 +45,8 @@ private:
     bool isloggedin;
     bool exit;
     int numberofplayers;
+    struct sockaddr_in serveraddress;
+    struct timeval sockettimeout;
     ViewModel* loginviewmodel;
     ViewModel* createaccountviewmodel;
     ViewModel* deleteaccountviewmodel;

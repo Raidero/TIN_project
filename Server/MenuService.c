@@ -3,15 +3,17 @@
 #include <string.h>
 
 
-int connectAccountToRoomService(int accountid)
+int connectAccountToRoomService(int accountid, bool* ishost)
 {
     int roomid = 0;
+    *ishost = 0;
     if(accountid >= 0 && accountid < MAX_ACCOUNTS_COUNT && loggedaccounts[accountid] != NULL)
     {
         roomid = findFreeRoomForAccount(accountid);
         if(roomid < 0)
         {
             roomid = createRoomForAccount(accountid);
+            *ishost = 1;
             if(roomid < 0)
             {
                 fprintf(stderr, "Couldn't connect account to any room\n");

@@ -1,6 +1,7 @@
 #include "ViewModel.h"
 
 int mainsocket;
+int communicationsocket;
 AccountData accountdata;
 AccountData playeraccountdata;
 
@@ -16,7 +17,6 @@ ViewModel::ViewModel()
 ViewModel::~ViewModel()
 {
     disposeButtons();
-
 }
 
 void ViewModel::createButton(sf::Text& name, sf::RectangleShape& buttonrect, std::string text, float height, float width, int fontsize)

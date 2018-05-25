@@ -1,6 +1,6 @@
 #include "Client.h"
 
-int initClient(int* clientsocketfd, struct sockaddr_in* serveraddress, struct timeval* timeout)
+int initSocket(int* clientsocketfd, struct sockaddr_in* serveraddress, struct timeval* timeout)
 {
     struct hostent *server;
 

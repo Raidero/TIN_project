@@ -21,11 +21,13 @@
 
 pthread_t threads[MAX_THREADS_COUNT];
 int sockets[MAX_SOCKETS_COUNT];
+int communicationsockets[MAX_SOCKETS_COUNT];
 
 int initServer(struct sockaddr_in* serveraddress);
 int startServer(struct sockaddr_in serveraddress);
 void intHandler(int sig);
 void* services(void *i);
+void copyBuffer(unsigned char* source, unsigned char* destination, int size);
 int createNewThread(int* socket);
 int createNewSocket(); //return index of first free socket, it will be playerid
 int socketToPlayerId(int socket);

@@ -13,7 +13,7 @@ int main()
     int clientsocket;
     struct sockaddr_in serveraddress;
     struct timeval sockettimeout;
-    initClient(&clientsocket, &serveraddress, &sockettimeout);
+    initSocket(&clientsocket, &serveraddress, &sockettimeout);
 
     if(startClient(clientsocket, serveraddress))
     {
@@ -21,7 +21,6 @@ int main()
         //return 1;
     }
 
-    sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "Maze Shooter");
     ViewModel* viewmodels[NUMBER_OF_VIEW_MODELS];
     viewmodels[0] = new MenuViewModel(clientsocket, serveraddress.sin_addr.s_addr);
     viewmodels[1] = new LoginViewModel(viewmodels[0]);
@@ -34,6 +33,9 @@ int main()
     dynamic_cast<MenuViewModel*>(viewmodels[0])->linkDeleteAccountViewModel(viewmodels[3]);
     dynamic_cast<MenuViewModel*>(viewmodels[0])->linkChangePasswordViewModel(viewmodels[4]);
     dynamic_cast<MenuViewModel*>(viewmodels[0])->linkRoomViewModel(viewmodels[5]);
+
+    sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "Maze Shooter");
+    window.setFramerateLimit(30);
     while (window.isOpen())
     {
         sf::Event event;
@@ -69,7 +71,10 @@ int main()
             window.draw(*viewmodels[i]);
         }
         if(viewmodels[5]->isActive())
+        {
             viewmodels[5]->refresh(REFRESH_LOGINS);
+        }
+
         window.display();
     }
     close(mainsocket);

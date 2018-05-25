@@ -4,6 +4,7 @@
 #include <string.h>
 #include "AccountService.h"
 #include "Defines.h"
+#include "Server.h"
 
 typedef struct
 {
@@ -31,7 +32,7 @@ int createRoomForAccount(int accountid);
 int refreshRoomService(int accountid, int roomid, char* loginlist);
 char* refreshReadyUpService(int accountid, int roomid);
 int toggleReadyService(int accountid, int roomid);
-int exitRoomService(int accountid, int roomid);
+int exitRoomService(int accountid, int* roomid);
 
 int sweepPlayer(int accountid, int roomid);	// function looks for a player and removes it from a room
 //create function that check if all the players are still in the room

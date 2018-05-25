@@ -34,6 +34,7 @@ extern "C"
 extern AccountData accountdata;
 extern AccountData playeraccountdata;
 extern int mainsocket;
+extern int communicationsocket;
 extern unsigned char buffer[BUFFER_SIZE];
 
 class ViewModel: public sf::Drawable
