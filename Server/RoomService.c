@@ -220,7 +220,8 @@ int toggleReadyService(int accountid, int roomid)
         if (rooms[roomid]->players[i] == NULL)	// taking care of not existing players in room
             continue;
 
-        if(rooms[roomid]->players[i]->currentip == loggedaccounts[accountid]->currentip)
+        if(rooms[roomid]->players[i]->currentip == loggedaccounts[accountid]->currentip &&
+        !strcmp(rooms[roomid]->players[i]->login, loggedaccounts[accountid]->login))
         {
             if (rooms[roomid]->isplayerready[i] == 1)
                 rooms[roomid]->isplayerready[i] = 0;
@@ -233,10 +234,14 @@ int toggleReadyService(int accountid, int roomid)
     return PLAYER_NOT_FOUND;
 }
 
-int exitRoomService(int accountid, int roomid)
+int exitRoomService(int accountid, int* roomid)
 {
-    // usunac pusty pokoj - fcja wyzej
-    return sweepPlayer(accountid, roomid);     // idk if sweepPlayer will be used somewhere else
+    int result = sweepPlayer(accountid, *roomid);
+    checkIfRoomIsEmptyAndDispose(*roomid);
+    close(communicationsockets[accountid]);
+    communicationsockets[accountid] = -1;
+    *roomid = -1;
+    return result;
 }
 
 int sweepPlayer(int accountid, int roomid)
@@ -252,11 +257,12 @@ int sweepPlayer(int accountid, int roomid)
 
     for(i = 0; i < MAX_PLAYER_COUNT; ++i)
     {
-        if(rooms[roomid]->players[i] != NULL && rooms[roomid]->players[i]->currentip == loggedaccounts[accountid]->currentip)
+        if(rooms[roomid]->players[i] != NULL && rooms[roomid]->players[i]->currentip == loggedaccounts[accountid]->currentip &&
+        !strcmp(rooms[roomid]->players[i]->login, loggedaccounts[accountid]->login))
         {
             rooms[roomid]->players[i] = NULL;
             rooms[roomid]->isplayerready[i] = 2;
-            for (j = 0; i < MAX_PLAYER_COUNT; ++j)
+            for (j = 0; j < MAX_PLAYER_COUNT; ++j)
             {
 				if (rooms[roomid]->players[j] != NULL)
 				{

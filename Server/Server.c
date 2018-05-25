@@ -17,6 +17,7 @@ int initServer(struct sockaddr_in* serveraddress)
     for(i = 0; i < MAX_SOCKETS_COUNT; ++i)
     {
         sockets[i] = -1;
+        communicationsockets[i] = -1;
     }
     int option = 1; //option is to use in setsockopt, by a pointer to this value
 
@@ -147,6 +148,8 @@ void* services(void *i)
             {
                 sweepPlayer(accountid, roomid);
                 checkIfRoomIsEmptyAndDispose(roomid);
+                close(communicationsockets[accountid]);
+                communicationsockets[accountid] = -1;
             }
             if(accountid >= 0)
             {
@@ -158,204 +161,176 @@ void* services(void *i)
         }
         else if(readbytes >= 1)
         {
+            Event* event = NULL;
+            unsigned char answer =  ERROR_QUEUE_FULL;
+            unsigned char* args = NULL;
+            unsigned char* bufferptr = NULL;
+            int size;
+            readbytes = 0;
             switch(buffer[0])
             {
                 case REQUEST_LOGIN:
                 {
-                    int i, alldata, size;
+                    int alldata;
                     size = sizeof(AccountData) + sizeof(int);
-                    unsigned char* args = (unsigned char*)malloc(size);
-                    unsigned char answer =  ERROR_QUEUE_FULL;
-                    readbytes = 0;
+                    args = (unsigned char*)malloc(size);
                     alldata = sizeof(AccountData);
                     do{
                         readbytes += recv(socket, buffer+readbytes, alldata-readbytes, MSG_WAITALL);
                     }while(readbytes < alldata);
                     serializeInt(buffer+readbytes, accountid);
-
-                    for(i = 0; i < size; ++i)
-                    {
-                        args[i] = buffer[i];
-                    }
-                    Event* event = createEvent((void (*)(void))logInService, args, socket, REQUEST_LOGIN);
-                    if (addNewElement(event))
-                    {
-						while(!send(socket, &answer, 1, 0)) {}
-					}
-                    readbytes = 0;
+                    copyBuffer(buffer, args, size);
+                    event = createEvent((void (*)(void))logInService, args, socket, REQUEST_LOGIN);
                     break;
                 }
 
                 case REQUEST_LOGOUT:
                 {
-                    int i, size;
                     size = sizeof(uint32_t);
-                    unsigned char* args = (unsigned char*)malloc(size);
-                    unsigned char answer =  ERROR_QUEUE_FULL;
-                    readbytes = 0;
+                    args = (unsigned char*)malloc(size);
                     do{
                         readbytes += recv(socket, buffer+readbytes, size-readbytes, MSG_WAITALL);
                     }while(readbytes < size);
-
-                    for(i = 0; i < size; ++i)
-                    {
-                        args[i] = buffer[i];
-                    }
-                    Event* event = createEvent((void (*)(void))logOutService, args, socket, REQUEST_LOGOUT);
-                    if (addNewElement(event))
-                    {
-						while(!send(socket, &answer, 1, 0)) {}
-					}
-                    readbytes = 0;
+                    copyBuffer(buffer, args, size);
+                    event = createEvent((void (*)(void))logOutService, args, socket, REQUEST_LOGOUT);
                     break;
                 }
 
                 case REQUEST_CREATE_ACCOUNT:
                 {
-                    int i, size;
                     size = sizeof(AccountData);
-                    unsigned char* args = (unsigned char*)malloc(size);
-                    unsigned char answer =  ERROR_QUEUE_FULL;
-                    readbytes = 0;
+                    args = (unsigned char*)malloc(size);
                     do{
                         readbytes += recv(socket, buffer+readbytes, size-readbytes, MSG_WAITALL);
                     }while(readbytes < size);
-
-                    for(i = 0; i < size; ++i)
-                    {
-                        args[i] = buffer[i];
-                    }
-                    Event* event = createEvent((void (*)(void))createAccountService, args, socket, REQUEST_CREATE_ACCOUNT);
-                    if (addNewElement(event))
-                    {
-						while(!send(socket, &answer, 1, 0)) {}
-					}
-                    readbytes = 0;
+                    copyBuffer(buffer, args, size);
+                    event = createEvent((void (*)(void))createAccountService, args, socket, REQUEST_CREATE_ACCOUNT);
                     break;
                 }
 
                 case REQUEST_DELETE_ACCOUNT:
                 {
-                    int i, size;
                     size = sizeof(AccountData);
-                    unsigned char* args = (unsigned char*)malloc(size);
-                    unsigned char answer =  ERROR_QUEUE_FULL;
-                    readbytes = 0;
+                    args = (unsigned char*)malloc(size);
                     do{
                         readbytes += recv(socket, buffer+readbytes, size-readbytes, MSG_WAITALL);
                     }while(readbytes < size);
-
-                    for(i = 0; i < size; ++i)
-                    {
-                        args[i] = buffer[i];
-                    }
-                    Event* event = createEvent((void (*)(void))deleteAccountService, args, socket, REQUEST_DELETE_ACCOUNT);
-                    if (addNewElement(event))
-                    {
-						while(!send(socket, &answer, 1, 0)) {}
-					}
-                    readbytes = 0;
+                    copyBuffer(buffer, args, size);
+                    event = createEvent((void (*)(void))deleteAccountService, args, socket, REQUEST_DELETE_ACCOUNT);
                     break;
                 }
 
                 case REQUEST_CHANGE_PASSWORD:
                 {
-                    int i, size;
                     size = sizeof(AccountData) + MAX_PASSHASH_LENGTH*sizeof(unsigned char);
-                    unsigned char* args = (unsigned char*)malloc(size);
-                    unsigned char answer =  ERROR_QUEUE_FULL;
-                    readbytes = 0;
-                    //alldata = sizeof(AccountData);
+                    args = (unsigned char*)malloc(size);
                     do{
                         readbytes += recv(socket, buffer+readbytes, size-readbytes, MSG_WAITALL);
                     }while(readbytes < size);
-
-                    for(i = 0; i < size; ++i)
-                    {
-                        args[i] = buffer[i];
-                    }
-                    Event* event = createEvent((void (*)(void))changePasswordService, args, socket, REQUEST_CHANGE_PASSWORD);
-					if (addNewElement(event))
-                    {
-						while(!send(socket, &answer, 1, 0)) {}
-					}
-                    readbytes = 0;
+                    copyBuffer(buffer, args, size);
+                    event = createEvent((void (*)(void))changePasswordService, args, socket, REQUEST_CHANGE_PASSWORD);
                     break;
                 }
 
                 case REQUEST_START_GAME:
                 {
-					int size, i;
-                    size = (sizeof(int)<<1);
-                    unsigned char* args = (unsigned char*)malloc(size);
-                    unsigned char answer =  ERROR_QUEUE_FULL;
-                    unsigned char* bufferptr = buffer;
+                    struct sockaddr_in client_address;
+                    unsigned int client_length = sizeof(client_address);
+                    communicationsockets[accountid] = accept(serversocketfd, (struct sockaddr *) &client_address, &client_length);
+                    size = sizeof(int) + sizeof(int);
+                    args = (unsigned char*)malloc(size);
+                    bufferptr = buffer;
                     bufferptr = serializeInt(bufferptr, accountid);
                     bufferptr = serializePointer(bufferptr, &roomid);
-
-                    for(i = 0; i < size; ++i)
-                    {
-                        args[i] = buffer[i];
-                    }
-                    Event* event = createEvent((void (*)(void))connectAccountToRoomService, args, socket, REQUEST_START_GAME);
-                    if (addNewElement(event))
-                    {
-						while(!send(socket, &answer, 1, 0)) {}
-					}
-                    readbytes = 0;
+                    copyBuffer(buffer, args, size);
+                    event = createEvent((void (*)(void))connectAccountToRoomService, args, socket, REQUEST_START_GAME);
                     break;
                 }
 
                 case REQUEST_REFRESH_LOGINS:
                 {
-                    int i, size;
                     size = sizeof(int) + sizeof(int);
-                    unsigned char* args = (unsigned char*)malloc(size);
-                    unsigned char answer =  ERROR_QUEUE_FULL;
-                    unsigned char* bufferptr =  buffer;
+                    args = (unsigned char*)malloc(size);
+                    bufferptr =  buffer;
                     bufferptr = serializeInt(bufferptr, accountid);
                     bufferptr = serializeInt(bufferptr, roomid);
-                    for(i = 0; i < size; ++i)
-                    {
-                        args[i] = buffer[i];
-                    }
-                    Event* event = createEvent((void (*)(void))refreshRoomService, args, socket, REQUEST_REFRESH_LOGINS);
-                    if (addNewElement(event))
-                    {
-						while(!send(socket, &answer, 1, 0)) {}
-					}
-                    readbytes = 0;
+                    copyBuffer(buffer, args, size);
+                    event = createEvent((void (*)(void))refreshRoomService, args, socket, REQUEST_REFRESH_LOGINS);
                     break;
                 }
 
                 case REQUEST_TOGGLE_READY:
                 {
-                    int i, size;
                     size = sizeof(int) + sizeof(int);
-                    unsigned char* args = (unsigned char*)malloc(size);
-                    unsigned char answer =  ERROR_QUEUE_FULL;
-                    unsigned char* bufferptr =  buffer;
+                    args = (unsigned char*)malloc(size);
+                    bufferptr =  buffer;
                     bufferptr = serializeInt(bufferptr, accountid);
                     bufferptr = serializeInt(bufferptr, roomid);
-                    for(i = 0; i < size; ++i)
-                    {
-                        args[i] = buffer[i];
-                    }
-                    Event* event = createEvent((void (*)(void))refreshRoomService, args, socket, REQUEST_REFRESH_LOGINS);
-                    if (addNewElement(event))
-                    {
-						while(!send(socket, &answer, 1, 0)) {}
-					}
-                    readbytes = 0;
+                    copyBuffer(buffer, args, size);
+                    event = createEvent((void (*)(void))toggleReadyService, args, socket, REQUEST_TOGGLE_READY);
+                    break;
+                }
+
+                case REQUEST_REFRESH_READYNESS:
+                {
+                    size = sizeof(int) + sizeof(int);
+                    args = (unsigned char*)malloc(size);
+                    bufferptr =  buffer;
+                    bufferptr = serializeInt(bufferptr, accountid);
+                    bufferptr = serializeInt(bufferptr, roomid);
+                    copyBuffer(buffer, args, size);
+                    event = createEvent((void (*)(void))refreshReadyUpService, args, socket, REQUEST_REFRESH_READYNESS);
+                    break;
+                }
+
+                case REQUEST_EXIT_ROOM:
+                {
+                    size = sizeof(int) + sizeof(int);
+                    args = (unsigned char*)malloc(size);
+                    bufferptr =  buffer;
+                    bufferptr = serializeInt(bufferptr, accountid);
+                    bufferptr = serializePointer(bufferptr, &roomid);
+                    copyBuffer(buffer, args, size);
+                    event = createEvent((void (*)(void))exitRoomService, args, socket, REQUEST_EXIT_ROOM);
+                    break;
+                }
+
+                case REQUEST_SEND_MESSAGE:
+                {
+                    int alldata = MAX_MESSAGEINBOX_LENGTH + MAX_LOGIN_LENGTH + 1;
+                    size = (MAX_MESSAGEINBOX_LENGTH + MAX_LOGIN_LENGTH + 1)*sizeof(char) + sizeof(int) + sizeof(int);
+                    args = (unsigned char*)malloc(size);
+
+                    do{
+                        readbytes += recv(socket, buffer+readbytes, alldata-readbytes, MSG_WAITALL);
+                    }while(readbytes < alldata);
+                    bufferptr =  buffer + readbytes;
+                    bufferptr = serializeInt(bufferptr, accountid);
+                    bufferptr = serializeInt(bufferptr, roomid);
+                    copyBuffer(buffer, args, size);
+                    event = createEvent((void (*)(void))sendMessageToRoomService, args, socket, REQUEST_SEND_MESSAGE);
                     break;
                 }
             }
+            if (addNewElement(event))
+            {
+                while(!send(socket, &answer, 1, 0)) {}
+            }
+            readbytes = 0;
         }
         bzero(buffer, BUFFER_SIZE);
     }
     return NULL;
 }
 
+void copyBuffer(unsigned char* source, unsigned char* destination, int size)
+{
+    int i;
+    for(i = 0; i < size; ++i)
+    {
+        destination[i] = source[i];
+    }
+}
 int createNewThread(int* socket)
 {
     int i;
@@ -368,6 +343,7 @@ int createNewThread(int* socket)
                 fprintf(stderr, "Couldn't create new thread");
                 return ERROR_CREATING_THREAD;
             }
+            printf("New thread with id %d has been created\n", i);
             return i;
         }
     }
