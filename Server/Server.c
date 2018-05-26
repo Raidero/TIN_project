@@ -4,8 +4,8 @@
 pthread_t eventhandler;
 pthread_t newClientThread;
 int serversocketfd = -1;
-
-int initServer(struct sockaddr_in* serveraddress)
+int servercommunicationsocket = -1;
+int initServer(struct sockaddr_in* serveraddress, struct sockaddr_in* servercommunicationaddress)
 {
     int i;
     //preparing threads array
@@ -23,9 +23,10 @@ int initServer(struct sockaddr_in* serveraddress)
 
     //creating socket
     serversocketfd = socket(AF_INET, SOCK_STREAM, 0);
-    if(serversocketfd < 0)
+    servercommunicationsocket = socket(AF_INET, SOCK_STREAM, 0);
+    if(serversocketfd < 0 || servercommunicationsocket < 0)
     {
-        fprintf(stderr, "Couldn't open a socket\n");
+        fprintf(stderr, "Couldn't open one of sockets\n");
         return ERROR_OPENING_SOCKET;
     }
     //setting socket options
@@ -36,25 +37,40 @@ int initServer(struct sockaddr_in* serveraddress)
         fprintf(stderr, "setsockopt failed\n");
         return ERROR_SETTING_SOCKET_OPTIONS;
     }
+    if(setsockopt(servercommunicationsocket, SOL_SOCKET, SO_REUSEADDR, (char*)&option, sizeof(option)) < 0)
+    {
+        fprintf(stderr, "setsockopt failed\n");
+        return ERROR_SETTING_SOCKET_OPTIONS;
+    }
     bzero((char *) serveraddress, sizeof(*serveraddress));
-
+    bzero((char *) servercommunicationaddress, sizeof(*serveraddress));
     //preparing sockaddr_in structure
     serveraddress->sin_family = AF_INET; //set address family to Internet Protocol v4 addresses
     serveraddress->sin_addr.s_addr = INADDR_ANY; //set destination ip number
     serveraddress->sin_port = htons(DEFAULT_PORT); //set destination port number
 
+    servercommunicationaddress->sin_family = AF_INET; //set address family to Internet Protocol v4 addresses
+    servercommunicationaddress->sin_addr.s_addr = INADDR_ANY; //set destination ip number
+    servercommunicationaddress->sin_port = htons(DEFAULT_PORT + 10); //set destination port number
     //binding server to address
     if(bind(serversocketfd, (struct sockaddr *) serveraddress, sizeof(*serveraddress)) < 0)
     {
         fprintf(stderr, "Couldn't bind server to address\n");
         return ERROR_BINDING_SOCKET;
     }
+
+    if(bind(servercommunicationsocket, (struct sockaddr *) servercommunicationaddress, sizeof(*serveraddress)) < 0)
+    {
+        fprintf(stderr, "Couldn't bind communication socket to address\n");
+        return ERROR_BINDING_SOCKET;
+    }
     //start listening for connections on socket
     listen(serversocketfd, MAX_CONNECTION_LIMIT);
+    listen(servercommunicationsocket, MAX_CONNECTION_LIMIT);
     return 0;
 }
 
-int startServer(struct sockaddr_in server_address)
+int startServer()
 {
     struct sockaddr_in client_address;
     unsigned int client_length = sizeof(client_address);
@@ -236,7 +252,7 @@ void* services(void *i)
                 {
                     struct sockaddr_in client_address;
                     unsigned int client_length = sizeof(client_address);
-                    communicationsockets[accountid] = accept(serversocketfd, (struct sockaddr *) &client_address, &client_length);
+                    communicationsockets[accountid] = accept(servercommunicationsocket, (struct sockaddr *) &client_address, &client_length);
                     size = sizeof(int) + sizeof(int);
                     args = (unsigned char*)malloc(size);
                     bufferptr = buffer;
@@ -316,7 +332,12 @@ void* services(void *i)
             {
                 while(!send(socket, &answer, 1, 0)) {}
             }
+            else
+            {
+                pthread_kill(eventhandler, SIGUSR1);
+            }
             readbytes = 0;
+
         }
         bzero(buffer, BUFFER_SIZE);
     }

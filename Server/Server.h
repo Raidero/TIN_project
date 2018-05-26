@@ -23,8 +23,8 @@ pthread_t threads[MAX_THREADS_COUNT];
 int sockets[MAX_SOCKETS_COUNT];
 int communicationsockets[MAX_SOCKETS_COUNT];
 
-int initServer(struct sockaddr_in* serveraddress);
-int startServer(struct sockaddr_in serveraddress);
+int initServer(struct sockaddr_in* serveraddress, struct sockaddr_in* servercommunicationaddress);
+int startServer();
 void intHandler(int sig);
 void* services(void *i);
 void copyBuffer(unsigned char* source, unsigned char* destination, int size);

@@ -76,6 +76,11 @@ void* startEventHandler()
 {
     Event* event = NULL;
     unsigned char answer;
+    sigset_t sigset;
+    sigemptyset(&sigset);
+    sigaddset(&sigset, SIGUSR1);
+    pthread_sigmask(SIG_BLOCK, &sigset, NULL);
+    int sig;
     for(;;)
     {
         event = popElement();
@@ -385,7 +390,11 @@ void* startEventHandler()
         }
         else
         {
-
+            while(!sigwait(&sigset, &sig))
+            {
+                if(sig == SIGUSR1)
+                    break;
+            }
         }
 
     }
