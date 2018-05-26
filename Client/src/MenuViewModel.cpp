@@ -46,8 +46,12 @@ void MenuViewModel::buttonPressed(int i)
                 buffer[0] = REQUEST_START_GAME;
                 while(!send(mainsocket, buffer, 1, 0)) {}
 
-                if (initSocket(&communicationsocket, &serveraddress, &sockettimeout) < 0  ||
-                connect(communicationsocket, (struct sockaddr *) &serveraddress, sizeof(serveraddress)) < 0)
+                if (initSocket(&communicationsocket, &serveraddress, &sockettimeout) < 0)
+                {
+                    std::cerr << "Couldn't init communication socket\n";
+                }
+                serveraddress.sin_port = htons(DEFAULT_PORT + 10);
+                if (connect(communicationsocket, (struct sockaddr *) &serveraddress, sizeof(serveraddress)) < 0)
                 {
                     std::cerr << "Couldn't connect communication socket\n";
                 }
