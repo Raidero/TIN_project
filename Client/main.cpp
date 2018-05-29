@@ -73,6 +73,7 @@ int main()
         if(viewmodels[5]->isActive())
         {
             viewmodels[5]->refresh(REFRESH_LOGINS);
+            viewmodels[5]->refresh(RECV_MESSAGE);
         }
 
         window.display();

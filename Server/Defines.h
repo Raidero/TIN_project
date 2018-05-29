@@ -111,6 +111,7 @@
 #define SET_HOST 10
 #define EXITED_ROOM 11
 #define SEND_MESSAGE 12
+#define RECV_MESSAGE 13
 
 #endif // DEFINES_H
 

@@ -50,6 +50,7 @@ void MenuViewModel::buttonPressed(int i)
                 {
                     std::cerr << "Couldn't init communication socket\n";
                 }
+                std::cout << communicationsocket << std::endl;
                 serveraddress.sin_port = htons(DEFAULT_PORT + 10);
                 if (connect(communicationsocket, (struct sockaddr *) &serveraddress, sizeof(serveraddress)) < 0)
                 {

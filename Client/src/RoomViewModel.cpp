@@ -7,11 +7,13 @@ RoomViewModel::RoomViewModel(ViewModel* mvm)
     {
         isplayerready[i] = 2;
     }
+    msgreadbytes = 0;
     ishost = false;
     playerready = false;
     lastloginrefresh = 0;
     writeaccess = -1;
     messageinboxstring = "";
+    allmessagesstring = "";
     this->mvm = mvm;
     initButtons(4);
     logins.setCharacterSize(FONT_SMALL);
@@ -27,6 +29,10 @@ RoomViewModel::RoomViewModel(ViewModel* mvm)
     messageinbox.setFont(font);
     messageinbox.setCharacterSize(FONT_SMALL);
     messageinbox.setColor(sf::Color(0,0,0));
+    allmessages.setPosition(10, HEIGHT/2.0);
+    allmessages.setFont(font);
+    allmessages.setCharacterSize(FONT_SMALL);
+    allmessages.setColor(sf::Color(255,255,255));
     for(int i = 0; i < MAX_PLAYER_COUNT; ++i)
     {
         ready[i].setOrigin(RADIUS,RADIUS);
@@ -146,22 +152,25 @@ void RoomViewModel::refresh(int message)
             errno = ENOENT;
             buffer[0] = REQUEST_SEND_MESSAGE;
             while(!send(mainsocket, buffer, 1, 0)) {}
-            char* cmessage = new char[MAX_MESSAGEINBOX_LENGTH + MAX_LOGIN_LENGTH + 1];
+            char* cmessage = new char[MAX_MESSAGEINBOX_LENGTH + MAX_LOGIN_LENGTH + 2];
             for(i = 0; i < MAX_LOGIN_LENGTH; ++i)
             {
                 if(playeraccountdata.login[i] == '\0')
                 {
                     cmessage[i++] = ':';
                     cmessage[i++] = '\n';
+                    break;
                 }
+                cmessage[i] = playeraccountdata.login[i];
             }
             for(unsigned int j = 0; j < messageinboxstring.size(); ++j)
             {
                 cmessage[i++] = messageinboxstring[j];
             }
+            cmessage[i++] = '\n';
             cmessage[i] = '\0';
             unsigned char* bufferptr = buffer;
-            bufferptr = serializeCharArray(bufferptr, cmessage, MAX_MESSAGEINBOX_LENGTH + MAX_LOGIN_LENGTH + 1);
+            bufferptr = serializeCharArray(bufferptr, cmessage, MAX_MESSAGEINBOX_LENGTH + MAX_LOGIN_LENGTH + 2);
             int sendbytes = 0;
             int alldata = bufferptr - buffer;
             while(sendbytes < alldata)
@@ -187,7 +196,36 @@ void RoomViewModel::refresh(int message)
                 std::cerr << "Can't reach server\n";
             }
         }
+        case RECV_MESSAGE:
+        {
+            msgreadbytes += recv(communicationsocket, msgbuffer + msgreadbytes, MAX_MESSAGEINBOX_LENGTH + MAX_LOGIN_LENGTH + 2 - msgreadbytes, MSG_DONTWAIT);
+            if(msgreadbytes == MAX_MESSAGEINBOX_LENGTH + MAX_LOGIN_LENGTH + 2)
+            {
+                int entercount = 0;
+                int erase = 0;
+                for(int i = 0; i < allmessagesstring.size(); ++i)
+                    if(allmessagesstring[i] == '\n')
+                    {
+                        entercount++;
+                        if(entercount == 2) erase = i;
+                    }
 
+                if(entercount >= 12)
+                {
+                    allmessagesstring.erase(0, erase + 1);
+                }
+                std::cerr << "XXXXXXXXXXXXXXXXX\n";
+                msgreadbytes = 0;
+                allmessagesstring.append(std::string((char*)msgbuffer));
+
+                allmessages.setString(allmessagesstring);
+            }
+            else if(msgreadbytes < 0)
+            {
+                //std::cerr << "XD\n";
+                msgreadbytes = 0;
+            }
+        }
     }
 }
 
@@ -284,8 +322,11 @@ void RoomViewModel::addLetter(char c)
 {
     if(c == '\t')
         return;
-    if(c == '\n' && messageinboxstring.size() > 0)
+    if(c == 13 && messageinboxstring.size() > 0)
+    {
         refresh(SEND_MESSAGE);
+        return;
+    }
     switch(writeaccess)
     {
         case 3:

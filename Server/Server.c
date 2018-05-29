@@ -313,13 +313,14 @@ void* services(void *i)
 
                 case REQUEST_SEND_MESSAGE:
                 {
-                    int alldata = MAX_MESSAGEINBOX_LENGTH + MAX_LOGIN_LENGTH + 1;
-                    size = (MAX_MESSAGEINBOX_LENGTH + MAX_LOGIN_LENGTH + 1)*sizeof(char) + sizeof(int) + sizeof(int);
+                    int alldata = MAX_MESSAGEINBOX_LENGTH + MAX_LOGIN_LENGTH + 2;
+                    size = (MAX_MESSAGEINBOX_LENGTH + MAX_LOGIN_LENGTH + 2)*sizeof(char) + sizeof(int) + sizeof(int);
                     args = (unsigned char*)malloc(size);
 
                     do{
                         readbytes += recv(socket, buffer+readbytes, alldata-readbytes, MSG_WAITALL);
                     }while(readbytes < alldata);
+                    printf("%s", buffer);
                     bufferptr =  buffer + readbytes;
                     bufferptr = serializeInt(bufferptr, accountid);
                     bufferptr = serializeInt(bufferptr, roomid);

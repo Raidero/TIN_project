@@ -359,8 +359,8 @@ void* startEventHandler()
 
                     int *roomid = (int*)malloc(sizeof(int));
                     int *accountid = (int*)malloc(sizeof(int));
-                    char *message = (char*)malloc((MAX_MESSAGEINBOX_LENGTH + MAX_LOGIN_LENGTH + 1)*sizeof(char));
-                    bufferptr = deserializeCharArray(bufferptr, message, MAX_MESSAGEINBOX_LENGTH + MAX_LOGIN_LENGTH + 1);
+                    char *message = (char*)malloc((MAX_MESSAGEINBOX_LENGTH + MAX_LOGIN_LENGTH + 2)*sizeof(char));
+                    bufferptr = deserializeCharArray(bufferptr, message, MAX_MESSAGEINBOX_LENGTH + MAX_LOGIN_LENGTH + 2);
                     bufferptr = deserializeInt(bufferptr, accountid);
                     bufferptr = deserializeInt(bufferptr, roomid);
 

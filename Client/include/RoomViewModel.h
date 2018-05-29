@@ -20,6 +20,7 @@ private:
     sf::Text setready;
     sf::Text startgame;
     sf::Text allmessages;
+    std::string allmessagesstring;
     sf::Text messageinbox;
     std::string messageinboxstring;
     sf::CircleShape ready[MAX_PLAYER_COUNT];
@@ -29,7 +30,8 @@ private:
     bool ishost;
     bool playerready;
     char isplayerready[MAX_PLAYER_COUNT];
-    int communicationsocket;
+    unsigned char* msgbuffer[MAX_MESSAGEINBOX_LENGTH + MAX_LOGIN_LENGTH + 2];
+    int msgreadbytes;
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const
     {
         if(isvisible)
@@ -43,6 +45,7 @@ private:
             target.draw(setready);
             target.draw(exit);
             target.draw(messageinbox);
+            target.draw(allmessages);
             int j = 0;
             for(int i = 0; i < MAX_PLAYER_COUNT; ++i)
             {

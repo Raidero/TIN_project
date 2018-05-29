@@ -4,6 +4,8 @@
 int sendMessageToPlayerService(char* login, char* message)
 {
     //getting player id from login to use it as socket
+    printf("%s", login);
+    printf("%s", message);
     int playerid = loginToPlayerId(login);
     //check if player id is in range
     if (playerid < 0 || playerid > MAX_ACCOUNTS_COUNT)
@@ -11,7 +13,7 @@ int sendMessageToPlayerService(char* login, char* message)
         fprintf(stderr, "Found player id is out of range\n");
         return PLAYER_ID_OUT_OF_RANGE;
     }
-    send_all(sockets[playerid], message, MAX_MESSAGEINBOX_LENGTH + MAX_LOGIN_LENGTH + 1);
+    send_all(communicationsockets[playerid], message, MAX_MESSAGEINBOX_LENGTH + MAX_LOGIN_LENGTH + 2);
 
     return 0;
 }
@@ -52,13 +54,9 @@ int sendMessageToRoomService(int accountid, int roomid, char* message)
         //checking if this player exists
         if(rooms[roomid]->players[i])
         {
-            //don't send message to sender - if strcmp returns 0 (the same logins) then it bypasses sending
-            if (strcmp(loggedaccounts[accountid]->login, rooms[roomid]->players[i]->login))
+            if(sendMessageToPlayerService(rooms[roomid]->players[i]->login, message))
             {
-                if(sendMessageToPlayerService(rooms[roomid]->players[i]->login, message))
-                {
-                    return ERROR_SENDING_MESSAGE;
-                }
+                return ERROR_SENDING_MESSAGE;
             }
         }
     }
