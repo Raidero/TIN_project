@@ -19,5 +19,7 @@
 
 int initSocket(int* serversocketfd, struct sockaddr_in* serveraddress, struct timeval* timeout);
 int startClient(int serversocketfd, struct sockaddr_in serveraddress);
+int joinMulticastGroup(int* recvsocketfd, struct sockaddr_in* localsock, const char* mcastgroupaddr, uint16_t mcastgroupport, const char* myinterfaceaddr, int reuse);	// this is for the client..
+
 
 #endif // CLIENT_H

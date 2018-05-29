@@ -7,7 +7,7 @@ int initSocket(int* clientsocketfd, struct sockaddr_in* serveraddress, struct ti
     /*first call to socket function*/
     *clientsocketfd = socket(AF_INET, SOCK_STREAM, 0);
 
-    if (clientsocketfd < 0)
+    if (*clientsocketfd < 0)
     {
         fprintf(stderr, "ERROR opening socket\n");
         return ERROR_OPENING_SOCKET;
@@ -32,6 +32,7 @@ int initSocket(int* clientsocketfd, struct sockaddr_in* serveraddress, struct ti
     serveraddress->sin_port = htons(DEFAULT_PORT);
     return 0;
 }
+
 int startClient(int clientsocketfd, struct sockaddr_in serveraddress)
 {
     //int n;
@@ -66,6 +67,51 @@ int startClient(int clientsocketfd, struct sockaddr_in serveraddress)
     }
     close(clientsocketfd); // added
     exit(0); // added*/
+    return 0;
+}
+
+int joinMulticastGroup(int* recvsocketfd, struct sockaddr_in* localsock, const char* mcastgroupaddr, uint16_t mcastgroupport, const char* myinterfaceaddr, int reuse)
+{
+
+    struct ip_mreq group;
+
+    *recvsocketfd = socket(AF_INET, SOCK_DGRAM, 0);
+
+    if (*recvsocketfd < 0)
+    {
+        fprintf(stderr, "ERROR opening socket\n");
+        return ERROR_OPENING_SOCKET;
+    }
+
+    if (reuse)	// useful when running multiple players on one machine
+        if(setsockopt(*recvsocketfd, SOL_SOCKET, SO_REUSEADDR, (char *)&reuse, sizeof(reuse)) < 0)
+        {
+            fprintf(stderr, "ERROR setting reuse opt\n");
+            return ERROR_SETTING_SOCKET_OPTIONS;
+        }
+
+    bzero((char *) localsock, sizeof(*localsock));
+    localsock->sin_family = AF_INET;
+    localsock->sin_port = htons(mcastgroupport);
+    localsock->sin_addr.s_addr = INADDR_ANY;
+
+    if(bind(*recvsocketfd, (struct sockaddr*)localsock, sizeof(*localsock)))
+    {
+        fprintf(stderr, "ERROR binding datagram socket\n");
+        close(*recvsocketfd);
+        return ERROR_BINDING_SOCKET;
+    }
+
+    group.imr_multiaddr.s_addr = inet_addr(mcastgroupaddr);
+    group.imr_interface.s_addr = inet_addr(myinterfaceaddr);
+
+    if(setsockopt(*recvsocketfd, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char *)&group, sizeof(group)) < 0)
+    {
+        fprintf(stderr, "ERROR adding multicast group");
+        close(*recvsocketfd);
+        return ERROR_SETTING_SOCKET_OPTIONS;
+    }
+
     return 0;
 }
 
