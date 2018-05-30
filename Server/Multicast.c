@@ -100,3 +100,15 @@ int initMulticastGroup(int* sendsocketfd, struct sockaddr_in* groupsock, const c
 
     return 0;
 }
+
+int sendMulticastData(int roomid, char* buf, int size)
+{
+	// prob should check if roomid is vaild
+	if(sendto(multicastdata[roomid].sendsocketfd, buf, size, 0, (struct sockaddr*)&(multicastdata[roomid].groupsock), sizeof(multicastdata[roomid].groupsock)) < 0)
+    {
+		fprintf(stderr, "multicast send on roomid %d failed\n", roomid);
+		return -1;	// later change it to some read error number
+    }
+
+	return 0;
+}
