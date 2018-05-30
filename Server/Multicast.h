@@ -32,5 +32,6 @@ void initMcastData(int roomid);
 int startMatchService (int roomid, int accountid);
 int startMulticasting (int roomid);
 int initMulticastGroup(int* sendsocketfd, struct sockaddr_in* groupsock, const char* mcastgroupaddr, uint16_t mcastgroupport, const char* myinterfaceaddr);	// finished, somewhat tested
+int sendMulticastData(int roomid, char* buf, int size);
 
 #endif // GAME_SERVICE_H

@@ -342,6 +342,39 @@ void* services(void *i)
 					event = createEvent((void (*)(void))startMatchService, args, socket, REQUEST_START_MATCH);
 					break;
                 }
+
+                case REQUEST_UPDATE_MY_COORDS:	// since we have roomid and accountid we only need to receive x and y, but send it with some id for other players to successfully update coords
+                {
+                // idk if thats good - also needs to be handled in Queue.c
+					int _i;	// to avoid conflicts with other is
+					int playerindex;
+					int alldata = sizeof(float) + sizeof(float);	// later add float fi - angle
+                    size = sizeof(int) + sizeof(int) + alldata + sizeof(int);
+                    args = (unsigned char*)malloc(size);
+
+					bufferptr = serializeInt(buffer, roomid);
+
+                    for (_i = 0; _i < MAX_PLAYER_COUNT; ++_i)	// idk where should I do this (or mb player should send it?)
+                    {
+						if (strcmp(loggedaccounts[accountid]->login, rooms[roomid]->players[_i]->login) == 0)
+						{
+							playerindex = _i;	// technically value of _i persists but..
+							break;
+						}
+                    }
+
+                    bufferptr = serializeInt(bufferptr, playerindex);
+
+                    do{
+                        readbytes += recv(socket, buffer+readbytes, alldata-readbytes, MSG_WAITALL);	// I got those floats serialized by a client, right?
+                    }while(readbytes < alldata);
+
+					bufferptr = serializeInt(bufferptr, size);
+
+					copyBuffer(buffer, args, size);
+					event = createEvent((void (*)(void))sendMulticastData, args, socket, REQUEST_START_MATCH);
+					break;
+                }
             }
             if (addNewElement(event))
             {
