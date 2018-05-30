@@ -328,6 +328,20 @@ void* services(void *i)
                     event = createEvent((void (*)(void))sendMessageToRoomService, args, socket, REQUEST_SEND_MESSAGE);
                     break;
                 }
+
+                case REQUEST_START_MATCH:	// after this block struct with essential multicast data [roomid] is all set and ready to be used to send packets
+                {
+					// do some fun stuff m9
+					// args - roomid
+					size = sizeof(int) + sizeof(int);
+					args = (unsigned char*)malloc(size);
+					bufferptr =  buffer;
+					bufferptr = serializeInt(bufferptr, accountid);
+                    bufferptr = serializeInt(bufferptr, roomid);
+                    copyBuffer(buffer, args, size);
+					event = createEvent((void (*)(void))startMatchService, args, socket, REQUEST_START_MATCH);
+					break;
+                }
             }
             if (addNewElement(event))
             {

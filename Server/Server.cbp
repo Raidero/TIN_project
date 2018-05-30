@@ -52,6 +52,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="MenuService.h" />
+		<Unit filename="Multicast.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Multicast.h" />
 		<Unit filename="Queue.c">
 			<Option compilerVar="CC" />
 		</Unit>

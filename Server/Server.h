@@ -15,6 +15,7 @@
 #include "Queue.h"
 #include "MenuService.h"
 #include "CommunicationService.h"
+#include "Multicast.h"
 
 #define DEFAULT_PORT 8001
 #define DEFAULT_IP "10.0.2.15"

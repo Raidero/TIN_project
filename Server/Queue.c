@@ -311,6 +311,7 @@ void* startEventHandler()
                         int sendbytes = 0;
                         unsigned char* buffer = (unsigned char*)malloc(size);
                         serializeCharArray(buffer, isplayerready, size);
+                        // serializeChar(buffer, rooms[roomid]->isingame);	// then send it (just a wild guess :P)
                         while(sendbytes < size)
                         {
                             sendbytes = send(event->socket, buffer + sendbytes, size - sendbytes, 0);
@@ -381,6 +382,32 @@ void* startEventHandler()
                     break;
                 }
 
+				case REQUEST_START_MATCH:
+                {
+					printf("start match\n");
+                    int (*func)(int, int) = (int (*)(int, int))event->functionpointer;
+                    unsigned char* bufferptr = event->argumentsbuffer;
+
+                    int *roomid = (int*)malloc(sizeof(int));
+                    int *accountid = (int*)malloc(sizeof(int));
+                    bufferptr = deserializeInt(bufferptr, accountid);
+                    bufferptr = deserializeInt(bufferptr, roomid);
+
+                    if(func(*roomid, *accountid))
+                    {
+                        answer = FAILED_TO_START_MATCH;
+                    }
+                    else
+                    {
+                        answer = START_MATCH_SUCCESSFUL;
+                    }
+
+                    while(!send(event->socket, &answer, 1, 0)) {}
+
+                    free(accountid);
+                    free(roomid);
+                    break;
+                }
 
                 ///TODO, there are some other messages that need being handled
             }
