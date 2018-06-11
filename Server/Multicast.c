@@ -1,7 +1,7 @@
 #include "Multicast.h"
 
-extern Room* rooms[MAX_ROOM_COUNT];
-
+Room* rooms[MAX_ROOM_COUNT];
+mcastdata multicastdata[MAX_ROOM_COUNT];
 void initMcastData(int roomid)
 {
     multicastdata[roomid].sendsocketfd = -1;

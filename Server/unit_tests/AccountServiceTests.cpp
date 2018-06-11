@@ -284,7 +284,7 @@ BOOST_AUTO_TEST_CASE( GivenNonEmptyAccountDataFile_WhenTryingToLogIn_UserIsNotRe
 
 }
 
-BOOST_AUTO_TEST_CASE( GivenLoggedInUser_WhenTryingToLogIn_UserIsAlreadyLoggedIn )
+/*BOOST_AUTO_TEST_CASE( GivenLoggedInUser_WhenTryingToLogIn_UserIsAlreadyLoggedIn )
 {
 	deleteDataFile();
 
@@ -302,7 +302,7 @@ BOOST_AUTO_TEST_CASE( GivenLoggedInUser_WhenTryingToLogIn_UserIsAlreadyLoggedIn 
 
 	deleteDataFile();
 
-}
+}*/
 
 
 // logOut

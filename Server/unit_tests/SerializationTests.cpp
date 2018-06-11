@@ -3,6 +3,7 @@ extern "C"
 #include "../Defines.h"
 
 #include "../Serialization.h"
+#include "../Multicast.h"
 
 }
 #include <limits.h>
@@ -167,23 +168,21 @@ BOOST_AUTO_TEST_CASE( GivenAccountData_WhenSerializingAndDeserializing_ValuesAre
 	buf2 = serializeAccountData(buf2, test1);
 	buf2 = serializeAccountData(buf2, test2);
 
-	BOOST_CHECK(buf2 == buf1+2*(4+4+MAX_LOGIN_LENGTH+MAX_PASSHASH_LENGTH)*sizeof(unsigned char));
+	BOOST_CHECK(buf2 == buf1+2*(4+MAX_LOGIN_LENGTH+MAX_PASSHASH_LENGTH)*sizeof(unsigned char));
 
 	buf2 = buf1;
 
 	buf2 = deserializeAccountData(buf2, out1);
 	buf2 = deserializeAccountData(buf2, out2);
-	BOOST_CHECK(buf2 == buf1+2*(4+4+MAX_LOGIN_LENGTH+MAX_PASSHASH_LENGTH)*sizeof(unsigned char));
+	BOOST_CHECK(buf2 == buf1+2*(4+MAX_LOGIN_LENGTH+MAX_PASSHASH_LENGTH)*sizeof(unsigned char));
 
 	BOOST_CHECK(test1->currentip == out1->currentip);
 	BOOST_CHECK(strcmp(test1->login, out1->login) == 0);
 	BOOST_CHECK(memcmp(test1->passwordhash, out1->passwordhash, 10) == 0);
-	BOOST_CHECK(test1->votercounter == out1->votercounter);
 
 	BOOST_CHECK(test2->currentip == out2->currentip);
 	BOOST_CHECK(strcmp(test2->login, out2->login) == 0);
 	BOOST_CHECK(memcmp(test2->passwordhash, out2->passwordhash, 10) == 0);
-	BOOST_CHECK(test2->votercounter == out2->votercounter);
 
 }
 

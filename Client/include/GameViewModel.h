@@ -10,7 +10,7 @@ class GameViewModel : public ViewModel
         GameViewModel(ViewModel* rvm);
         virtual ~GameViewModel();
         void refresh(int message);
-        void addLetter(char c) {}
+        void addLetter(char c);
         void buttonPressed(int i) {}
     protected:
 
@@ -29,6 +29,8 @@ class GameViewModel : public ViewModel
         PlayerData playersinfo[MAX_PLAYER_COUNT];
         sf::CircleShape playercharacter[MAX_PLAYER_COUNT];
         int playeringameid;
+        int rb;
+        unsigned char buf[16];
 };
 
 #endif // GAMEVIEWMODEL_H

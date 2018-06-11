@@ -205,7 +205,7 @@ void RoomViewModel::refresh(int message)
                 {
                     if(joinMulticastGroup(&multicastsocket, &multicastGroup,
                      DEFAULT_MULTICAST_ADDRESS, DEFAULT_MULTICAST_PORT + msgbuffer[1],
-                      DEFAULT_INTERFACE_ADDRESS, 0))
+                      DEFAULT_INTERFACE_ADDRESS, 1))
                     {
                         std::cerr << "Couldn't join multicast group\n";
                     }

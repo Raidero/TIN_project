@@ -5,6 +5,9 @@ pthread_t eventhandler;
 pthread_t newClientThread;
 int serversocketfd = -1;
 int servercommunicationsocket = -1;
+
+pthread_t threads[MAX_THREADS_COUNT];
+int sockets[MAX_SOCKETS_COUNT];
 int initServer(struct sockaddr_in* serveraddress, struct sockaddr_in* servercommunicationaddress)
 {
     int i;
@@ -352,6 +355,17 @@ void* services(void *i)
                     copyBuffer(buffer, args, size);
                     event = createEvent((void (*)(void))getPlayersInformation, args, socket, REQUEST_STARTING_INFO);
                     break;
+                }
+
+                case REQUEST_SEND_MULTICAST_DATA:
+                {
+					int alldata = 16;
+                    do{
+                        readbytes += recv(socket, buffer+readbytes, alldata-readbytes, MSG_WAITALL);
+                    }while(readbytes < alldata);
+					//printf("%s\n", buffer);
+					//puts("WHATAERVER"); // without puts prinft doesnt work
+					sendMulticastData(roomid, buffer, alldata);
                 }
 
             }

@@ -193,22 +193,25 @@ BOOST_AUTO_TEST_CASE( GivenNoRooms_WhenTryingToConnect_UserIsConnected )
 BOOST_AUTO_TEST_CASE( GivenMaxRooms_WhenTryingToConnect_ReturnErrorRoomLimit )
 {
 	int roomid;
+	int accountid = 0;
+
 	AccountData* account = initAccoundData((char*)"login1",(unsigned char*)"pass1",1,0);
+	loggedaccounts[accountid] = account;
 
 	char* ll = testInitLL2();
 	BOOST_REQUIRE(ll != NULL);
 
 	for (int i = 0; i < MAX_ROOM_COUNT; ++i)
 	{
-		roomid = createRoomForAccount(account);
+		roomid = createRoomForAccount(accountid);
 		BOOST_CHECK(roomid > -1);
 
-		BOOST_REQUIRE(refreshRoomService(account, roomid, ll) == 0);
+		BOOST_REQUIRE(refreshRoomService(accountid, roomid, ll) == 0);
 
-		BOOST_CHECK(strcmp(ll[0],"login1") == 0);
+		BOOST_CHECK(strcmp(ll,"login1") == 0);
 	}
 
-	BOOST_CHECK(createRoomForAccount(account) == MAX_ROOM_LIMIT_ERROR);
+	BOOST_CHECK(createRoomForAccount(accountid) == MAX_ROOM_LIMIT_ERROR);
 
 	testDeleteLL2(ll);
 
@@ -222,19 +225,21 @@ BOOST_AUTO_TEST_CASE( GivenNonEmptyRoom_WhenRefreshing_PlayerIsInRoom )
 {
 	initRoomService();
 	int roomid = 0;
+	int accountid = 0;
 	rooms[roomid] = initRoom();
 	BOOST_REQUIRE(rooms[roomid] != NULL);
 
 	AccountData* account = initAccoundData((char*)"login1",(unsigned char*)"pass1",1,0);
+	loggedaccounts[accountid] = account;
 
-	BOOST_CHECK(findFreeRoomForAccount(account) == roomid);
+	BOOST_CHECK(findFreeRoomForAccount(accountid) == roomid);
 
 	char* ll = testInitLL2();
 	BOOST_REQUIRE(ll != NULL);
 
-	BOOST_REQUIRE(refreshRoomService(account, roomid, ll) == 0);
+	BOOST_REQUIRE(refreshRoomService(accountid, roomid, ll) == 0);
 
-	BOOST_CHECK(strcmp(ll[0],"login1") == 0);
+	BOOST_CHECK(strcmp(ll,"login1") == 0);
 
 	testDeleteLL2(ll);
 
@@ -246,16 +251,18 @@ BOOST_AUTO_TEST_CASE( GivenNoRooms_WhenRefreshing_ReturnErrorNotAValidRoom )
 {
 	initRoomService();
 	int roomid = 0;
+	int accountid = 0;
 	BOOST_REQUIRE(rooms[roomid] == NULL);
 
 	AccountData* account = initAccoundData((char*)"login1",(unsigned char*)"pass1",1,0);
+	loggedaccounts[accountid] = account;
 
 	char* ll = testInitLL2();
 	BOOST_REQUIRE(ll != NULL);
 
-	BOOST_REQUIRE(refreshRoomService(account, roomid, ll) == OUT_OF_RANGE);
+	BOOST_REQUIRE(refreshRoomService(accountid, roomid, ll) == OUT_OF_RANGE);
 
-	BOOST_CHECK(strcmp(ll[0],"login1") != 0);
+	BOOST_CHECK(strcmp(ll,"login1") != 0);
 
 	testDeleteLL2(ll);
 
@@ -267,19 +274,22 @@ BOOST_AUTO_TEST_CASE( GivenNonEmptyRoom_WhenRefreshing_ReturnErrorPlayerNotInRoo
 {
 	initRoomService();
 	int roomid = 0;
+	int accountid = 0;
 	rooms[roomid] = initRoom();
 	BOOST_REQUIRE(rooms[roomid] != NULL);
 
 	AccountData* account = initAccoundData((char*)"login1",(unsigned char*)"pass1",1,0);
+	loggedaccounts[accountid] = account;
 
-	BOOST_CHECK(findFreeRoomForAccount(account) == roomid);
+	BOOST_CHECK(findFreeRoomForAccount(accountid) == roomid);
 
 	char* ll = testInitLL2();
 	BOOST_REQUIRE(ll != NULL);
 
 	account = initAccoundData((char*)"login1",(unsigned char*)"pass1",2,0);
+	loggedaccounts[accountid+1] = account;
 
-	BOOST_REQUIRE(refreshRoomService(account, roomid, ll) == PLAYER_NOT_FOUND);
+	BOOST_REQUIRE(refreshRoomService(accountid+1, roomid, ll) == PLAYER_NOT_FOUND);
 
 	testDeleteLL2(ll);
 
@@ -291,15 +301,17 @@ BOOST_AUTO_TEST_CASE( GivenEmptyRoom_WhenRefreshing_ReturnErrorPlayerNotInRoom )
 {
 	initRoomService();
 	int roomid = 0;
+	int accountid = 0;
 	rooms[roomid] = initRoom();
 	BOOST_REQUIRE(rooms[roomid] != NULL);
 
 	AccountData* account = initAccoundData((char*)"login1",(unsigned char*)"pass1",1,0);
+	loggedaccounts[accountid] = account;
 
 	char* ll = testInitLL2();
 	BOOST_REQUIRE(ll != NULL);
 
-	BOOST_REQUIRE(refreshRoomService(account, roomid, ll) == PLAYER_NOT_FOUND);
+	BOOST_REQUIRE(refreshRoomService(accountid, roomid, ll) == PLAYER_NOT_FOUND);
 
 	testDeleteLL2(ll);
 
@@ -313,25 +325,27 @@ BOOST_AUTO_TEST_CASE( GivenNonEmptyRoom_WhenTryingToDisconnect_PlayerIsDisconnec
 {
 	initRoomService();
 	int roomid = 0;
+	int accountid = 0;
 	rooms[roomid] = initRoom();
 	BOOST_REQUIRE(rooms[roomid] != NULL);
 
 	AccountData* account = initAccoundData((char*)"login1",(unsigned char*)"pass1",1,0);
+	loggedaccounts[accountid] = account;
 
-	BOOST_REQUIRE(findFreeRoomForAccount(account) == roomid);
+	BOOST_REQUIRE(findFreeRoomForAccount(accountid) == roomid);
 
 	char* ll = testInitLL2();
 	BOOST_REQUIRE(ll != NULL);
 
-	BOOST_REQUIRE(refreshRoomService(account, roomid, ll) == 0);
+	BOOST_REQUIRE(refreshRoomService(accountid, roomid, ll) == 0);
 
-	BOOST_REQUIRE(strcmp(ll[0],"login1") == 0);
+	BOOST_REQUIRE(strcmp(ll,"login1") == 0);
 
-	BOOST_CHECK(sweepPlayer(account, roomid) == 0);
+	BOOST_CHECK(sweepPlayer(accountid, roomid) == 0);
 
-	BOOST_REQUIRE(refreshRoomService(account, roomid, ll) == PLAYER_NOT_FOUND);
+	BOOST_REQUIRE(refreshRoomService(accountid, roomid, ll) == PLAYER_NOT_FOUND);
 
-	BOOST_CHECK(strcmp(ll[0],"login1") != 0);
+	BOOST_CHECK(strcmp(ll,"login1") != 0);
 
 	testDeleteLL2(ll);
 
@@ -343,11 +357,13 @@ BOOST_AUTO_TEST_CASE( GivenNonExistentRoom_WhenTryingToDisconnect_ReturnErrorNot
 {
 	initRoomService();
 	int roomid = 0;
+	int accountid = 0;
 	BOOST_REQUIRE(rooms[roomid] == NULL);
 
 	AccountData* account = initAccoundData((char*)"login1",(unsigned char*)"pass1",1,0);
+	loggedaccounts[accountid] = account;
 
-	BOOST_CHECK(sweepPlayer(account, roomid) == OUT_OF_RANGE);
+	BOOST_CHECK(sweepPlayer(accountid, roomid) == OUT_OF_RANGE);
 
 	disposeAllRooms();
 
@@ -357,29 +373,31 @@ BOOST_AUTO_TEST_CASE( GivenNonEmptyRoom_WhenTryingToDisconnect_ReturnErrorPlayer
 {
 	initRoomService();
 	int roomid = 0;
+	int accountid = 0;
 	rooms[roomid] = initRoom();
 	BOOST_REQUIRE(rooms[roomid] != NULL);
 
 	AccountData* account = initAccoundData((char*)"login1",(unsigned char*)"pass1",1,0);
+	loggedaccounts[accountid] = account;
 
-	BOOST_REQUIRE(findFreeRoomForAccount(account) == roomid);
+	BOOST_REQUIRE(findFreeRoomForAccount(accountid) == roomid);
 
 	char* ll = testInitLL2();
 	BOOST_REQUIRE(ll != NULL);
 
-	BOOST_REQUIRE(refreshRoomService(account, roomid, ll) == 0);
+	BOOST_REQUIRE(refreshRoomService(accountid, roomid, ll) == 0);
 
-	BOOST_REQUIRE(strcmp(ll[0],"login1") == 0);
+	BOOST_REQUIRE(strcmp(ll,"login1") == 0);
 
 	account = initAccoundData((char*)"login2",(unsigned char*)"pass1",2,0);
-	BOOST_CHECK(sweepPlayer(account, roomid) == PLAYER_NOT_FOUND);
+	loggedaccounts[accountid+1] = account;
+	BOOST_CHECK(sweepPlayer(accountid+1, roomid) == PLAYER_NOT_FOUND);
 
-	BOOST_REQUIRE(refreshRoomService(account, roomid, ll) == PLAYER_NOT_FOUND);
+	BOOST_REQUIRE(refreshRoomService(accountid+1, roomid, ll) == PLAYER_NOT_FOUND);
 
-	account = initAccoundData((char*)"login1",(unsigned char*)"pass1",1,0);
-	BOOST_REQUIRE(refreshRoomService(account, roomid, ll) == 0);
+	BOOST_REQUIRE(refreshRoomService(accountid, roomid, ll) == 0);
 
-	BOOST_CHECK(strcmp(ll[0],"login1") == 0);
+	BOOST_CHECK(strcmp(ll,"login1") == 0);
 
 	testDeleteLL2(ll);
 

@@ -21,7 +21,7 @@ typedef struct
 } mcastdata;	// later delete what's not needed
 
 
-mcastdata multicastdata[MAX_ROOM_COUNT];	// every room gets one thread with it's mcast data
+extern mcastdata multicastdata[MAX_ROOM_COUNT];	// every room gets one thread with it's mcast data
 
 void initMcastData(int roomid);
 int startMulticasting (int roomid);

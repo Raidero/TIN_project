@@ -20,8 +20,8 @@
 #define DEFAULT_PORT 8001
 #define DEFAULT_IP "10.0.2.15"
 
-pthread_t threads[MAX_THREADS_COUNT];
-int sockets[MAX_SOCKETS_COUNT];
+extern pthread_t threads[MAX_THREADS_COUNT];
+extern int sockets[MAX_SOCKETS_COUNT];
 
 int initServer(struct sockaddr_in* serveraddress, struct sockaddr_in* servercommunicationaddress);
 int startServer();

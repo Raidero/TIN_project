@@ -20,7 +20,7 @@ typedef struct
     char message;
 }Event;
 
-Event* queue[MAX_QUEUE_LENGTH];
+extern Event* queue[MAX_QUEUE_LENGTH];
 
 void initQueue();
 void disposeQueue();

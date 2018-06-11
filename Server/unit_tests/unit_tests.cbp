@@ -61,6 +61,10 @@
 		<Unit filename="../MenuService.h">
 			<Option virtualFolder="Headers/src/" />
 		</Unit>
+		<Unit filename="../Multicast.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Multicast.h" />
 		<Unit filename="../Queue.c">
 			<Option compilerVar="CC" />
 		</Unit>

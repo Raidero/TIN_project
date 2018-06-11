@@ -76,6 +76,11 @@ int main()
             viewmodels[5]->refresh(REFRESH_LOGINS);
             viewmodels[5]->refresh(RECV_MESSAGE);
         }
+        if(viewmodels[6]->isActive())
+        {
+			viewmodels[6]->refresh(REFRESH_MAP);
+
+        }
 
         window.display();
     }

@@ -4,8 +4,6 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
-#include "AccountService.h"
-#include "RoomService.h"
 #include "Defines.h"
 #include "Server.h"
 
