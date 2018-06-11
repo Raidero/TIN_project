@@ -17,26 +17,13 @@ extern "C"
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <openssl/sha.h>
 
-#define WIDTH 640
-#define HEIGHT 480
-#define FONT_BIG 25
-#define FONT_MEDIUM 20
-#define FONT_SMALL 15
-#define TEXT_STEP 27
-#define MARGIN 4
-#define NUMBER_OF_BUTTONS_LOGIN 4
-#define NUMBER_OF_BUTTONS_MENU 6
-#define NO_BUTTON_IS_PRESSED -1
-
-#define BACKGROUND_WIDTH 400
-#define BACKGROUND_HEIGHT 120
-
 extern AccountData accountdata;
 extern AccountData playeraccountdata;
 extern int mainsocket;
 extern int communicationsocket;
 extern unsigned char buffer[BUFFER_SIZE];
-
+extern int multicastsocket;
+extern int numberofplayersingame;
 class ViewModel: public sf::Drawable
 {
 public:

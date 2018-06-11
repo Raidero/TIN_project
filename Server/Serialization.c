@@ -110,3 +110,40 @@ unsigned char* deserializePointer(unsigned char* buffer, int* output)
     *output = address;
     return buffer + sizeof(int*);
 }
+
+unsigned char* serializeFloat(unsigned char* buffer, float input)
+{
+    unsigned int integercast = *((unsigned int*)&input);
+    buffer[0] = integercast >> 24;
+    buffer[1] = integercast >> 16;
+    buffer[2] = integercast >> 8;
+    buffer[3] = integercast;
+    return buffer + sizeof(unsigned int);
+}
+
+unsigned char* deserializeFloat(unsigned char* buffer, float* output)
+{
+    unsigned int integercast = 0;
+    integercast |= buffer[0] << 24;
+    integercast |= buffer[1] << 16;
+    integercast |= buffer[2] << 8;
+    integercast |= buffer[3];
+    *output = *((float*)&integercast);
+    return buffer + sizeof(unsigned int);
+}
+
+unsigned char* serializePlayerData(unsigned char* buffer, PlayerData* playerinfo)
+{
+    buffer = serializeFloat(buffer, playerinfo->x);
+    buffer = serializeFloat(buffer, playerinfo->y);
+    buffer = serializeInt(buffer, playerinfo->hp);
+    return buffer;
+}
+
+unsigned char* deserializePlayerData(unsigned char* buffer, PlayerData* playerinfo)
+{
+    buffer = deserializeFloat(buffer, &playerinfo->x);
+    buffer = deserializeFloat(buffer, &playerinfo->y);
+    buffer = deserializeInt(buffer, &playerinfo->hp);
+    return buffer;
+}

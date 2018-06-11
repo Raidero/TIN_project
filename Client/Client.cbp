@@ -55,9 +55,14 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Client.h" />
+		<Unit filename="GameService.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="GameService.h" />
 		<Unit filename="include/ChangePasswordViewModel.h" />
 		<Unit filename="include/CreateAccountViewModel.h" />
 		<Unit filename="include/DeleteAccountViewModel.h" />
+		<Unit filename="include/GameViewModel.h" />
 		<Unit filename="include/LoginViewModel.h" />
 		<Unit filename="include/MenuViewModel.h" />
 		<Unit filename="include/RoomViewModel.h" />
@@ -66,6 +71,7 @@
 		<Unit filename="src/ChangePasswordViewModel.cpp" />
 		<Unit filename="src/CreateAccountViewModel.cpp" />
 		<Unit filename="src/DeleteAccountViewModel.cpp" />
+		<Unit filename="src/GameViewModel.cpp" />
 		<Unit filename="src/LoginViewModel.cpp" />
 		<Unit filename="src/MenuViewModel.cpp" />
 		<Unit filename="src/RoomViewModel.cpp" />

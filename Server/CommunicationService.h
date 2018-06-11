@@ -16,6 +16,6 @@ int sendMessageToPlayerService(char* login, char* message);
 int send_all(int socket, char *buffer, size_t length);
 
 //function to send message to all players in room (1 to multiple)
-int sendMessageToRoomService(int accountid, int roomid, char* message);
+int sendMessageToRoomService(int roomid, char* message);
 
 #endif // PRIVATE_COMMUNICATION_SERVICE_H

@@ -1,9 +1,11 @@
 #include "RoomService.h"
 #include <stdio.h>
 #include <string.h>
+#include "Serialization.h"
+#include "CommunicationService.h"
 
-extern AccountData* loggedaccounts[MAX_ACCOUNTS_COUNT];
-
+AccountData* loggedaccounts[MAX_ACCOUNTS_COUNT];
+int communicationsockets[MAX_SOCKETS_COUNT];
 Room* rooms[MAX_ROOM_COUNT];
 
 void initRoomService()
@@ -273,6 +275,138 @@ int sweepPlayer(int accountid, int roomid)
         }
     }
 	return PLAYER_NOT_FOUND;
+}
+
+void defragmentRoom(int roomid)
+{
+    int i, lastfree = 0;
+    for(i = 0; i < MAX_PLAYER_COUNT; ++i)
+    {
+        if(rooms[roomid]->players[i] != NULL)
+        {
+            if(i == lastfree)
+            {
+                lastfree++;
+            }
+            else
+            {
+                rooms[roomid]->players[lastfree++] = rooms[roomid]->players[i];
+                rooms[roomid]->players[i] = NULL;
+            }
+        }
+    }
+}
+
+int startMatchService (int roomid, int accountid)
+{
+    int i;
+    int nplayers = 0;
+	// do we really need those checks?
+    if(roomid < 0 || roomid >= MAX_ROOM_COUNT || rooms[roomid] == NULL)
+    {
+        fprintf(stderr, "Room ID out of range: %d\n", roomid);
+        return OUT_OF_RANGE;
+    }
+
+    if(rooms[roomid]->isingame == 1)
+    {
+        fprintf(stderr, "Room already in game: %d\n", roomid);
+        return ROOM_IN_GAME;
+    }
+
+    for(i = 0; i < MAX_PLAYER_COUNT; ++i)
+    {
+        if(rooms[roomid]->isplayerready[i] == 0)
+        {
+            fprintf(stderr, "Not all players ready in room: %d\n", roomid);
+            return PLAYER_NOT_READY;
+        }
+        else if(rooms[roomid]->players[i] != NULL)
+        {
+            ++nplayers;
+        }
+    }
+    if(nplayers < 2)
+    {
+        fprintf(stderr, "There are no enough players in room to start game\n");
+        return NOT_ENOUGH_PLAYERS;
+    }
+	if (strcmp(loggedaccounts[accountid]->login, rooms[roomid]->players[rooms[roomid]->hostindex]->login) != 0)
+	{
+		fprintf(stderr, "Match start requested by not a host\n");
+		return IS_NOT_HOST;
+	}
+
+    if (startMulticasting(roomid) < 0)	// this one is important
+    {
+        fprintf(stderr, "Could not prepare new multicast group\n");
+        return MULTICAST_INIT_ERROR;
+    }
+
+    rooms[roomid]->isingame = 1;
+    rooms[roomid]->numberofplayersingame = nplayers;
+    defragmentRoom(roomid);
+
+    char* message = (char*)malloc(FINAL_MESSAGE_LENGTH*sizeof(char));
+    message[0] = SERVER_REQUESTS_TO_START_GAME; //bell
+    message[1] = roomid;
+    message[2] = nplayers;
+    sendMessageToRoomService(roomid, message);
+    free(message);
+
+    prepareStartingInformations(roomid);
+    return 0;
+}
+
+void prepareStartingInformations(int roomid)
+{
+    int x, y;
+    int i;
+
+    srand(time(NULL));
+
+    for(i = 0, x = 100; x < WIDTH - 100; x += 100)
+    {
+        for(y = 100; y < HEIGHT - 100; y += 100)
+        {
+            rooms[roomid]->playersinfo[i].x = x + (rand() % 200) - 100;
+            rooms[roomid]->playersinfo[i].y = y + (rand() % 200) - 100;
+            rooms[roomid]->playersinfo[i++].hp = 100;
+            if(i >= rooms[roomid]->numberofplayersingame)
+            {
+                break;
+            }
+        }
+    }
+}
+
+unsigned char* getPlayersInformation(int roomid, int accountid, unsigned char* playersinfobuffer, int* bytessaved)
+{
+    int i;
+    if(playersinfobuffer == NULL)
+    {
+        playersinfobuffer = (unsigned char*)malloc(rooms[roomid]->numberofplayersingame*sizeof(PlayerData) + sizeof(int)) ;
+    }
+    PlayerData* playersinfo = (PlayerData*)malloc(rooms[roomid]->numberofplayersingame*sizeof(PlayerData));
+
+    for(i = 0; i < rooms[roomid]->numberofplayersingame; ++i)
+    {
+        playersinfo[i] = rooms[roomid]->playersinfo[i];
+    }
+    unsigned char* ptr = playersinfobuffer;
+    for(i = 0; i < rooms[roomid]->numberofplayersingame; ++i)
+    {
+        ptr = serializePlayerData(ptr, &playersinfo[i]);
+    }
+    for(i = 0; i < rooms[roomid]->numberofplayersingame; ++i)
+    {
+        if(!strcmp(rooms[roomid]->players[i]->login, loggedaccounts[accountid]->login))
+        {
+            ptr = serializeInt(ptr, i);
+        }
+    }
+    *bytessaved = ptr - playersinfobuffer;
+    return playersinfobuffer;
 }
 
 

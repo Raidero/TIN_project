@@ -22,7 +22,6 @@
 
 pthread_t threads[MAX_THREADS_COUNT];
 int sockets[MAX_SOCKETS_COUNT];
-int communicationsockets[MAX_SOCKETS_COUNT];
 
 int initServer(struct sockaddr_in* serveraddress, struct sockaddr_in* servercommunicationaddress);
 int startServer();

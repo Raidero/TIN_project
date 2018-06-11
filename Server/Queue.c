@@ -355,17 +355,14 @@ void* startEventHandler()
                 case REQUEST_SEND_MESSAGE:
                 {
 					printf("send message to room\n");
-                    int (*func)(int, int, char*) = (int (*)(int, int, char*))event->functionpointer;
+                    int (*func)(int, char*) = (int (*)(int, char*))event->functionpointer;
                     unsigned char* bufferptr = event->argumentsbuffer;
-
                     int *roomid = (int*)malloc(sizeof(int));
-                    int *accountid = (int*)malloc(sizeof(int));
-                    char *message = (char*)malloc((MAX_MESSAGEINBOX_LENGTH + MAX_LOGIN_LENGTH + 2)*sizeof(char));
-                    bufferptr = deserializeCharArray(bufferptr, message, MAX_MESSAGEINBOX_LENGTH + MAX_LOGIN_LENGTH + 2);
-                    bufferptr = deserializeInt(bufferptr, accountid);
+                    char *message = (char*)malloc(FINAL_MESSAGE_LENGTH*sizeof(char));
+                    bufferptr = deserializeCharArray(bufferptr, message, FINAL_MESSAGE_LENGTH);
                     bufferptr = deserializeInt(bufferptr, roomid);
 
-                    if(func(*accountid, *roomid, message))
+                    if(func(*roomid, message))
                     {
                         answer = FAILED_TO_SEND_MESSAGE;
                     }
@@ -376,7 +373,6 @@ void* startEventHandler()
 
                     while(!send(event->socket, &answer, 1, 0)) {}
 
-                    free(accountid);
                     free(roomid);
                     free(message);
                     break;
@@ -404,6 +400,30 @@ void* startEventHandler()
 
                     while(!send(event->socket, &answer, 1, 0)) {}
 
+                    free(accountid);
+                    free(roomid);
+                    break;
+                }
+                case REQUEST_STARTING_INFO:
+                {
+                    int size;
+                    printf("get start info\n");
+                    unsigned char* (*func)(int, int, unsigned char*, int*) = (unsigned char* (*)(int, int, unsigned char*, int*))event->functionpointer;
+                    unsigned char* bufferptr = event->argumentsbuffer;
+                    unsigned char* responsebuffer = NULL;
+                    int *roomid = (int*)malloc(sizeof(int));
+                    int *accountid = (int*)malloc(sizeof(int));
+                    bufferptr = deserializeInt(bufferptr, roomid);
+                    bufferptr = deserializeInt(bufferptr, accountid);
+                    responsebuffer = func(*roomid, *accountid, responsebuffer, &size);
+
+                    int sendbytes = 0;
+                    while(sendbytes < size)
+                    {
+                        sendbytes = send(event->socket, responsebuffer + sendbytes, size - sendbytes, 0);
+                    }
+
+                    free(responsebuffer);
                     free(accountid);
                     free(roomid);
                     break;

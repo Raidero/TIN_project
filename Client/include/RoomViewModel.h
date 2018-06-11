@@ -13,8 +13,10 @@ public:
     void addLetter(char c);
     void refresh(int message);
     void setLogins(char* lgs);
+    void setGameViewModel(ViewModel* gvm) { this->gvm = gvm; }
 private:
     ViewModel* mvm;
+    ViewModel* gvm;
     sf::Text logins;
     sf::Text exit;
     sf::Text setready;
@@ -30,8 +32,9 @@ private:
     bool ishost;
     bool playerready;
     char isplayerready[MAX_PLAYER_COUNT];
-    unsigned char* msgbuffer[MAX_MESSAGEINBOX_LENGTH + MAX_LOGIN_LENGTH + 2];
+    unsigned char msgbuffer[MAX_MESSAGEINBOX_LENGTH + MAX_LOGIN_LENGTH + 2];
     int msgreadbytes;
+    struct sockaddr_in multicastGroup;
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const
     {
         if(isvisible)

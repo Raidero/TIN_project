@@ -2,6 +2,7 @@
 #define QUEUE_H
 #include "Defines.h"
 #include "AccountService.h"
+#include "RoomService.h"
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>

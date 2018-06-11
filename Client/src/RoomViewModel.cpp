@@ -152,7 +152,7 @@ void RoomViewModel::refresh(int message)
             errno = ENOENT;
             buffer[0] = REQUEST_SEND_MESSAGE;
             while(!send(mainsocket, buffer, 1, 0)) {}
-            char* cmessage = new char[MAX_MESSAGEINBOX_LENGTH + MAX_LOGIN_LENGTH + 2];
+            char* cmessage = new char[FINAL_MESSAGE_LENGTH];
             for(i = 0; i < MAX_LOGIN_LENGTH; ++i)
             {
                 if(playeraccountdata.login[i] == '\0')
@@ -170,7 +170,7 @@ void RoomViewModel::refresh(int message)
             cmessage[i++] = '\n';
             cmessage[i] = '\0';
             unsigned char* bufferptr = buffer;
-            bufferptr = serializeCharArray(bufferptr, cmessage, MAX_MESSAGEINBOX_LENGTH + MAX_LOGIN_LENGTH + 2);
+            bufferptr = serializeCharArray(bufferptr, cmessage, FINAL_MESSAGE_LENGTH);
             int sendbytes = 0;
             int alldata = bufferptr - buffer;
             while(sendbytes < alldata)
@@ -198,12 +198,24 @@ void RoomViewModel::refresh(int message)
         }
         case RECV_MESSAGE:
         {
-            msgreadbytes += recv(communicationsocket, msgbuffer + msgreadbytes, MAX_MESSAGEINBOX_LENGTH + MAX_LOGIN_LENGTH + 2 - msgreadbytes, MSG_DONTWAIT);
-            if(msgreadbytes == MAX_MESSAGEINBOX_LENGTH + MAX_LOGIN_LENGTH + 2)
+            msgreadbytes += recv(communicationsocket, msgbuffer + msgreadbytes, FINAL_MESSAGE_LENGTH - msgreadbytes, MSG_DONTWAIT);
+            if(msgreadbytes == FINAL_MESSAGE_LENGTH)
             {
+                if(*msgbuffer == SERVER_REQUESTS_TO_START_GAME)
+                {
+                    if(joinMulticastGroup(&multicastsocket, &multicastGroup,
+                     DEFAULT_MULTICAST_ADDRESS, DEFAULT_MULTICAST_PORT + msgbuffer[1],
+                      DEFAULT_INTERFACE_ADDRESS, 0))
+                    {
+                        std::cerr << "Couldn't join multicast group\n";
+                    }
+                    numberofplayersingame = msgbuffer[2];
+                    gvm->refresh(GET_READY);
+                    break;
+                }
                 int entercount = 0;
                 int erase = 0;
-                for(int i = 0; i < allmessagesstring.size(); ++i)
+                for(unsigned int i = 0; i < allmessagesstring.size(); ++i)
                     if(allmessagesstring[i] == '\n')
                     {
                         entercount++;
@@ -239,7 +251,27 @@ void RoomViewModel::buttonPressed(int i)
         {
             if(ishost)
             {
-                ///TODO
+                recv(mainsocket, buffer, BUFFER_SIZE, MSG_DONTWAIT); ///clear the buffer
+                errno = ENOENT;
+                buffer[0] = REQUEST_START_MATCH;
+                while(!send(mainsocket, buffer, 1, 0)) {}
+
+                while(recv(mainsocket, buffer, 1, 0) >= 0)
+                {
+                    if(buffer[0] == FAILED_TO_START_MATCH)
+                    {
+                        std::cerr << "Failed to set or unset ready\n";
+                        break;
+                    }
+                    else if(buffer[0] == START_MATCH_SUCCESSFUL)
+                    {
+                        break;
+                    }
+                }
+                if(errno == EAGAIN || errno == EWOULDBLOCK)
+                {
+                    std::cerr << "Can't reach server\n";
+                }
             }
             break;
         }

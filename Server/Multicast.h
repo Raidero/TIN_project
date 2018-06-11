@@ -10,11 +10,6 @@
 #include "RoomService.h"
 #include "Defines.h"
 
-// server defaults
-#define DEFAULT_MULTICAST_ADDRESS "226.1.1.1"
-#define DEFAULT_MULTICAST_PORT 4321
-#define DEFAULT_INTERFACE_ADDRESS "192.168.1.24"
-
 typedef struct
 {
 	int sendsocketfd;
@@ -29,7 +24,6 @@ typedef struct
 mcastdata multicastdata[MAX_ROOM_COUNT];	// every room gets one thread with it's mcast data
 
 void initMcastData(int roomid);
-int startMatchService (int roomid, int accountid);
 int startMulticasting (int roomid);
 int initMulticastGroup(int* sendsocketfd, struct sockaddr_in* groupsock, const char* mcastgroupaddr, uint16_t mcastgroupport, const char* myinterfaceaddr);	// finished, somewhat tested
 int sendMulticastData(int roomid, char* buf, int size);

@@ -2,6 +2,8 @@
 
 int mainsocket;
 int communicationsocket;
+int multicastsocket;
+int numberofplayersingame;
 AccountData accountdata;
 AccountData playeraccountdata;
 

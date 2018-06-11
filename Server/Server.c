@@ -313,8 +313,8 @@ void* services(void *i)
 
                 case REQUEST_SEND_MESSAGE:
                 {
-                    int alldata = MAX_MESSAGEINBOX_LENGTH + MAX_LOGIN_LENGTH + 2;
-                    size = (MAX_MESSAGEINBOX_LENGTH + MAX_LOGIN_LENGTH + 2)*sizeof(char) + sizeof(int) + sizeof(int);
+                    int alldata = FINAL_MESSAGE_LENGTH;
+                    size = FINAL_MESSAGE_LENGTH*sizeof(char) + sizeof(int);
                     args = (unsigned char*)malloc(size);
 
                     do{
@@ -322,7 +322,6 @@ void* services(void *i)
                     }while(readbytes < alldata);
                     printf("%s", buffer);
                     bufferptr =  buffer + readbytes;
-                    bufferptr = serializeInt(bufferptr, accountid);
                     bufferptr = serializeInt(bufferptr, roomid);
                     copyBuffer(buffer, args, size);
                     event = createEvent((void (*)(void))sendMessageToRoomService, args, socket, REQUEST_SEND_MESSAGE);
@@ -343,38 +342,18 @@ void* services(void *i)
 					break;
                 }
 
-                case REQUEST_UPDATE_MY_COORDS:	// since we have roomid and accountid we only need to receive x and y, but send it with some id for other players to successfully update coords
+                case REQUEST_STARTING_INFO:
                 {
-                // idk if thats good - also needs to be handled in Queue.c
-					int _i;	// to avoid conflicts with other is
-					int playerindex;
-					int alldata = sizeof(float) + sizeof(float);	// later add float fi - angle
-                    size = sizeof(int) + sizeof(int) + alldata + sizeof(int);
+                    size = sizeof(int) + sizeof(int);
                     args = (unsigned char*)malloc(size);
-
-					bufferptr = serializeInt(buffer, roomid);
-
-                    for (_i = 0; _i < MAX_PLAYER_COUNT; ++_i)	// idk where should I do this (or mb player should send it?)
-                    {
-						if (strcmp(loggedaccounts[accountid]->login, rooms[roomid]->players[_i]->login) == 0)
-						{
-							playerindex = _i;	// technically value of _i persists but..
-							break;
-						}
-                    }
-
-                    bufferptr = serializeInt(bufferptr, playerindex);
-
-                    do{
-                        readbytes += recv(socket, buffer+readbytes, alldata-readbytes, MSG_WAITALL);	// I got those floats serialized by a client, right?
-                    }while(readbytes < alldata);
-
-					bufferptr = serializeInt(bufferptr, size);
-
-					copyBuffer(buffer, args, size);
-					event = createEvent((void (*)(void))sendMulticastData, args, socket, REQUEST_START_MATCH);
-					break;
+                    bufferptr =  buffer;
+                    bufferptr = serializeInt(bufferptr, roomid);
+                    bufferptr = serializeInt(bufferptr, accountid);
+                    copyBuffer(buffer, args, size);
+                    event = createEvent((void (*)(void))getPlayersInformation, args, socket, REQUEST_STARTING_INFO);
+                    break;
                 }
+
             }
             if (addNewElement(event))
             {

@@ -13,7 +13,7 @@ int sendMessageToPlayerService(char* login, char* message)
         fprintf(stderr, "Found player id is out of range\n");
         return PLAYER_ID_OUT_OF_RANGE;
     }
-    send_all(communicationsockets[playerid], message, MAX_MESSAGEINBOX_LENGTH + MAX_LOGIN_LENGTH + 2);
+    send_all(communicationsockets[playerid], message, FINAL_MESSAGE_LENGTH);
 
     return 0;
 }
@@ -39,7 +39,7 @@ int send_all(int socket, char *buffer, size_t length)
 }
 
 //function to send message to all players in room (1 to multiple)
-int sendMessageToRoomService(int accountid, int roomid, char* message)
+int sendMessageToRoomService(int roomid, char* message)
 {
     int i;
     //check if room with given roomid exists

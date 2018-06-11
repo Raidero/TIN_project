@@ -4,8 +4,8 @@
 #include "DeleteAccountViewModel.h"
 #include "ChangePasswordViewModel.h"
 #include "RoomViewModel.h"
-
-#define NUMBER_OF_VIEW_MODELS 6
+#include "GameViewModel.h"
+#define NUMBER_OF_VIEW_MODELS 7
 using namespace std;
 
 int main()
@@ -18,7 +18,7 @@ int main()
     if(startClient(clientsocket, serveraddress))
     {
         std::cout << "Couldn't connect to server. Try again later\n";
-        //return 1;
+        return 1;
     }
 
     ViewModel* viewmodels[NUMBER_OF_VIEW_MODELS];
@@ -28,12 +28,13 @@ int main()
     viewmodels[3] = new DeleteAccountViewModel(viewmodels[0]);
     viewmodels[4] = new ChangePasswordViewModel(viewmodels[0]);
     viewmodels[5] = new RoomViewModel(viewmodels[0]);
+    viewmodels[6] = new GameViewModel(viewmodels[5]);
     dynamic_cast<MenuViewModel*>(viewmodels[0])->linkLoginViewModel(viewmodels[1]);
     dynamic_cast<MenuViewModel*>(viewmodels[0])->linkCreateAccountViewModel(viewmodels[2]);
     dynamic_cast<MenuViewModel*>(viewmodels[0])->linkDeleteAccountViewModel(viewmodels[3]);
     dynamic_cast<MenuViewModel*>(viewmodels[0])->linkChangePasswordViewModel(viewmodels[4]);
     dynamic_cast<MenuViewModel*>(viewmodels[0])->linkRoomViewModel(viewmodels[5]);
-
+    dynamic_cast<RoomViewModel*>(viewmodels[5])->setGameViewModel(viewmodels[6]);
     sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "Maze Shooter");
     window.setFramerateLimit(30);
     while (window.isOpen())

@@ -12,48 +12,6 @@ void initMcastData(int roomid)
 
 }
 
-int startMatchService (int roomid, int accountid)
-{
-    int i;
-	// do we really need those checks?
-    if(roomid < 0 || roomid >= MAX_ROOM_COUNT || rooms[roomid] == NULL)
-    {
-        fprintf(stderr, "Room ID out of range: %d\n", roomid);
-        return OUT_OF_RANGE;
-    }
-
-    if(rooms[roomid]->isingame == 1)
-    {
-        fprintf(stderr, "Room already in game: %d\n", roomid);
-        return OUT_OF_RANGE;	// idk
-    }
-
-    for(i = 0; i < MAX_PLAYER_COUNT; ++i)
-    {
-        if(rooms[roomid]->isplayerready[i] != 1)
-        {
-            fprintf(stderr, "Not all players ready: %d\n", roomid);
-            return OUT_OF_RANGE;	// idk
-        }
-    }
-
-	if (strcmp(loggedaccounts[accountid]->login, rooms[roomid]->players[rooms[roomid]->hostindex]->login) != 0)
-	{
-		fprintf(stderr, "Match start requested by not a host\n");
-		return OUT_OF_RANGE;	// change that later
-	}
-
-    if (startMulticasting(roomid) < 0)	// this one is important
-    {
-        // handle this error
-        return -1;
-    }
-
-    rooms[roomid]->isingame = 1;
-
-    return 0;
-}
-
 int startMulticasting(int roomid)	// it basically wraps initMulticastGroup(..)
 {
 
